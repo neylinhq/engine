@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "motion.path"
+role = "core"
+owner = "camera_path_system"
+purpose = "Original NAADF camera path interpolation and playback."

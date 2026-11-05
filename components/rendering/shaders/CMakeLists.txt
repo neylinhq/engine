@@ -1,0 +1,2 @@
+add_library(rendering_shaders INTERFACE)
+ac_component(rendering_shaders rendering.shaders)

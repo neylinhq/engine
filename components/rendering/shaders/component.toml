@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "rendering.shaders"
+role = "adapter"
+owner = "engine"
+purpose = "Original NAADF traversal, distance-field construction and rendering shaders compiled with Slang"

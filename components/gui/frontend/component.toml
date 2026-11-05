@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "gui.frontend"
+role = "adapter"
+owner = "original_engine_interface"
+purpose = "Original NAADF menus, settings, world editing and camera path panels using Dear ImGui."

@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "interaction.input"
+role = "core"
+owner = "input_routing"
+purpose = "Snapshot input ownership, edge memory, pointer capture and canonical hotkey commands"

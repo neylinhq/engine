@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "global_uniform_binding": 0,
+  "set": 0,
+  "bindings": {
+    "atmosphereComp": 1,
+    "blockVoxelCount": 2,
+    "blocks": 3,
+    "boundBlockQueues": 4,
+    "boundChunkQueues": 5,
+    "boundGroupMasks": 6,
+    "boundGroupQueueDispatchCount": 7,
+    "boundGroupQueues": 8,
+    "boundQueueInfo": 9,
+    "boundRefinedInfo": 10,
+    "changedBlocksDynamic": 11,
+    "changedChunksDynamic": 12,
+    "changedGroupsDynamic": 13,
+    "changedVoxelsDynamic": 14,
+    "chunkData": 15,
+    "chunkDataTex3D": 16,
+    "chunkUpdatesDynamic": 17,
+    "chunks": 18,
+    "denoisePreprocessed": 19,
+    "denoisePreprocessedHorizontal": 20,
+    "dstData": 21,
+    "entityChunkInstances": 22,
+    "entityChunkInstancesDynamic": 23,
+    "entityHistoryDynamic": 24,
+    "entityInstancesHistory": 25,
+    "entityVoxelData": 26,
+    "finalColor": 27,
+    "firstHitAbsorption": 28,
+    "firstHitData": 29,
+    "globalIlumBucketInfo": 30,
+    "globalIlumInvalidDispatch": 31,
+    "globalIlumInvalidSamples": 32,
+    "globalIlumSampleCounts": 33,
+    "globalIlumValidDispatch": 34,
+    "globalIlumValidSamples": 35,
+    "globalIlumValidSamplesCompressed": 36,
+    "globalIlumValidSamplesRefined": 37,
+    "gpuCpuSyncBuffer": 38,
+    "groupCount": 39,
+    "hashMap": 40,
+    "modelDataBlock": 41,
+    "modelDataChunk": 42,
+    "modelDataVoxel": 43,
+    "newMap": 44,
+    "oldMap": 45,
+    "pixelsToRender": 46,
+    "resultHash": 47,
+    "sampleAccumulated": 48,
+    "segmentVoxelBuffer": 49,
+    "srcData": 50,
+    "taaDistMinMax": 51,
+    "taaSampleAccum": 52,
+    "taaSamples": 53,
+    "voxelData": 54,
+    "voxelTypeData": 55,
+    "voxels": 56,
+    "rayStepCount": 59,
+    "chunkEntities": 60,
+    "chunkAtomic": 61
+  },
+  "programs": [
+    {
+      "name": "_dataCopy_copyData",
+      "source": "dataCopy.slang",
+      "entry": "copyData",
+      "stage": "compute"
+    },
+    {
+      "name": "albedo_renderFinal_MainVS",
+      "source": "render/versions/albedo/renderFinal.slang",
+      "entry": "MainVS",
+      "stage": "vertex"
+    },
+    {
+      "name": "albedo_renderFinal_MainPS",
+      "source": "render/versions/albedo/renderFinal.slang",
+      "entry": "MainPS",
+      "stage": "fragment"
+    },
+    {
+      "name": "albedo_renderFirstHit_calcFirstHit",
+      "source": "render/versions/albedo/renderFirstHit.slang",
+      "entry": "calcFirstHit",
+      "stage": "compute"
+    },
+    {
+      "name": "albedo_renderTaaSampleReverse_reprojectOldSamples",
+      "source": "render/versions/albedo/renderTaaSampleReverse.slang",
+      "entry": "reprojectOldSamples",
+      "stage": "compute"
+    },
+    {
+      "name": "base_rayQueueCalc_calcRayQueue",
+      "source": "render/versions/base/rayQueueCalc.slang",
+      "entry": "calcRayQueue",
+      "stage": "compute"
+    },
+    {
+      "name": "base_rayQueueCalc_calcRayQueueStore",
+      "source": "render/versions/base/rayQueueCalc.slang",
+      "entry": "calcRayQueueStore",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderAtmosphere_precomputeAtmosphere",
+      "source": "render/versions/base/renderAtmosphere.slang",
+      "entry": "precomputeAtmosphere",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderDenoiseSplit_calcDenoiseHorizontal",
+      "source": "render/versions/base/renderDenoiseSplit.slang",
+      "entry": "calcDenoiseHorizontal",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderDenoiseSplit_calcDenoiseVertical",
+      "source": "render/versions/base/renderDenoiseSplit.slang",
+      "entry": "calcDenoiseVertical",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderFinal_MainVS",
+      "source": "render/versions/base/renderFinal.slang",
+      "entry": "MainVS",
+      "stage": "vertex"
+    },
+    {
+      "name": "base_renderFinal_MainPS",
+      "source": "render/versions/base/renderFinal.slang",
+      "entry": "MainPS",
+      "stage": "fragment"
+    },
+    {
+      "name": "base_renderFirstHit_calcFirstHit",
+      "source": "render/versions/base/renderFirstHit.slang",
+      "entry": "calcFirstHit",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderGlobalIllum_calcGlobalIlum",
+      "source": "render/versions/base/renderGlobalIllum.slang",
+      "entry": "calcGlobalIlum",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderSampleRefine_clearBucketsAndCalcMask",
+      "source": "render/versions/base/renderSampleRefine.slang",
+      "entry": "clearBucketsAndCalcMask",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderSampleRefine_computeValidHistory",
+      "source": "render/versions/base/renderSampleRefine.slang",
+      "entry": "computeValidHistory",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderSampleRefine_countValidDataAndRefine",
+      "source": "render/versions/base/renderSampleRefine.slang",
+      "entry": "countValidDataAndRefine",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderSampleRefine_countInvalidData",
+      "source": "render/versions/base/renderSampleRefine.slang",
+      "entry": "countInvalidData",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderSampleRefine_refineBuckets",
+      "source": "render/versions/base/renderSampleRefine.slang",
+      "entry": "refineBuckets",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderSpatialResampling_calcSpatialResampling",
+      "source": "render/versions/base/renderSpatialResampling.slang",
+      "entry": "calcSpatialResampling",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderTaaSampleReverse_reprojectOldSamples",
+      "source": "render/versions/base/renderTaaSampleReverse.slang",
+      "entry": "reprojectOldSamples",
+      "stage": "compute"
+    },
+    {
+      "name": "base_renderTaaSampleReverse_calcNewTaaSample",
+      "source": "render/versions/base/renderTaaSampleReverse.slang",
+      "entry": "calcNewTaaSample",
+      "stage": "compute"
+    },
+    {
+      "name": "pathTracer_renderAtmosphere_precomputeAtmosphere",
+      "source": "render/versions/path_tracer/renderAtmosphere.slang",
+      "entry": "precomputeAtmosphere",
+      "stage": "compute"
+    },
+    {
+      "name": "pathTracer_renderFinal_MainVS",
+      "source": "render/versions/path_tracer/renderFinal.slang",
+      "entry": "MainVS",
+      "stage": "vertex"
+    },
+    {
+      "name": "pathTracer_renderFinal_MainPS",
+      "source": "render/versions/path_tracer/renderFinal.slang",
+      "entry": "MainPS",
+      "stage": "fragment"
+    },
+    {
+      "name": "pathTracer_renderFirstHit_calcFirstHit",
+      "source": "render/versions/path_tracer/renderFirstHit.slang",
+      "entry": "calcFirstHit",
+      "stage": "compute"
+    },
+    {
+      "name": "pathTracer_renderGlobalIllum_calcGlobalIlum",
+      "source": "render/versions/path_tracer/renderGlobalIllum.slang",
+      "entry": "calcGlobalIlum",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_boundsCalc_addInitialGroupsToBoundQueue",
+      "source": "world/data/boundsCalc.slang",
+      "entry": "addInitialGroupsToBoundQueue",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_boundsCalc_prepareGroupBounds",
+      "source": "world/data/boundsCalc.slang",
+      "entry": "prepareGroupBounds",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_boundsCalc_computeGroupBounds",
+      "source": "world/data/boundsCalc.slang",
+      "entry": "computeGroupBounds",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_chunkCalc_calcBlockFromRawData",
+      "source": "world/data/chunkCalc.slang",
+      "entry": "calcBlockFromRawData",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_chunkCalc_computeVoxelBounds",
+      "source": "world/data/chunkCalc.slang",
+      "entry": "computeVoxelBounds",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_chunkCalc_computeBlockBounds",
+      "source": "world/data/chunkCalc.slang",
+      "entry": "computeBlockBounds",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_chunkCalc_chunkCopyToCpu",
+      "source": "world/data/chunkCalc.slang",
+      "entry": "chunkCopyToCpu",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_entityUpdate_updateChunks",
+      "source": "world/data/entityUpdate.slang",
+      "entry": "updateChunks",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_entityUpdate_copyEntityChunkInstances",
+      "source": "world/data/entityUpdate.slang",
+      "entry": "copyEntityChunkInstances",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_entityUpdate_copyEntityHistory",
+      "source": "world/data/entityUpdate.slang",
+      "entry": "copyEntityHistory",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_mapCopy_copyMap",
+      "source": "world/data/mapCopy.slang",
+      "entry": "copyMap",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_mapCopy_testHash",
+      "source": "world/data/mapCopy.slang",
+      "entry": "testHash",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_worldChange_applyGroupChange",
+      "source": "world/data/worldChange.slang",
+      "entry": "applyGroupChange",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_worldChange_applyChunkChange",
+      "source": "world/data/worldChange.slang",
+      "entry": "applyChunkChange",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_worldChange_applyBlockChange",
+      "source": "world/data/worldChange.slang",
+      "entry": "applyBlockChange",
+      "stage": "compute"
+    },
+    {
+      "name": "world_data_worldChange_applyVoxelChange",
+      "source": "world/data/worldChange.slang",
+      "entry": "applyVoxelChange",
+      "stage": "compute"
+    },
+    {
+      "name": "world_generator_generatorModel_fillChunkDataWithModelData16",
+      "source": "world/generator/generatorModel.slang",
+      "entry": "fillChunkDataWithModelData16",
+      "stage": "compute"
+    },
+    {
+      "name": "world_model_typeMapping_mapTypesWithState",
+      "source": "world/model/typeMapping.slang",
+      "entry": "mapTypesWithState",
+      "stage": "compute"
+    },
+    {
+      "name": "world_model_typeMapping_mapTypes16",
+      "source": "world/model/typeMapping.slang",
+      "entry": "mapTypes16",
+      "stage": "compute"
+    }
+  ]
+}

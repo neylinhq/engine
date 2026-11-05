@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "rendering.vulkan"
+role = "adapter"
+owner = "engine_maintainers"
+purpose = "Vulkan rendering of the original NAADF Slang pass graph and presentation."

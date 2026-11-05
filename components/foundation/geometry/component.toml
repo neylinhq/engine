@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "foundation.geometry"
+role = "foundation"
+owner = "engine_maintainers"
+purpose = "Double precision positions, bounds, and directed geometric predicates."

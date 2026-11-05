@@ -1,0 +1,82 @@
+{
+  "schema": "engine.benchmark.scenario.v1",
+  "name": "strata_16k",
+  "scene": {
+    "file": "scene.cvox"
+  },
+  "voxel_size": 0.03125,
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "mode": "base",
+    "fov": 70,
+    "bounces": 3,
+    "presentation": "immediate",
+    "profile": "updates",
+    "borderless": true
+  },
+  "frames": 600,
+  "warmup_frames": 4000,
+  "step_seconds": 0.016666666666666666,
+  "memory_interval": 60,
+  "bounds_budget": 32768,
+  "camera": [
+    {
+      "frame": 0,
+      "position": [
+        256,
+        104,
+        112
+      ],
+      "yaw": 0,
+      "pitch": -0.08
+    },
+    {
+      "frame": 299,
+      "position": [
+        264,
+        104,
+        112
+      ],
+      "yaw": 0.1,
+      "pitch": -0.08
+    },
+    {
+      "frame": 599,
+      "position": [
+        256,
+        104,
+        112
+      ],
+      "yaw": 0,
+      "pitch": -0.08
+    }
+  ],
+  "events": [
+    {
+      "frame": 120,
+      "type": "brush",
+      "tool": "sphere",
+      "center": [
+        8192,
+        2800,
+        4096
+      ],
+      "radius": 256,
+      "material": 0,
+      "erase": true
+    },
+    {
+      "frame": 360,
+      "type": "brush",
+      "tool": "cube",
+      "center": [
+        8192,
+        2800,
+        4096
+      ],
+      "radius": 128,
+      "material": 1
+    }
+  ]
+}

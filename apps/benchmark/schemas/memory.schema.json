@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine benchmark memory v1",
+  "type": "array",
+  "minItems": 3,
+  "items": {
+    "type": "object",
+    "properties": {
+      "phase": {
+        "enum": [
+          "loaded",
+          "warmed",
+          "measure",
+          "finished"
+        ]
+      },
+      "after_frame": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "resident_bytes": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "lifetime_peak_resident_bytes": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "private_committed_bytes": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "renderer_allocated_bytes": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "heap_budget_supported": {
+        "type": "boolean"
+      },
+      "heaps": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "properties": {
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "device_local": {
+              "type": "boolean"
+            },
+            "budget_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "estimated_usage_bytes": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "size_bytes",
+            "device_local",
+            "budget_bytes",
+            "estimated_usage_bytes"
+          ],
+          "additionalProperties": true
+        }
+      }
+    },
+    "required": [
+      "phase",
+      "after_frame",
+      "resident_bytes",
+      "lifetime_peak_resident_bytes",
+      "private_committed_bytes",
+      "renderer_allocated_bytes",
+      "heap_budget_supported",
+      "heaps"
+    ],
+    "additionalProperties": true
+  }
+}

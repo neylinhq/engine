@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "rendering.settings"
+role = "core"
+owner = "engine_maintainers"
+purpose = "Original NAADF rendering and atmosphere settings contracts."

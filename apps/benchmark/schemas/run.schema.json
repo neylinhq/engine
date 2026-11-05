@@ -1,0 +1,734 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine benchmark run v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "engine.benchmark.run.v1"
+    },
+    "status": {
+      "const": "complete"
+    },
+    "utc": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "run_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "process_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "kind": {
+      "enum": [
+        "timing",
+        "validation"
+      ]
+    },
+    "workload_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "workload": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "engine.benchmark.workload.v1"
+        },
+        "scene_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "world_palette": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        "voxel_size": {
+          "type": "number",
+          "minimum": 0
+        },
+        "step_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frames": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warmup_frames": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "memory_interval": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bounds_budget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "presentation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "type": "boolean"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "borderless": {
+          "type": "boolean"
+        },
+        "validation": {
+          "type": "boolean"
+        },
+        "profile_updates": {
+          "type": "boolean"
+        },
+        "profile_passes": {
+          "type": "boolean"
+        },
+        "offscreen": {
+          "type": "boolean"
+        },
+        "warmup_policy": {
+          "const": "static-initial-camera-no-events"
+        },
+        "entity_policy": {
+          "const": "types-prepared-before-warmup"
+        },
+        "settings": {
+          "type": "object"
+        },
+        "camera": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "scene_sha256",
+        "world_palette",
+        "voxel_size",
+        "step_seconds",
+        "frames",
+        "warmup_frames",
+        "memory_interval",
+        "bounds_budget",
+        "width",
+        "height",
+        "presentation",
+        "ui",
+        "hidden",
+        "borderless",
+        "validation",
+        "profile_updates",
+        "profile_passes",
+        "offscreen",
+        "warmup_policy",
+        "entity_policy",
+        "settings",
+        "camera",
+        "events"
+      ],
+      "additionalProperties": true
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "type": "string"
+        },
+        "processor": {
+          "type": "string"
+        },
+        "gpu_name": {
+          "type": "string"
+        },
+        "gpu_uuid": {
+          "type": "string"
+        },
+        "driver_name": {
+          "type": "string"
+        },
+        "driver_info": {
+          "type": "string"
+        },
+        "gpu_clock_policy": {
+          "type": "string"
+        },
+        "filesystem_cache_policy": {
+          "type": "string"
+        },
+        "hardware_threads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "vendor_id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "device_id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "driver_version_raw": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "api_version_raw": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "queue_family": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timestamp_bits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_presentation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_chunk_layout": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timestamp_period_ns": {
+          "type": "number",
+          "minimum": 0
+        },
+        "actual_direct_output": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "system",
+        "processor",
+        "gpu_name",
+        "gpu_uuid",
+        "driver_name",
+        "driver_info",
+        "gpu_clock_policy",
+        "filesystem_cache_policy",
+        "hardware_threads",
+        "vendor_id",
+        "device_id",
+        "driver_version_raw",
+        "api_version_raw",
+        "queue_family",
+        "timestamp_bits",
+        "actual_presentation",
+        "actual_chunk_layout",
+        "timestamp_period_ns",
+        "actual_direct_output"
+      ],
+      "additionalProperties": true
+    },
+    "build": {
+      "type": "object",
+      "properties": {
+        "executable": {
+          "type": "string"
+        },
+        "executable_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "compiler": {
+          "type": "string"
+        },
+        "configuration": {
+          "type": "string"
+        },
+        "engine_version": {
+          "type": "string"
+        },
+        "shaders": {
+          "type": "object",
+          "properties": {
+            "root": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "files": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": true
+              }
+            }
+          },
+          "required": [
+            "root",
+            "sha256",
+            "files"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "executable",
+        "executable_sha256",
+        "compiler",
+        "configuration",
+        "engine_version",
+        "shaders"
+      ],
+      "additionalProperties": true
+    },
+    "assets": {
+      "type": "object",
+      "properties": {
+        "scene": {
+          "type": "object"
+        },
+        "models": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "scene",
+        "models"
+      ],
+      "additionalProperties": true
+    },
+    "input_scenario": {
+      "type": "object"
+    },
+    "timings": {
+      "type": "object",
+      "properties": {
+        "frame_wall_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gpu_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "edit_event_wall_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scene_load_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "world_generation_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "setup_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "warmup_wall_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "measurement_wall_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "final_drain_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observation_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "throughput_fps": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "frame_wall_ms",
+        "gpu_ms",
+        "edit_event_wall_ms",
+        "scene_load_ms",
+        "world_generation_ms",
+        "setup_ms",
+        "warmup_wall_ms",
+        "measurement_wall_ms",
+        "final_drain_ms",
+        "observation_ms",
+        "throughput_fps"
+      ],
+      "additionalProperties": true
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "sampled_peak_resident_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifetime_peak_resident_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sampled_peak_private_committed_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sampled_peak_device_local_estimated_bytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame_boundary_peak_renderer_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "frame_record_storage_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "sampled_peak_resident_bytes",
+        "lifetime_peak_resident_bytes",
+        "sampled_peak_private_committed_bytes",
+        "sampled_peak_device_local_estimated_bytes",
+        "frame_boundary_peak_renderer_bytes",
+        "frame_record_storage_bytes"
+      ],
+      "additionalProperties": true
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "expected_frames": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recorded_frames": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gpu_timed_frames": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recorded_events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "validated_probes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "expected_frames",
+        "recorded_frames",
+        "gpu_timed_frames",
+        "expected_events",
+        "recorded_events",
+        "validated_probes"
+      ],
+      "additionalProperties": true
+    },
+    "validation_enabled": {
+      "type": "boolean"
+    },
+    "validation_errors": {
+      "const": 0
+    },
+    "capture_after_measurement": {
+      "type": "boolean"
+    },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "frames.csv",
+        "events.csv",
+        "passes.csv",
+        "memory.json"
+      ],
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "utc",
+    "name",
+    "label",
+    "run_index",
+    "process_id",
+    "kind",
+    "workload_sha256",
+    "workload",
+    "environment",
+    "build",
+    "assets",
+    "input_scenario",
+    "timings",
+    "memory",
+    "coverage",
+    "validation_enabled",
+    "validation_errors",
+    "capture_after_measurement",
+    "artifacts"
+  ],
+  "additionalProperties": true
+}

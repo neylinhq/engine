@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "app.benchmark"
+role = "composition"
+owner = "engine_benchmark_application"
+purpose = "Execute versioned reproducible engine workloads and report frame, editing and memory measurements."

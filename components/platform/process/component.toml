@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "platform.process"
+role = "adapter"
+owner = "engine_maintainers"
+purpose = "Native process identity, memory observations, isolated child execution and content fingerprints."

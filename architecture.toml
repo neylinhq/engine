@@ -1,0 +1,4 @@
+schema = "archcheck.workspace.v1"
+project = "engine"
+profile = "cpp23"
+configurations = "debug;release"

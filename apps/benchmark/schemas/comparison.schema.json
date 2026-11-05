@@ -1,0 +1,1006 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine benchmark comparison v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "engine.benchmark.comparison.v1"
+    },
+    "compatible": {
+      "const": true
+    },
+    "workload_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "baseline_runs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "candidate_runs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "frame_wall_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "gpu_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "frame_wall_p95_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "frame_wall_p99_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "gpu_p99_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "edit_event_wall_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "scene_load_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "world_generation_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "measurement_wall_ms": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "throughput_fps": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "sampled_peak_resident_bytes": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "lifetime_peak_resident_bytes": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "sampled_peak_private_committed_bytes": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "frame_boundary_peak_renderer_bytes": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        },
+        "sampled_peak_device_local_estimated_bytes": {
+          "type": "object",
+          "properties": {
+            "ratio": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "percent_change": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ci95": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "baseline_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "candidate_runs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interval_status": {
+              "type": "string"
+            },
+            "bootstrap_resamples": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ratio",
+            "percent_change",
+            "ci95"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "frame_wall_ms",
+        "gpu_ms",
+        "frame_wall_p95_ms",
+        "frame_wall_p99_ms",
+        "gpu_p99_ms",
+        "edit_event_wall_ms",
+        "scene_load_ms",
+        "world_generation_ms",
+        "measurement_wall_ms",
+        "throughput_fps",
+        "sampled_peak_resident_bytes",
+        "lifetime_peak_resident_bytes",
+        "sampled_peak_private_committed_bytes",
+        "frame_boundary_peak_renderer_bytes",
+        "sampled_peak_device_local_estimated_bytes"
+      ],
+      "additionalProperties": true
+    },
+    "ratio_definition": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "compatible",
+    "workload_sha256",
+    "baseline_runs",
+    "candidate_runs",
+    "metrics",
+    "ratio_definition"
+  ],
+  "additionalProperties": true
+}

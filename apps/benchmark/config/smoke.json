@@ -1,0 +1,62 @@
+{
+  "schema": "engine.benchmark.scenario.v1",
+  "name": "smoke",
+  "scene": {
+    "size": [
+      64,
+      64,
+      64
+    ]
+  },
+  "voxel_size": 1,
+  "render": {
+    "width": 256,
+    "height": 256,
+    "mode": "albedo",
+    "fov": 70,
+    "bounces": 3,
+    "presentation": "immediate",
+    "profile": "frame"
+  },
+  "frames": 32,
+  "warmup_frames": 8,
+  "step_seconds": 0.016666666666666666,
+  "memory_interval": 8,
+  "bounds_budget": 32768,
+  "camera": [
+    {
+      "frame": 0,
+      "position": [
+        32,
+        32,
+        -64
+      ],
+      "yaw": 0,
+      "pitch": 0
+    }
+  ],
+  "events": [
+    {
+      "frame": 0,
+      "type": "brush",
+      "tool": "sphere",
+      "center": [
+        32,
+        32,
+        32
+      ],
+      "radius": 8,
+      "material": 2
+    }
+  ],
+  "probes": [
+    {
+      "position": [
+        32,
+        32,
+        32
+      ],
+      "material": 2
+    }
+  ]
+}

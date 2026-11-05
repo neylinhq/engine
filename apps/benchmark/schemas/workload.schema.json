@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine benchmark workload v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "engine.benchmark.workload.v1"
+    },
+    "scene_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "world_palette": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object"
+      }
+    },
+    "voxel_size": {
+      "type": "number",
+      "minimum": 0
+    },
+    "step_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "frames": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "warmup_frames": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "memory_interval": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "bounds_budget": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "presentation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ui": {
+      "type": "boolean"
+    },
+    "hidden": {
+      "type": "boolean"
+    },
+    "borderless": {
+      "type": "boolean"
+    },
+    "validation": {
+      "type": "boolean"
+    },
+    "profile_updates": {
+      "type": "boolean"
+    },
+    "profile_passes": {
+      "type": "boolean"
+    },
+    "offscreen": {
+      "type": "boolean"
+    },
+    "warmup_policy": {
+      "const": "static-initial-camera-no-events"
+    },
+    "entity_policy": {
+      "const": "types-prepared-before-warmup"
+    },
+    "settings": {
+      "type": "object"
+    },
+    "camera": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "scene_sha256",
+    "world_palette",
+    "voxel_size",
+    "step_seconds",
+    "frames",
+    "warmup_frames",
+    "memory_interval",
+    "bounds_budget",
+    "width",
+    "height",
+    "presentation",
+    "ui",
+    "hidden",
+    "borderless",
+    "validation",
+    "profile_updates",
+    "profile_passes",
+    "offscreen",
+    "warmup_policy",
+    "entity_policy",
+    "settings",
+    "camera",
+    "events"
+  ],
+  "additionalProperties": true
+}

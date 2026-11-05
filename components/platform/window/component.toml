@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "platform.window"
+role = "adapter"
+owner = "desktop_window"
+purpose = "GLFW desktop window, input snapshots, monitor topology and nonexclusive borderless transitions"

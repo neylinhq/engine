@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.cvox binary
+*.spv binary
+*.png binary

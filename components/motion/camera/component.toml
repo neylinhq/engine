@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "motion.camera"
+role = "core"
+owner = "camera_system"
+purpose = "Metric observer pose, prescribed camera basis, perspective and free flight."

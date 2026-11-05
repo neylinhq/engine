@@ -1,0 +1,1020 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine benchmark suite v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "engine.benchmark.suite.v1"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "complete",
+        "failed"
+      ]
+    },
+    "expected_runs": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "directory",
+          "sha256"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "message": {
+      "type": "string"
+    },
+    "run_level_statistics": {
+      "type": "object",
+      "properties": {
+        "frame_wall_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gpu_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame_wall_p95_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame_wall_p99_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gpu_p99_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "edit_event_wall_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scene_load_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "world_generation_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "measurement_wall_ms": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "throughput_fps": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sampled_peak_resident_bytes": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifetime_peak_resident_bytes": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sampled_peak_private_committed_bytes": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frame_boundary_peak_renderer_bytes": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sampled_peak_device_local_estimated_bytes": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mean": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "stddev": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "min": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p50": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p95": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "p99": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "count",
+                "mean",
+                "stddev",
+                "min",
+                "p50",
+                "p95",
+                "p99",
+                "max"
+              ],
+              "additionalProperties": true
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "frame_wall_ms",
+        "gpu_ms",
+        "frame_wall_p95_ms",
+        "frame_wall_p99_ms",
+        "gpu_p99_ms",
+        "edit_event_wall_ms",
+        "scene_load_ms",
+        "world_generation_ms",
+        "measurement_wall_ms",
+        "throughput_fps",
+        "sampled_peak_resident_bytes",
+        "lifetime_peak_resident_bytes",
+        "sampled_peak_private_committed_bytes",
+        "frame_boundary_peak_renderer_bytes",
+        "sampled_peak_device_local_estimated_bytes"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "expected_runs",
+    "runs"
+  ],
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "complete"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "run_level_statistics"
+        ]
+      }
+    }
+  ]
+}

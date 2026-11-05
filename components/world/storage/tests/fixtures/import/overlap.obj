@@ -1,0 +1,11 @@
+mtllib overlap.mtl
+v 0 0 0
+v 4 0 0
+v 0 4 0
+v 1 1 0
+v 1.5 1 0
+v 1 1.5 0
+usemtl red
+f 1 2 3
+usemtl blue
+f 4 5 6

@@ -1,0 +1,25 @@
+{
+  "reference_decoder": "Pillow/libjpeg (test fixture only, no runtime dependency)",
+  "width": 23,
+  "height": 19,
+  "fixtures": [
+    "rgb_0_0_0",
+    "rgb_0_0_1",
+    "rgb_0_1_0",
+    "rgb_0_1_1",
+    "rgb_1_0_0",
+    "rgb_1_0_1",
+    "rgb_1_1_0",
+    "rgb_1_1_1",
+    "rgb_2_0_0",
+    "rgb_2_0_1",
+    "rgb_2_1_0",
+    "rgb_2_1_1",
+    "l_0",
+    "l_1",
+    "cmyk_0",
+    "cmyk_1",
+    "restart_1",
+    "restart_3"
+  ]
+}

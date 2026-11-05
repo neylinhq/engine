@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine benchmark failure v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "engine.benchmark.failure.v1"
+    },
+    "status": {
+      "const": "failed"
+    },
+    "message": {
+      "type": "string"
+    },
+    "run_index": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "message",
+    "run_index"
+  ],
+  "additionalProperties": true
+}

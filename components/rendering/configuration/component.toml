@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "rendering.configuration"
+role = "adapter"
+owner = "engine_maintainers"
+purpose = "Encode and validate renderer settings shared by interactive and automated applications."

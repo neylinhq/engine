@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "world.storage"
+role = "adapter"
+owner = "engine_maintainers"
+purpose = "Native CVox, MagicaVoxel, VL32, mesh and camera path file adapters."

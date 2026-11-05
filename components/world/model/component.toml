@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "world.model"
+role = "core"
+owner = "engine_maintainers"
+purpose = "Sparse hierarchical voxel storage, material packing, directional bounds and dynamic entities."

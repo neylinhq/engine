@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "world.editing"
+role = "core"
+owner = "engine_maintainers"
+purpose = "Voxel shape brushes, connected material fill and model stamping."

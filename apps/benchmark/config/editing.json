@@ -1,0 +1,74 @@
+{
+  "schema": "engine.benchmark.scenario.v1",
+  "name": "editing",
+  "scene": {
+    "file": "scene.cvox"
+  },
+  "voxel_size": 1,
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "mode": "base",
+    "fov": 70,
+    "bounces": 3,
+    "presentation": "immediate",
+    "profile": "updates",
+    "borderless": true
+  },
+  "frames": 600,
+  "warmup_frames": 4000,
+  "step_seconds": 0.016666666666666666,
+  "memory_interval": 60,
+  "bounds_budget": 32768,
+  "camera": [
+    {
+      "frame": 0,
+      "position": [
+        500,
+        200,
+        40
+      ],
+      "yaw": 0,
+      "pitch": 0
+    }
+  ],
+  "events": [
+    {
+      "frame": 120,
+      "type": "brush",
+      "tool": "sphere",
+      "center": [
+        512,
+        128,
+        512
+      ],
+      "radius": 64,
+      "material": 1
+    },
+    {
+      "frame": 240,
+      "type": "brush",
+      "tool": "sphere",
+      "center": [
+        512,
+        128,
+        512
+      ],
+      "radius": 64,
+      "material": 0,
+      "erase": true
+    },
+    {
+      "frame": 360,
+      "type": "brush",
+      "tool": "cube",
+      "center": [
+        512,
+        128,
+        512
+      ],
+      "radius": 32,
+      "material": 1
+    }
+  ]
+}

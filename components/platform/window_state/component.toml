@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "platform.window_state"
+role = "core"
+owner = "window_state_machine"
+purpose = "Monitor selection and transactional borderless placement without operating-system calls"

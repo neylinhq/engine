@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "foundation.parallel"
+role = "foundation"
+owner = "engine_maintainers"
+purpose = "Bounded parallel loops with joined lifetime and propagated worker failures."
