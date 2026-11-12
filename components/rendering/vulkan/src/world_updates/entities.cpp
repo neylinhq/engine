@@ -6,7 +6,7 @@ namespace engine::rendering::vulkan {
 namespace {
 
 void update_entity_chunks(WorldCompute& compute, const world::model::EntityGpuData& data,
-                          world::model::IVec3 chunks) {
+                          world::model::Vec3i chunks) {
     if (data.changed_chunks.empty()) {
         return;
     }

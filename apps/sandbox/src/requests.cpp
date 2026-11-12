@@ -7,7 +7,7 @@ namespace {
 void replace_world(Application& app, const gui::frontend::Request& request,
                    world::model::Model model) {
     const auto fixed = request.operation == gui::frontend::Operation::open_fixed;
-    generate_world(app, std::move(model), fixed ? request.requested_size : world::model::IVec3{},
+    generate_world(app, std::move(model), fixed ? request.requested_size : world::model::Vec3i{},
                    request.segment_groups);
     app.ui->reset_world();
     reframe_camera(app);
@@ -56,10 +56,10 @@ void handle_request(Application& app, const gui::frontend::Request& request) {
     }
 }
 } // namespace
-void generate_world(Application& app, world::model::Model source, world::model::IVec3 requested,
+void generate_world(Application& app, world::model::Model source, world::model::Vec3i requested,
                     int segment_groups) {
     auto mapped = app.world.prepare_generation(std::move(source));
-    if (requested == world::model::IVec3{}) {
+    if (requested == world::model::Vec3i{}) {
         requested = mapped.size;
     }
     const auto result = app.renderer->generate_world(app.world, mapped, requested, segment_groups);

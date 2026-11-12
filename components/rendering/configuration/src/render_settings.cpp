@@ -43,16 +43,22 @@ void read_render(const json::object& object, settings::Render& render) {
         throw std::runtime_error("Unknown render version");
     }
     render.version = static_cast<settings::RenderVersion>(version);
-    const auto& albedo = object_setting(object, "renderAlbedo");
-    read_setting(albedo, "isTAAJitter", render.albedo.taa_jitter);
-    read_setting(albedo, "checkSun", render.albedo.check_sun);
-    read_setting(albedo, "taaSampleMaxAge", render.albedo.taa_sample_max_age);
-    read_base(object_setting(object, "renderBase"), render.base);
-    const auto& path = object_setting(object, "renderPathTracer");
-    read_setting(path, "isTAAJitter", render.path_tracer.taa_jitter);
-    read_setting(path, "isAtmosphereInteraction", render.path_tracer.atmosphere_interaction);
-    read_setting(path, "maxSamples", render.path_tracer.max_samples);
-    read_setting(path, "bounceCount", render.path_tracer.bounce_count);
+    if (const auto* group = object.if_contains("renderAlbedo")) {
+        const auto& albedo = group->as_object();
+        read_setting(albedo, "isTAAJitter", render.albedo.taa_jitter);
+        read_setting(albedo, "checkSun", render.albedo.check_sun);
+        read_setting(albedo, "taaSampleMaxAge", render.albedo.taa_sample_max_age);
+    }
+    if (const auto* group = object.if_contains("renderBase")) {
+        read_base(group->as_object(), render.base);
+    }
+    if (const auto* group = object.if_contains("renderPathTracer")) {
+        const auto& path = group->as_object();
+        read_setting(path, "isTAAJitter", render.path_tracer.taa_jitter);
+        read_setting(path, "isAtmosphereInteraction", render.path_tracer.atmosphere_interaction);
+        read_setting(path, "maxSamples", render.path_tracer.max_samples);
+        read_setting(path, "bounceCount", render.path_tracer.bounce_count);
+    }
 }
 json::object write_render(const settings::Render& render) {
     json::object albedo{{"isTAAJitter", render.albedo.taa_jitter},

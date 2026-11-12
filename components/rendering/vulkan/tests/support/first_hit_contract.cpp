@@ -140,15 +140,15 @@ void verify_sky_result(WorldCompute& compute) {
     const auto hits = read_words(compute, "firstHitData", kPixelCount * 4);
     const auto colors = read_words(compute, "finalColor", kPixelCount * 2);
     const auto samples = read_words(compute, "sampleAccumulated", kPixelCount * 4);
-    constexpr std::array expected{0.75F, 1.5F, 2.25F, 2.0F};
+    constexpr std::array kExpected{0.75F, 1.5F, 2.25F, 2.0F};
     for (std::size_t pixel = 0; pixel < kPixelCount; ++pixel) {
         if ((hits[pixel * 4] >> 15) != 0x1FFFFU || (hits[pixel * 4 + 2] & 0x7FFFU) != 0 ||
             colors[pixel * 2] != 0x40003C00U || colors[pixel * 2 + 1] != 0x4200U) {
             throw std::runtime_error("PathTracer sky fixture did not produce an empty first hit");
         }
-        for (std::size_t channel = 0; channel < expected.size(); ++channel) {
+        for (std::size_t channel = 0; channel < kExpected.size(); ++channel) {
             const auto value = std::bit_cast<float>(samples[pixel * 4 + channel]);
-            if (!std::isfinite(value) || std::abs(value - expected[channel]) > 1e-6F) {
+            if (!std::isfinite(value) || std::abs(value - kExpected[channel]) > 1e-6F) {
                 throw std::runtime_error("PathTracer GI corrupted the sky running average");
             }
         }

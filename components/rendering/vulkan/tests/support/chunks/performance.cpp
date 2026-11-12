@@ -154,12 +154,12 @@ double ChunkLayoutPerformance::dispatch(bool measured) {
 std::uint64_t ChunkLayoutPerformance::verify_results() {
     const auto bytes =
         compute_.read("test_results", 0, std::uint64_t(options_.rays) * sizeof(RayRecord));
-    constexpr RayRecord expected{0, 0, std::bit_cast<std::uint32_t>(100000000.0F), 0x3FFFU, 0, 0,
-                                 0, 0};
+    constexpr RayRecord kExpected{0, 0, std::bit_cast<std::uint32_t>(100000000.0F), 0x3FFFU, 0, 0,
+                                  0, 0};
     for (std::size_t offset = 0; offset < bytes.size(); offset += sizeof(RayRecord)) {
         RayRecord actual{};
         std::memcpy(actual.data(), bytes.data() + offset, sizeof(actual));
-        if (actual != expected) {
+        if (actual != kExpected) {
             throw std::runtime_error("Synthetic empty-volume ray did not return the expected miss");
         }
     }

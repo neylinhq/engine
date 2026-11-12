@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_SRC_WORLD_GENERATION_HPP
+#define ENGINE_RENDERING_VULKAN_SRC_WORLD_GENERATION_HPP
 
 #include <array>
 #include <cstdint>
@@ -8,12 +9,12 @@
 namespace engine::rendering::vulkan {
 
 class WorldCompute;
-[[nodiscard]] bool uniform_source(const world::model::Model& source, world::model::IVec3 requested,
+[[nodiscard]] bool uniform_source(const world::model::Model& source, world::model::Vec3i requested,
                                   int segment_groups);
 
 struct GenerationResult {
     world::model::Model model;
-    world::model::IVec3 actual_size;
+    world::model::Vec3i actual_size;
     std::vector<std::array<std::uint32_t, 3>> hash;
     double compression = 1;
     std::uint32_t logical_voxels = 0;
@@ -26,6 +27,8 @@ struct GenerationResult {
 
 [[nodiscard]] GenerationResult generate_world(WorldCompute& compute,
                                               const world::model::Model& source,
-                                              world::model::IVec3 requested, int segment_groups);
+                                              world::model::Vec3i requested, int segment_groups);
 
 } // namespace engine::rendering::vulkan
+
+#endif

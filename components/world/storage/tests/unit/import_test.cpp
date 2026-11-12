@@ -35,7 +35,7 @@ std::size_t count_voxels(const model::Model& value) {
 void cvox_versions(const std::filesystem::path& root) {
     for (const auto* name : {"v1.cvox", "v2.cvox", "v3.cvox", "zip64.cvox"}) {
         const auto value = storage::load_cvox(root / name);
-        require(value.size == model::IVec3{16, 16, 16}, "CVox fixture dimensions incorrect");
+        require(value.size == model::Vec3i{16, 16, 16}, "CVox fixture dimensions incorrect");
         require(value.blocks[0] == 0x80000020U, "Legacy CVox pointer units not migrated");
         require(count_voxels(value) == 1 && model::voxel_at(value, {0, 0, 0}) == 1,
                 "Independent CVox fixture voxel incorrect");
@@ -44,13 +44,13 @@ void cvox_versions(const std::filesystem::path& root) {
 
 void voxel_formats(const std::filesystem::path& root) {
     const auto vox = storage::import_vox(root / "scene.vox");
-    require(vox.size == model::IVec3{6, 4, 3}, "VOX transformed scene bounds incorrect");
+    require(vox.size == model::Vec3i{6, 4, 3}, "VOX transformed scene bounds incorrect");
     require(count_voxels(vox) == 2 && model::voxel_at(vox, {1, 3, 2}) == 1 &&
                 model::voxel_at(vox, {5, 3, 2}) == 1,
             "VOX graph translation or Y/Z mapping incorrect");
     require(vox.materials[1].color_base == model::Vec3{1, 0, 0}, "VOX palette incorrect");
     const auto vl32 = storage::import_vl32(root / "pair.vl32");
-    require(vl32.size == model::IVec3{2, 1, 1}, "VL32 big-endian signed bounds incorrect");
+    require(vl32.size == model::Vec3i{2, 1, 1}, "VL32 big-endian signed bounds incorrect");
     const auto red = model::voxel_at(vl32, {0, 0, 0});
     const auto blue = model::voxel_at(vl32, {1, 0, 0});
     require(vl32.materials[red].color_base == model::Vec3{1, 0, 0} &&
@@ -60,7 +60,7 @@ void voxel_formats(const std::filesystem::path& root) {
 
 void vox_materials(const std::filesystem::path& root) {
     const auto scene = storage::import_vox(root / "material_scene.vox");
-    require(scene.size == model::IVec3{3, 3, 3} && count_voxels(scene) == 4,
+    require(scene.size == model::Vec3i{3, 3, 3} && count_voxels(scene) == 4,
             "VOX hidden layer, frame0 selection or index0-empty semantics differ");
     require(model::voxel_at(scene, {2, 0, 0}) == 1 && model::voxel_at(scene, {2, 1, 2}) == 2 &&
                 model::voxel_at(scene, {0, 2, 0}) == 216 &&
@@ -76,7 +76,7 @@ void vox_materials(const std::filesystem::path& root) {
     require(scene.materials[216].color_base == model::Vec3{red, 0, 0},
             "VOX default palette tail or float32 transfer function incorrect");
     const auto parts = storage::import_vox(root / "parts_0.vox");
-    require(parts.size == model::IVec3{32, 16, 16} && count_voxels(parts) == 2 &&
+    require(parts.size == model::Vec3i{32, 16, 16} && count_voxels(parts) == 2 &&
                 model::voxel_at(parts, {0, 0, 0}) == 1 && model::voxel_at(parts, {31, 15, 15}) == 2,
             "VOX sibling assembly must preserve first nonempty chunk ownership");
     require(parts.materials[1].color_base == model::Vec3{0, 0, 1} &&
@@ -129,7 +129,7 @@ void meshes(const std::filesystem::path& root) {
     options.max_size = 8;
     for (const auto* name : {"plane.obj", "plane.stl", "attributes.stl"}) {
         const auto mesh = storage::import_mesh(root / name, options);
-        require(mesh.size == model::IVec3{8, 8, 1}, "Mesh resolution/permutation incorrect");
+        require(mesh.size == model::Vec3i{8, 8, 1}, "Mesh resolution/permutation incorrect");
         require(count_voxels(mesh) == 64, "Conservative mesh surface voxelization has holes");
         if (std::filesystem::path{name}.extension() == ".stl") {
             require(mesh.materials[1].color_base == model::Vec3{1, 1, 1},
@@ -139,7 +139,7 @@ void meshes(const std::filesystem::path& root) {
     const auto textured = storage::import_mesh(root / "plane.obj", options);
     require(textured.materials.size() == 5, "Textured OBJ did not sample all four fixture colors");
     const auto rectangle = storage::import_mesh(root / "rectangle.obj", options);
-    require(rectangle.size == model::IVec3{8, 4, 1} && count_voxels(rectangle) == 32,
+    require(rectangle.size == model::Vec3i{8, 4, 1} && count_voxels(rectangle) == 32,
             "Mesh anti-bleed transform or occupied-bounds crop differs from original converter");
     require(rectangle.materials[model::voxel_at(rectangle, {0, 0, 0})].color_base ==
                 model::Vec3{1, 1, 1},
@@ -175,7 +175,7 @@ void original_mesh_oracle(const std::filesystem::path& root, const char* name, i
             "Native mesh bounds differ from original converter oracle");
     const auto count = static_cast<std::size_t>(actual.size.x) * actual.size.y * actual.size.z;
     for (std::size_t index = 0; index < count; ++index) {
-        const model::IVec3 position{static_cast<int>(index % actual.size.x),
+        const model::Vec3i position{static_cast<int>(index % actual.size.x),
                                     static_cast<int>((index / actual.size.x) % actual.size.y),
                                     static_cast<int>(index / actual.size.x / actual.size.y)};
         const auto left = model::voxel_at(actual, position);
@@ -202,7 +202,7 @@ void exact_image(const std::filesystem::path& root, const char* file, const char
 }
 
 void bitmap_and_gif(const std::filesystem::path& root) {
-    constexpr std::array<std::pair<const char*, const char*>, 12> fixtures{
+    constexpr std::array<std::pair<const char*, const char*>, 12> kFixtures{
         {{"rgb.bmp", "rgb_bmp.rgb"},
          {"rgba.bmp", "rgba_bmp.rgb"},
          {"indexed.bmp", "indexed_bmp.rgb"},
@@ -215,7 +215,7 @@ void bitmap_and_gif(const std::filesystem::path& root) {
          {"indexed.gif", "indexed.rgb"},
          {"indexed_interlaced.gif", "indexed_interlaced.rgb"},
          {"transparent.gif", "transparent.rgb"}}};
-    for (const auto& [file, oracle] : fixtures) {
+    for (const auto& [file, oracle] : kFixtures) {
         exact_image(root, file, oracle);
     }
 }

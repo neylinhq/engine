@@ -8,9 +8,9 @@
 Пример из корня проекта после сборки:
 
 ```powershell
-.\out\release\bin\benchmark.exe validate --scenario .\apps\benchmark\config\smoke.json
-.\out\release\bin\benchmark.exe run --scenario .\apps\benchmark\config\smoke.json --output C:\Measurements\smoke --repetitions 5
-.\out\release\bin\benchmark.exe compare --baseline C:\Measurements\before --candidate C:\Measurements\after
+.\out\windows-release\bin\benchmark.exe validate --scenario .\apps\benchmark\resources\scenarios\smoke.json
+.\out\windows-release\bin\benchmark.exe run --scenario .\apps\benchmark\resources\scenarios\smoke.json --output C:\Measurements\smoke --repetitions 5
+.\out\windows-release\bin\benchmark.exe compare --baseline C:\Measurements\before --candidate C:\Measurements\after
 ```
 
 `validate` проверяет сценарий и наличие файлов сцены и моделей без создания GPU-контекста.
@@ -25,4 +25,4 @@
 - [Контракт сценариев и отчётов](docs/contract.md)
 - [Методика измерений](docs/methodology.md)
 - [JSON-схемы](schemas)
-- [Примеры сценариев](config)
+- [Примеры сценариев](resources/scenarios)

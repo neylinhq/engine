@@ -1,5 +1,5 @@
-#ifndef ENGINE_APP_BENCHMARK_COMMAND_HPP
-#define ENGINE_APP_BENCHMARK_COMMAND_HPP
+#ifndef ENGINE_APP_BENCHMARK_SRC_COMMAND_HPP
+#define ENGINE_APP_BENCHMARK_SRC_COMMAND_HPP
 #include <filesystem>
 #include <string>
 #include <vector>

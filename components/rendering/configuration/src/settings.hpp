@@ -1,5 +1,5 @@
-#ifndef ENGINE_RENDERING_CONFIGURATION_SETTINGS_HPP
-#define ENGINE_RENDERING_CONFIGURATION_SETTINGS_HPP
+#ifndef ENGINE_RENDERING_CONFIGURATION_SRC_SETTINGS_HPP
+#define ENGINE_RENDERING_CONFIGURATION_SRC_SETTINGS_HPP
 #include <boost/json.hpp>
 #include <cmath>
 #include <engine/rendering/settings/settings.hpp>
@@ -34,7 +34,6 @@ void read_setting(const json::object& object, std::string_view key, Value& targe
         target = static_cast<Value>(numeric);
     }
 }
-[[nodiscard]] const json::object& object_setting(const json::object& object, std::string_view key);
 void read_render(const json::object& object, settings::Render& render);
 void read_atmosphere(const json::object& object, settings::Atmosphere& sky);
 [[nodiscard]] json::object write_render(const settings::Render& render);

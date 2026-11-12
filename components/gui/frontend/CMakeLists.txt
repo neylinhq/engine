@@ -22,6 +22,8 @@ if(ENGINE_DESKTOP)
     target_link_libraries(gui_frontend_world_state_test PRIVATE
         engine::gui.frontend engine::world.editing engine::world.storage engine_imgui)
 else()
-    ac_inactive_component(gui.frontend "ENGINE_DESKTOP=OFF" ${frontend_sources}
+    add_library(gui_frontend INTERFACE)
+    ac_component(gui_frontend gui.frontend)
+    engine_inactive_sources(gui_frontend "UI adapter requires the desktop build" ${frontend_sources}
         tests/unit/input_test.cpp tests/unit/world_state_test.cpp)
 endif()

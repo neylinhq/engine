@@ -6,8 +6,8 @@
 namespace engine::rendering::vulkan {
 namespace {
 
-using Position = world::model::IVec3;
-constexpr std::uint32_t unvisited = 0x3FFFFFFFU;
+using Position = world::model::Vec3i;
+constexpr std::uint32_t kUnvisited = 0x3FFFFFFFU;
 
 std::uint64_t volume(Position size) {
     return static_cast<std::uint64_t>(size.x) * size.y * size.z;
@@ -42,9 +42,9 @@ std::uint32_t matches(std::uint32_t neighbor, std::uint32_t current) {
 }
 
 void grow(std::uint32_t neighbor, unsigned side, std::uint32_t& current) {
-    constexpr std::array<unsigned, 6> masks{0x3DU, 0x3EU, 0x37U, 0x3BU, 0x1FU, 0x2FU};
+    constexpr std::array<unsigned, 6> kMasks{0x3DU, 0x3EU, 0x37U, 0x3BU, 0x1FU, 0x2FU};
     if ((neighbor & 0x80000000U) == 0 &&
-        (matches(neighbor, current) & masks[side]) == masks[side]) {
+        (matches(neighbor, current) & kMasks[side]) == kMasks[side]) {
         current += 4U << (side * 5);
     }
 }
@@ -66,7 +66,7 @@ Position aadf_group_dimensions(Position chunks) {
 void GroupChanges::initialize(Position chunks) {
     groups_ = aadf_group_dimensions(chunks);
     chunks_ = chunks;
-    distances_.assign(static_cast<std::size_t>(volume(groups_)), unvisited);
+    distances_.assign(static_cast<std::size_t>(volume(groups_)), kUnvisited);
     changed_.clear();
     pending_.clear();
     records_.clear();
@@ -86,7 +86,7 @@ void GroupChanges::mark(std::uint32_t chunk) {
     }
     const auto point = position(chunk, chunks_);
     const auto group = linear({point.x / 4, point.y / 4, point.z / 4}, groups_);
-    if (distances_[group] != unvisited) {
+    if (distances_[group] != kUnvisited) {
         return;
     }
     distances_[group] = 0x80000000U;
@@ -104,7 +104,7 @@ void GroupChanges::expand(std::uint32_t group) {
             continue;
         }
         const auto neighbor = linear(next, groups_);
-        if (distances_[neighbor] != unvisited) {
+        if (distances_[neighbor] != kUnvisited) {
             continue;
         }
         distances_[neighbor] = distance + 4;
@@ -155,7 +155,7 @@ void GroupChanges::emit(std::size_t original_count) {
         const auto group = changed_[index];
         const auto distance = index < original_count ? 0xC0000000U : distances_[group];
         records_.push_back({packed(position(group, groups_)), distance});
-        distances_[group] = unvisited;
+        distances_[group] = kUnvisited;
     }
 }
 

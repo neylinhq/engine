@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_MODEL_SRC_HELPERS_HPP
+#define ENGINE_WORLD_MODEL_SRC_HELPERS_HPP
 
 #include <engine/world/model/types.hpp>
 
@@ -46,13 +47,13 @@ struct BoundWork {
 struct ChunkBounds {
     std::span<std::uint32_t> chunks;
     std::span<const std::uint32_t> entities;
-    IVec3 size;
+    Vec3i size;
 };
 
-[[nodiscard]] std::size_t volume(IVec3 size);
-[[nodiscard]] std::size_t flatten(IVec3 position, IVec3 size);
-[[nodiscard]] IVec3 unflatten(std::size_t index, IVec3 size);
-[[nodiscard]] bool inside(IVec3 position, IVec3 size);
+[[nodiscard]] std::size_t volume(Vec3i size);
+[[nodiscard]] std::size_t flatten(Vec3i position, Vec3i size);
+[[nodiscard]] Vec3i unflatten(std::size_t index, Vec3i size);
+[[nodiscard]] bool inside(Vec3i position, Vec3i size);
 [[nodiscard]] std::uint32_t checked_pointer(std::size_t value);
 [[nodiscard]] std::array<std::uint32_t, 4> pack_material(const Material& material);
 [[nodiscard]] DenseChunk decode_chunk(const Model& model, std::size_t index);
@@ -66,13 +67,15 @@ void initialize_pool(const Model& model, BlockPool& pool);
 [[nodiscard]] double block_compression(const BlockPool& pool);
 void unique_indices(std::vector<std::uint32_t>& indices);
 void bounds4(std::span<std::uint32_t, 64> cells, unsigned state_shift);
-void chunk_bounds(std::span<std::uint32_t> chunks, IVec3 size);
+void chunk_bounds(std::span<std::uint32_t> chunks, Vec3i size);
 void invalidate_bounds(ChunkBounds bounds, std::span<const std::size_t> changed, BoundWork& work);
 [[nodiscard]] bool advance_bounds(ChunkBounds bounds, BoundWork& work, std::size_t budget);
 void model_bounds(Model& model);
-[[nodiscard]] Model generate_model(Model source, IVec3 actual_size, IVec3 padded_size);
+[[nodiscard]] Model generate_model(Model source, Vec3i actual_size, Vec3i padded_size);
 [[nodiscard]] std::vector<std::uint32_t> entity_voxels(const Model& model);
 [[nodiscard]] Vec3 rotate(Vec3 point, const std::array<float, 4>& quaternion);
 [[nodiscard]] std::array<std::uint32_t, 2> pack_quaternion(std::array<float, 4> quaternion);
 
 } // namespace engine::world::model
+
+#endif

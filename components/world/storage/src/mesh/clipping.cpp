@@ -5,7 +5,7 @@
 namespace engine::world::storage {
 namespace {
 
-constexpr double epsilon = 1.0 / 65536;
+constexpr double kEpsilon = 1.0 / 65536;
 
 struct Plane {
     unsigned axis = 0;
@@ -25,7 +25,7 @@ Classification classify(const Fragment& fragment, Plane plane) {
     for (unsigned index = 0; index < 3; ++index) {
         const auto value = fragment.points[index][plane.axis];
         result.lower[index] = value < plane.position;
-        result.planar[index] = std::abs(value - plane.position) < epsilon;
+        result.planar[index] = std::abs(value - plane.position) < kEpsilon;
         result.lower_count += result.lower[index];
         result.planar_count += result.planar[index];
     }
@@ -57,7 +57,7 @@ Vertex vertex(const Fragment& fragment, unsigned index) {
 Vertex intersection(Vertex a, Vertex b, Plane plane) {
     const auto distance = b.point[plane.axis] - a.point[plane.axis];
     const auto ratio =
-        std::abs(distance) < epsilon ? 0 : (plane.position - a.point[plane.axis]) / distance;
+        std::abs(distance) < kEpsilon ? 0 : (plane.position - a.point[plane.axis]) / distance;
     return {a.point * (1 - ratio) + b.point * ratio, mix(a.coordinate, b.coordinate, ratio)};
 }
 
@@ -131,7 +131,7 @@ WeightedCoordinate collect(std::span<const Fragment> fragments, float original_a
 
 } // namespace
 
-WeightedCoordinate clip_voxel(const Fragment& fragment, model::IVec3 voxel, float original_area,
+WeightedCoordinate clip_voxel(const Fragment& fragment, model::Vec3i voxel, float original_area,
                               ClipWorkspace& workspace) {
     workspace.current.clear();
     workspace.current.push_back(fragment);

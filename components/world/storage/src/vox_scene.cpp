@@ -39,7 +39,7 @@ VoxTransform frame_transform(const Dictionary& values) {
     return result;
 }
 
-model::IVec3 transform(model::IVec3 point, const VoxTransform& matrix) {
+model::Vec3i transform(model::Vec3i point, const VoxTransform& matrix) {
     const std::array<int, 3> coordinates{point.x, point.y, point.z};
     std::array<std::int64_t, 3> result{matrix.translation.x, matrix.translation.y,
                                        matrix.translation.z};
@@ -70,11 +70,11 @@ VoxTransform compose(const VoxTransform& parent, const VoxTransform& local) {
 
 struct Flattened {
     std::vector<model::Sample> samples;
-    model::IVec3 lower{1000000000, 1000000000, 1000000000};
-    model::IVec3 upper{-1000000000, -1000000000, -1000000000};
+    model::Vec3i lower{1000000000, 1000000000, 1000000000};
+    model::Vec3i upper{-1000000000, -1000000000, -1000000000};
 };
 
-void include(Flattened& output, model::IVec3 position) {
+void include(Flattened& output, model::Vec3i position) {
     output.lower = {std::min(output.lower.x, position.x), std::min(output.lower.y, position.y),
                     std::min(output.lower.z, position.z)};
     output.upper = {std::max(output.upper.x, position.x), std::max(output.upper.y, position.y),
@@ -82,9 +82,9 @@ void include(Flattened& output, model::IVec3 position) {
 }
 
 void append_shape(Flattened& output, const VoxShape& shape, VoxTransform matrix, bool centered) {
-    const model::IVec3 origin =
-        centered ? model::IVec3{-shape.size.x / 2, -shape.size.y / 2, -shape.size.z / 2}
-                 : model::IVec3{};
+    const model::Vec3i origin =
+        centered ? model::Vec3i{-shape.size.x / 2, -shape.size.y / 2, -shape.size.z / 2}
+                 : model::Vec3i{};
     include(output, transform(origin, matrix));
     include(output, transform({origin.x + shape.size.x - 1, origin.y + shape.size.y - 1,
                                origin.z + shape.size.z - 1},
@@ -179,12 +179,12 @@ using ChunkOwners = std::map<std::uint64_t, std::size_t>;
 
 void append_file(Flattened& output, const Flattened& source, std::size_t file_index,
                  ChunkOwners& owners) {
-    const model::IVec3 offset{(source.lower.x - output.lower.x) / 16 * 16,
+    const model::Vec3i offset{(source.lower.x - output.lower.x) / 16 * 16,
                               (source.lower.z - output.lower.z) / 16 * 16,
                               (source.lower.y - output.lower.y) / 16 * 16};
     for (const auto& sample : source.samples) {
         const auto local = sample.position;
-        const model::IVec3 position{offset.x + local.x - source.lower.x,
+        const model::Vec3i position{offset.x + local.x - source.lower.x,
                                     offset.y + local.z - source.lower.z,
                                     offset.z + local.y - source.lower.y};
         const auto key = static_cast<std::uint64_t>(position.x / 16) |
@@ -236,7 +236,7 @@ model::Model import_vox(const std::filesystem::path& path) {
         include(flattened, content.upper);
         files.push_back(std::move(content));
     }
-    const model::IVec3 size{flattened.upper.x - flattened.lower.x + 1,
+    const model::Vec3i size{flattened.upper.x - flattened.lower.x + 1,
                             flattened.upper.z - flattened.lower.z + 1,
                             flattened.upper.y - flattened.lower.y + 1};
     if (size.x < 1 || size.y < 1 || size.z < 1 || size.x > 16384 || size.y > 16384 ||

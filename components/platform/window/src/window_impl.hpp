@@ -1,5 +1,5 @@
-#ifndef ENGINE_PLATFORM_WINDOW_WINDOW_IMPL_HPP
-#define ENGINE_PLATFORM_WINDOW_WINDOW_IMPL_HPP
+#ifndef ENGINE_PLATFORM_WINDOW_SRC_WINDOW_IMPL_HPP
+#define ENGINE_PLATFORM_WINDOW_SRC_WINDOW_IMPL_HPP
 #include <GLFW/glfw3.h>
 #include <engine/platform/window/window.hpp>
 #include <utility>

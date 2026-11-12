@@ -15,9 +15,9 @@ model::Model import_vl32(const std::filesystem::path& path, int palette_size) {
     Reader reader{bytes};
     std::vector<ColorVoxel> voxels;
     voxels.reserve(bytes.size() / 16);
-    model::IVec3 lower{std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),
+    model::Vec3i lower{std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),
                        std::numeric_limits<int>::max()};
-    model::IVec3 upper{std::numeric_limits<int>::min(), std::numeric_limits<int>::min(),
+    model::Vec3i upper{std::numeric_limits<int>::min(), std::numeric_limits<int>::min(),
                        std::numeric_limits<int>::min()};
     while (reader.remaining() != 0) {
         const auto x = reader.big_i32();
@@ -39,7 +39,7 @@ model::Model import_vl32(const std::filesystem::path& path, int palette_size) {
         }
         return static_cast<int>(difference);
     };
-    const model::IVec3 size{dimension(lower.x, upper.x), dimension(lower.y, upper.y),
+    const model::Vec3i size{dimension(lower.x, upper.x), dimension(lower.y, upper.y),
                             dimension(lower.z, upper.z)};
     for (auto& voxel : voxels) {
         voxel.position = {voxel.position.x - lower.x, voxel.position.y - lower.y,

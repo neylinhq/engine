@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_MODEL_TYPES_HPP
+#define ENGINE_WORLD_MODEL_TYPES_HPP
 
 #include <engine/foundation/geometry/vector.hpp>
 
@@ -11,11 +12,11 @@ namespace engine::world::model {
 
 using Vec3 = foundation::geometry::Vec3;
 
-struct IVec3 {
+struct Vec3i {
     int x = 0;
     int y = 0;
     int z = 0;
-    constexpr bool operator==(const IVec3&) const = default;
+    constexpr bool operator==(const Vec3i&) const = default;
 };
 
 enum class MaterialBase : std::uint32_t { diffuse, emissive, metallic_rough, metallic_mirror };
@@ -32,7 +33,7 @@ struct Material {
 
 struct Model {
     std::string name;
-    IVec3 size;
+    Vec3i size;
     std::vector<Material> materials;
     std::vector<std::uint32_t> chunks;
     std::vector<std::uint32_t> blocks;
@@ -45,7 +46,7 @@ struct Model {
 // Hash entries retain the original {voxel word offset, use count, hash} layout.
 struct GeneratedWorld {
     Model model;
-    IVec3 actual_size;
+    Vec3i actual_size;
     std::vector<std::array<std::uint32_t, 3>> hash;
     double compression = 1;
     std::uint32_t logical_voxels = 0;
@@ -53,14 +54,14 @@ struct GeneratedWorld {
 };
 
 struct Sample {
-    IVec3 position;
+    Vec3i position;
     std::uint16_t material = 0;
 };
 
 struct Hit {
     bool hit = false;
     double distance = 0;
-    IVec3 voxel;
+    Vec3i voxel;
     Vec3 normal;
     std::uint16_t material = 0;
     std::uint32_t steps = 0;
@@ -68,7 +69,7 @@ struct Hit {
 
 struct EntityType {
     std::string name;
-    IVec3 size;
+    Vec3i size;
     std::vector<std::uint32_t> voxels;
     std::uint32_t voxel_start = 0;
 };
@@ -90,10 +91,12 @@ struct EntityGpuData {
     std::uint32_t entity_count = 0;
 };
 
-[[nodiscard]] IVec3 chunk_size(IVec3 size);
-[[nodiscard]] std::uint16_t voxel_at(const Model& model, IVec3 position);
-[[nodiscard]] Model build_model(IVec3 size, std::vector<Material> materials,
+[[nodiscard]] Vec3i chunk_size(Vec3i size);
+[[nodiscard]] std::uint16_t voxel_at(const Model& model, Vec3i position);
+[[nodiscard]] Model build_model(Vec3i size, std::vector<Material> materials,
                                 const std::vector<Sample>& samples);
 void validate(const Model& model);
 
 } // namespace engine::world::model
+
+#endif

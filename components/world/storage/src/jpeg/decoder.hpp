@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_JPEG_DECODER_HPP
+#define ENGINE_WORLD_STORAGE_SRC_JPEG_DECODER_HPP
 
 #include "../image/image.hpp"
 
@@ -97,3 +98,5 @@ void decode_progressive(Scan& scan, Component& component, Block& block);
 [[nodiscard]] Image decode(std::span<const std::uint8_t> bytes);
 
 } // namespace engine::world::storage::jpeg
+
+#endif

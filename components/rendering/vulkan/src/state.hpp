@@ -1,5 +1,5 @@
-#ifndef ENGINE_RENDERING_VULKAN_STATE_HPP
-#define ENGINE_RENDERING_VULKAN_STATE_HPP
+#ifndef ENGINE_RENDERING_VULKAN_SRC_STATE_HPP
+#define ENGINE_RENDERING_VULKAN_SRC_STATE_HPP
 
 #include "gpu/device.hpp"
 #include "program/reflection.hpp"
@@ -145,7 +145,7 @@ struct Renderer::Impl {
     void upload_world(const FrameInput& input);
     void update_gpu_world(const FrameInput& input);
     [[nodiscard]] world::model::GeneratedWorld
-    generate_world(const world::model::Model& source, world::model::IVec3 requested,
+    generate_world(const world::model::Model& source, world::model::Vec3i requested,
                    int segment_groups, world::model::World* target = nullptr);
     void upload_entities(const FrameInput& input);
     void upload_chunks(const FrameInput& input);

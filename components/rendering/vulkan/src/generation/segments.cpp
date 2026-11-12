@@ -9,7 +9,7 @@
 namespace engine::rendering::vulkan {
 namespace {
 
-UniformValues generator_values(const GenerationState& state, world::model::IVec3 offset) {
+UniformValues generator_values(const GenerationState& state, world::model::Vec3i offset) {
     UniformValues values;
     const auto size = world::model::chunk_size(state.source.size);
     set_value(values, "modelSizeInChunksX", size.x);
@@ -27,7 +27,7 @@ UniformValues generator_values(const GenerationState& state, world::model::IVec3
     return values;
 }
 
-UniformValues hash_values(const GenerationState& state, world::model::IVec3 offset) {
+UniformValues hash_values(const GenerationState& state, world::model::Vec3i offset) {
     UniformValues values;
     set_value(values, "chunkOffsetX", offset.x);
     set_value(values, "chunkOffsetY", offset.y);
@@ -87,9 +87,9 @@ void finish_segment(GenerationState& state) {
     state.compute.grow("blocks", block_words * 4);
 }
 
-void segment(GenerationState& state, world::model::IVec3 index) {
+void segment(GenerationState& state, world::model::Vec3i index) {
     const auto side = static_cast<int>(state.segment_chunks);
-    const world::model::IVec3 offset{index.x * side, index.y * side, index.z * side};
+    const world::model::Vec3i offset{index.x * side, index.y * side, index.z * side};
     const vk::Extent3D groups(state.segment_chunks, state.segment_chunks, state.segment_chunks);
     state.compute.run("world_generator_generatorModel_fillChunkDataWithModelData16", groups,
                       generator_values(state, offset));

@@ -1,6 +1,6 @@
+#include <engine/platform/window_state/window_state.hpp>
 #include <algorithm>
 #include <cmath>
-#include <engine/platform/window_state/window_state.hpp>
 #include <limits>
 namespace engine::platform::window_state {
 namespace {

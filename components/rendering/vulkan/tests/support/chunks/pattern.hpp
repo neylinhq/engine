@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_CHUNKS_PATTERN_HPP
+#define ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_CHUNKS_PATTERN_HPP
 
 #include "../../../src/world/compute.hpp"
 
@@ -19,3 +20,5 @@ struct ChunkPatternInfo {
                                                         ChunkPattern pattern);
 
 } // namespace engine::rendering::vulkan::test
+
+#endif

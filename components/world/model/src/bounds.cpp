@@ -7,12 +7,12 @@ namespace {
 
 struct BoundsField {
     std::span<std::uint32_t> cells;
-    IVec3 size;
+    Vec3i size;
     unsigned bits = 2;
     unsigned state_shift = 30;
 };
 
-constexpr std::array<unsigned, 6> masks{0x3D, 0x3E, 0x37, 0x3B, 0x1F, 0x2F};
+constexpr std::array<unsigned, 6> kMasks{0x3D, 0x3E, 0x37, 0x3B, 0x1F, 0x2F};
 
 unsigned matching(std::uint32_t neighbor, std::uint32_t current, unsigned bits) {
     unsigned result = 0;
@@ -34,7 +34,7 @@ void grow(BoundsField field, std::size_t index, std::size_t neighbor, unsigned d
     if ((next >> field.state_shift) != 0 || ((word >> shift) & maximum) == maximum) {
         return;
     }
-    if ((matching(next, word, field.bits) & masks[direction]) == masks[direction]) {
+    if ((matching(next, word, field.bits) & kMasks[direction]) == kMasks[direction]) {
         word += 1U << shift;
     }
 }
@@ -88,7 +88,7 @@ void bounds4(std::span<std::uint32_t, 64> cells, unsigned state_shift) {
     calculate({cells, {4, 4, 4}, 2, state_shift}, 3);
 }
 
-void chunk_bounds(std::span<std::uint32_t> chunks, IVec3 size) {
+void chunk_bounds(std::span<std::uint32_t> chunks, Vec3i size) {
     calculate({chunks, size, 5, 30}, 31);
 }
 

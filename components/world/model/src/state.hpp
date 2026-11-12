@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_MODEL_SRC_STATE_HPP
+#define ENGINE_WORLD_MODEL_SRC_STATE_HPP
 
 #include "helpers.hpp"
 
@@ -15,7 +16,7 @@ struct ChunkEdit {
 
 struct World::State {
     Model model;
-    IVec3 actual_size;
+    Vec3i actual_size;
     BlockPool pool;
     std::unordered_map<std::size_t, ChunkEdit> edits;
     std::vector<std::array<std::uint32_t, 4>> packed_materials;
@@ -41,3 +42,5 @@ struct World::State {
 };
 
 } // namespace engine::world::model
+
+#endif

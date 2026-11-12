@@ -20,9 +20,9 @@ std::vector<model::Material> default_palette() {
         palette[index + 1].color_base = linear_rgb(
             255 - (index / 36) * 51, 255 - ((index / 6) % 6) * 51, 255 - (index % 6) * 51);
     }
-    constexpr std::array<unsigned, 10> shades{238, 221, 187, 170, 136, 119, 85, 68, 34, 17};
+    constexpr std::array<unsigned, 10> kShades{238, 221, 187, 170, 136, 119, 85, 68, 34, 17};
     for (unsigned index = 0; index < 40; ++index) {
-        const auto value = shades[index % 10];
+        const auto value = kShades[index % 10];
         const auto group = index / 10;
         palette[index + 216].color_base =
             linear_rgb(group == 0 || group == 3 ? value : 0, group == 1 || group == 3 ? value : 0,
@@ -89,7 +89,7 @@ void read_voxels(VoxScene& scene, Reader& reader) {
     }
     shape.samples.reserve(count);
     for (std::uint32_t index = 0; index < count; ++index) {
-        const model::IVec3 position{reader.u8(), reader.u8(), reader.u8()};
+        const model::Vec3i position{reader.u8(), reader.u8(), reader.u8()};
         const auto material = reader.u8();
         if (position.x >= size.x || position.y >= size.y || position.z >= size.z) {
             throw std::runtime_error("Invalid VOX voxel position or palette index");

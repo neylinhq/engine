@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_MODEL_WORLD_HPP
+#define ENGINE_WORLD_MODEL_WORLD_HPP
 
 #include <engine/world/model/types.hpp>
 
@@ -8,8 +9,8 @@
 namespace engine::world::model {
 
 struct WorldView {
-    IVec3 size;
-    IVec3 actual_size;
+    Vec3i size;
+    Vec3i actual_size;
     std::span<const std::uint32_t> chunks;
     std::span<const std::uint32_t> blocks;
     std::span<const std::uint32_t> voxels;
@@ -27,30 +28,33 @@ struct WorldView {
 
 class World {
   public:
-    World();
+    explicit World(unsigned worker_count = 1);
     ~World();
     World(World&&) noexcept;
     World& operator=(World&&) noexcept;
     World(const World&) = delete;
     World& operator=(const World&) = delete;
 
-    void replace(Model model, IVec3 requested_size = {}, int segment_groups = 4);
+    void replace(Model model, Vec3i requested_size = {}, int segment_groups = 4);
     [[nodiscard]] Model prepare_generation(Model source);
     void adopt_generated(GeneratedWorld generated);
     void acknowledge_changes();
     [[nodiscard]] Model snapshot() const;
     [[nodiscard]] WorldView view() const;
-    [[nodiscard]] IVec3 size() const;
-    [[nodiscard]] IVec3 actual_size() const;
+    [[nodiscard]] Vec3i size() const;
+    [[nodiscard]] Vec3i actual_size() const;
     [[nodiscard]] double compression_factor() const;
-    [[nodiscard]] std::uint16_t at(IVec3 position) const;
+    [[nodiscard]] unsigned worker_count() const noexcept {
+        return worker_count_;
+    }
+    [[nodiscard]] std::uint16_t at(Vec3i position) const;
     [[nodiscard]] Hit trace(Vec3 origin, Vec3 direction, double max_distance = 100000) const;
-    void set(IVec3 position, std::uint16_t material);
+    void set(Vec3i position, std::uint16_t material);
     // Chunk coordinates; includes pending edits. All 4096 cells use X-major order.
-    [[nodiscard]] std::array<std::uint16_t, 4096> chunk_voxels(IVec3 chunk) const;
-    void set_chunk_voxels(IVec3 chunk, std::span<const std::uint16_t, 4096> voxels);
-    void adopt_chunk_voxels(IVec3 chunk, std::unique_ptr<std::array<std::uint16_t, 4096>> voxels);
-    void fill_chunk(IVec3 chunk, std::uint16_t material);
+    [[nodiscard]] std::array<std::uint16_t, 4096> chunk_voxels(Vec3i chunk) const;
+    void set_chunk_voxels(Vec3i chunk, std::span<const std::uint16_t, 4096> voxels);
+    void adopt_chunk_voxels(Vec3i chunk, std::unique_ptr<std::array<std::uint16_t, 4096>> voxels);
+    void fill_chunk(Vec3i chunk, std::uint16_t material);
     void commit_edits();
     void rebuild_bounds();
     void update_bounds(std::size_t cell_budget = 32768);
@@ -72,6 +76,9 @@ class World {
   private:
     struct State;
     std::unique_ptr<State> state_;
+    unsigned worker_count_;
 };
 
 } // namespace engine::world::model
+
+#endif

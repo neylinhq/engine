@@ -1,4 +1,6 @@
 schema = "archcheck.workspace.v1"
+contract = "1.0"
 project = "engine"
-profile = "cpp23"
-configurations = "debug;release"
+sdk = "engine"
+profiles = ["cpp23.v1", "conan.v1", "engine"]
+configurations = ["windows/windows-debug", "windows/windows-release", "linux/linux-debug", "linux/linux-release"]

@@ -130,12 +130,12 @@ class Renderer {
     // Ends ImGui, records original NAADF passes, submits and presents.
     [[nodiscard]] std::expected<void, std::string> draw(const FrameInput& input);
     [[nodiscard]] std::expected<world::model::GeneratedWorld, std::string>
-    generate_world(const world::model::Model& source, world::model::IVec3 requested = {},
+    generate_world(const world::model::Model& source, world::model::Vec3i requested = {},
                    int segment_groups = 4);
     // Commits CPU and GPU world state together; adoption failure restores the prior scene.
     [[nodiscard]] std::expected<void, std::string>
     generate_world(world::model::World& target, const world::model::Model& source,
-                   world::model::IVec3 requested = {}, int segment_groups = 4);
+                   world::model::Vec3i requested = {}, int segment_groups = 4);
     [[nodiscard]] std::vector<ComputeExecution> world_executions() const;
     void reset_accumulation();
     // Reconstructs the selected renderer on the next draw, including a same-mode selection.

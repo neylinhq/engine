@@ -68,12 +68,12 @@ void scale_mesh(std::vector<Triangle>& triangles, const ImportOptions& options) 
     }
 }
 
-model::IVec3 normalize(std::span<ColorVoxel> voxels) {
+model::Vec3i normalize(std::span<ColorVoxel> voxels) {
     if (voxels.empty()) {
         throw std::runtime_error("Mesh contains no nondegenerate voxelized surface");
     }
-    model::IVec3 lower{16384, 16384, 16384};
-    model::IVec3 upper{0, 0, 0};
+    model::Vec3i lower{16384, 16384, 16384};
+    model::Vec3i upper{0, 0, 0};
     for (const auto& voxel : voxels) {
         lower = {std::min(lower.x, voxel.position.x), std::min(lower.y, voxel.position.y),
                  std::min(lower.z, voxel.position.z)};

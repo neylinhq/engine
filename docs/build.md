@@ -1,94 +1,93 @@
 # Сборка и запуск
 
-## Зависимости
+Нужны LLVM 23.1.5, CMake и CTest 4.4.5, Ninja 1.13.2, sccache 0.19.0 и
+Conan 2.34.0. Установите [archcheck](https://github.com/neylinhq/archcheck)
+с экспортёром CMake для контракта 1.0 и укажите префикс установки в
+`ENGINE_ARCHCHECK_ROOT`. В `ENGINE_LLVM_ROOT` укажите каталог LLVM.
+Добавьте каталоги инструментов в `PATH`.
 
-Для полной сборки нужны:
-
-- CMake 3.27+, Ninja и компилятор C++23 со стандартной библиотекой,
-  поддерживающей `std::expected`, `std::jthread` и `std::from_chars`
-  для вещественных чисел;
-- Boost 1.83+ с собранной библиотекой Boost.JSON;
-- OpenSSL Crypto; CMake запрашивает статическую библиотеку;
-- Vulkan 1.3: заголовки, загрузчик и драйвер;
-- Slang с программой `slangc`;
-- GLFW 3.4+;
-- исходники Dear ImGui **1.91.9b**. Эта версия проверяется при конфигурации.
-
-Требования к возможностям GPU перечислены в
+Conan устанавливает Boost.JSON 1.92.0. Для настольной сборки он также
+устанавливает GLFW 3.4 и исходники Dear ImGui 1.91.9b
+с официальными backend GLFW и Vulkan. Ревизии рецептов закреплены в
+`conan.lock`. Системный Vulkan SDK предоставляет заголовки, загрузчик и
+`slangc`. Требования к устройству перечислены в
 [документации рендерера](../components/rendering/vulkan/README.md).
 
-CMake не скачивает зависимости. Установите их отдельно и передайте пути через
-параметры конфигурации или локальный `CMakeUserPresets.json`, который не входит
-в Git. Пресеты `debug` и `release` используют Ninja и каталоги `out/debug`
-и `out/release`. Команды ниже выполняются из корня проекта.
-
-## Windows
-
-Откройте Developer PowerShell для MSVC. Замените пути в примере на свои:
-
-```powershell
-cmake --preset release `
-  "-DCMAKE_PREFIX_PATH=C:/SDK/Boost;C:/SDK/GLFW" `
-  -DOPENSSL_ROOT_DIR=C:/SDK/OpenSSL `
-  -DENGINE_IMGUI_SOURCE_DIR=C:/SDK/imgui-1.91.9b `
-  -DSLANGC_EXECUTABLE=C:/SDK/slang/bin/slangc.exe
-cmake --build --preset release --parallel
-ctest --preset release
-.\out\release\bin\sandbox.exe
-```
-
-Для Debug используйте пресет `debug` при конфигурации, сборке и запуске CTest.
-Параметры внешних зависимостей задаются отдельно для каждой конфигурации.
-Компиляция MSVC использует `/utf-8`.
-
-## Linux
+Команды выполняются из корня Engine. В новом кэше Conan один раз
+зарегистрируйте локальные рецепты:
 
 ```sh
-cmake --preset release \
-  -DCMAKE_PREFIX_PATH="/path/to/boost;/path/to/glfw" \
-  -DOPENSSL_ROOT_DIR=/path/to/openssl \
-  -DENGINE_IMGUI_SOURCE_DIR=/path/to/imgui-1.91.9b \
-  -DSLANGC_EXECUTABLE=/path/to/slang/bin/slangc
-cmake --build --preset release --parallel
-ctest --preset release
-./out/release/bin/sandbox
+conan export cmake/conan/recipes/boost_json --user=engine --channel=dependencies
+conan export cmake/conan/recipes/imgui_sources --user=engine --channel=dependencies
 ```
 
-Если Vulkan не найден автоматически, задайте `Vulkan_INCLUDE_DIR` и
-`Vulkan_LIBRARY`. Slang должен находить свои динамические библиотеки через
-окружение загрузчика ОС. Для запуска приложений нужна оконная система с
-поддержкой Vulkan; `--hidden` создаёт скрытое окно и не устраняет это требование.
+## Windows x64
+
+Откройте Developer PowerShell для Visual C++ Build Tools. `clang-cl` использует
+MSVC STL и Windows SDK, а программы линкуются через `lld-link`. Debug и Release
+используют статическую Release CRT, совместимую с общими пакетами Conan.
+Debug собирается без оптимизации и с отладочной информацией.
+Для SHA-256 Engine использует системный CNG.
+
+```powershell
+$env:ENGINE_LLVM_ROOT = 'C:/SDK/llvm-23.1.5'
+$env:ENGINE_ARCHCHECK_ROOT = 'C:/SDK/archcheck'
+conan install . -pr:h=cmake/conan/profiles/windows.profile -pr:b=cmake/conan/profiles/windows.profile -of=out/windows-release/conan --build=missing
+cmake --preset windows-release
+cmake --build --preset windows-release --parallel
+ctest --preset windows-release
+.\out\windows-release\bin\sandbox.exe
+```
+
+Для Debug при установке Conan добавьте `-s:h build_type=Debug` и замените
+`windows-release` на `windows-debug` во всех командах.
+
+## Linux x86-64
+
+`clang++` использует libstdc++ и LLD. Для SHA-256 Conan устанавливает
+OpenSSL Crypto 3.6.3. Для настольной сборки установите системные
+зависимости GLFW для X11 и Vulkan SDK. Загрузчик ОС должен находить динамические
+библиотеки Slang и Vulkan.
+
+```sh
+export ENGINE_LLVM_ROOT=/opt/llvm-23.1.5
+export ENGINE_ARCHCHECK_ROOT=/opt/archcheck
+export PATH="$ENGINE_LLVM_ROOT/bin:$PATH"
+conan install . -pr:h=cmake/conan/profiles/linux.profile -pr:b=cmake/conan/profiles/linux.profile -of=out/linux-release/conan --build=missing
+cmake --preset linux-release
+cmake --build --preset linux-release --parallel
+ctest --preset linux-release
+./out/linux-release/bin/sandbox
+```
+
+Для Debug добавьте `-s:h build_type=Debug` и используйте `linux-debug`.
+Для локальной сборки CPU-компонентов добавьте `-o '&:desktop=False'` к команде
+Conan. Чтобы запустить AddressSanitizer и UndefinedBehaviorSanitizer вместе,
+установите зависимости Debug в `out/sanitizers/conan` и используйте пресет
+`sanitizers`.
 
 ## Проверки
 
-`-DENGINE_GPU_TESTS=ON` при конфигурации добавляет интеграционные GPU-тесты:
-им нужны дисплей, совместимое устройство и `VK_LAYER_KHRONOS_validation`.
-Для проверки синхронизации задайте переменную окружения
+Пресеты Windows включают GPU-тесты. Им нужны дисплей, совместимое устройство
+и `VK_LAYER_KHRONOS_validation`. В Linux их можно включить параметром
+`-DENGINE_GPU_TESTS=ON`. Для проверки синхронизации задайте
 `VK_LAYER_ENABLES=VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT`.
 
-Пресет `sanitizers` включает AddressSanitizer и UndefinedBehaviorSanitizer
-для GCC/Clang. Совместный режим этих санитайзеров не поддерживается сборкой MSVC.
-`-DENGINE_DESKTOP=OFF` исключает приложения и компоненты, которым нужны Vulkan,
-GLFW и ImGui; Boost.JSON и OpenSSL Crypto по-прежнему требуются.
-
-Архитектуру проверяет отдельный [archcheck](architecture_rules.md).
-Для измерений времени используйте Release без слоя валидации Vulkan и санитайзеров;
-методика описана в [документации Benchmark](../apps/benchmark/docs/methodology.md).
-Логи и результаты измерений сохраняйте вне проекта.
+Порядок архитектурной проверки описан в [docs/architecture_rules.md](architecture_rules.md).
+Для замеров используйте Release. Условия запуска и формат отчётов описаны в
+[методике Benchmark](../apps/benchmark/docs/methodology.md).
+Логи и результаты сохраняйте вне проекта.
 
 ## Установка
 
 ```powershell
-cmake --install out/release --prefix C:/Apps/Engine
+cmake --install out/windows-release --prefix C:/Apps/Engine
 ```
 
-Пакет содержит Sandbox, Benchmark, каталог `bin/shaders`, сценарии и схемы
-benchmark, инструкции и лицензионные уведомления. Карты загружаются из внешних
-файлов. Сохраняйте `shaders` рядом с исполняемыми файлами при переносе пакета.
+В пакет входят Sandbox, Benchmark, шейдеры, сценарии и схемы Benchmark,
+инструкции и лицензии. При переносе пакета сохраняйте каталог `bin/shaders`
+рядом с исполняемыми файлами. Карты загружаются из внешних файлов.
+Для запуска нужны совместимый драйвер и загрузчик Vulkan.
 
-Установка не копирует DLL импортированных зависимостей. Если GLFW, Boost или
-среда выполнения C++ связаны динамически, обеспечьте доступность соответствующих
-библиотек на целевой машине. Slang, CMake и заголовки SDK для запуска не нужны.
-
-Параметры приложений и примеры:
-[Sandbox](../apps/sandbox/README.md), [Benchmark](../apps/benchmark/README.md).
+Параметры и примеры запуска приведены в документации
+[Sandbox](../apps/sandbox/README.md) и [Benchmark](../apps/benchmark/README.md).

@@ -8,7 +8,7 @@ namespace engine::world::storage {
 namespace {
 
 std::uint32_t crc32(std::span<const std::byte> bytes) {
-    static const auto table = [] {
+    static const auto kTable = [] {
         std::array<std::uint32_t, 256> result{};
         for (unsigned index = 0; index < 256; ++index) {
             auto value = index;
@@ -21,7 +21,7 @@ std::uint32_t crc32(std::span<const std::byte> bytes) {
     }();
     std::uint32_t result = 0xFFFFFFFFU;
     for (auto byte : bytes) {
-        result = (result >> 8) ^ table[(result ^ std::to_integer<unsigned>(byte)) & 255U];
+        result = (result >> 8) ^ kTable[(result ^ std::to_integer<unsigned>(byte)) & 255U];
     }
     return result ^ 0xFFFFFFFFU;
 }

@@ -42,7 +42,7 @@ foundation::geometry::Vec3 vector(const json::value& value) {
     }
     return {real(array[0], -1e9, 1e9), real(array[1], -1e9, 1e9), real(array[2], -1e9, 1e9)};
 }
-world::model::IVec3 voxel(const json::value& value) {
+world::model::Vec3i voxel(const json::value& value) {
     const auto v = vector(value);
     if (std::trunc(v.x) != v.x || std::trunc(v.y) != v.y || std::trunc(v.z) != v.z) {
         throw std::invalid_argument("Voxel coordinates must be integers");

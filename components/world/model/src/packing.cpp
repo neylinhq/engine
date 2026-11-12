@@ -36,7 +36,7 @@ std::uint32_t pair(double low, double high) {
     return half(static_cast<float>(low)) | (std::uint32_t{half(static_cast<float>(high))} << 16);
 }
 
-BlockWords pack_block(const DenseChunk& dense, IVec3 block, bool raw) {
+BlockWords pack_block(const DenseChunk& dense, Vec3i block, bool raw) {
     std::array<std::uint32_t, 64> cells{};
     const auto origin = block.x * 4 + block.y * 64 + block.z * 1024;
     for (std::size_t index = 0; index < 64; ++index) {
@@ -198,7 +198,7 @@ void pack_chunk(const DenseChunk& dense, bool raw, PackedChunk& packed) {
     }
     packed.uniform = 0x80000000U;
     for (std::size_t index = 0; index < 64; ++index) {
-        const IVec3 block{static_cast<int>(index & 3), static_cast<int>((index >> 2) & 3),
+        const Vec3i block{static_cast<int>(index & 3), static_cast<int>((index >> 2) & 3),
                           static_cast<int>(index >> 4)};
         packed.blocks[index] = pack_block(dense, block, raw);
         packed.kinds[index] = block_kind(packed.blocks[index]);

@@ -5,7 +5,7 @@
 
 namespace engine::world::model {
 
-std::array<std::uint16_t, 4096> World::chunk_voxels(IVec3 chunk) const {
+std::array<std::uint16_t, 4096> World::chunk_voxels(Vec3i chunk) const {
     const auto dimensions = chunk_size(size());
     if (!inside(chunk, dimensions)) {
         throw std::out_of_range("Chunk is outside the world");
@@ -23,13 +23,13 @@ std::array<std::uint16_t, 4096> World::chunk_voxels(IVec3 chunk) const {
     return result;
 }
 
-void World::set_chunk_voxels(IVec3 chunk, std::span<const std::uint16_t, 4096> voxels) {
+void World::set_chunk_voxels(Vec3i chunk, std::span<const std::uint16_t, 4096> voxels) {
     auto copy = std::make_unique<DenseChunk>();
     std::ranges::copy(voxels, copy->begin());
     adopt_chunk_voxels(chunk, std::move(copy));
 }
 
-void World::adopt_chunk_voxels(IVec3 chunk, std::unique_ptr<DenseChunk> voxels) {
+void World::adopt_chunk_voxels(Vec3i chunk, std::unique_ptr<DenseChunk> voxels) {
     const auto dimensions = chunk_size(size());
     if (!inside(chunk, dimensions)) {
         throw std::out_of_range("Chunk is outside the world");
@@ -41,7 +41,7 @@ void World::adopt_chunk_voxels(IVec3 chunk, std::unique_ptr<DenseChunk> voxels) 
     destination.voxels = std::move(voxels);
 }
 
-void World::fill_chunk(IVec3 chunk, std::uint16_t material) {
+void World::fill_chunk(Vec3i chunk, std::uint16_t material) {
     const auto dimensions = chunk_size(size());
     if (!inside(chunk, dimensions)) {
         throw std::out_of_range("Chunk is outside the world");

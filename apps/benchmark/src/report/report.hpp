@@ -1,5 +1,5 @@
-#ifndef ENGINE_APP_BENCHMARK_REPORT_HPP
-#define ENGINE_APP_BENCHMARK_REPORT_HPP
+#ifndef ENGINE_APP_BENCHMARK_SRC_REPORT_REPORT_HPP
+#define ENGINE_APP_BENCHMARK_SRC_REPORT_REPORT_HPP
 #include "../measurement/session.hpp"
 #include <span>
 namespace engine::app::benchmark {

@@ -14,7 +14,7 @@ namespace renderer = engine::rendering::vulkan;
 namespace test = engine::rendering::vulkan::test;
 using test::require_update;
 
-std::size_t index_of(model::IVec3 point, model::IVec3 size) {
+std::size_t index_of(model::Vec3i point, model::Vec3i size) {
     return point.x + static_cast<std::size_t>(point.y) * size.x +
            static_cast<std::size_t>(point.z) * size.x * size.y;
 }
@@ -35,7 +35,7 @@ model::Model empty_model() {
 void verify_geometry(test::UpdateProbe& probe, std::span<const std::uint16_t> dense) {
     const auto gpu = probe.snapshot();
     for (std::size_t index = 0; index < dense.size(); ++index) {
-        const model::IVec3 point{static_cast<int>(index % gpu.size.x),
+        const model::Vec3i point{static_cast<int>(index % gpu.size.x),
                                  static_cast<int>((index / gpu.size.x) % gpu.size.y),
                                  static_cast<int>(index / gpu.size.x / gpu.size.y)};
         require_update(model::voxel_at(gpu, point) == dense[index],
@@ -53,15 +53,15 @@ void write_voxel(test::UpdateProbe& probe, std::vector<std::uint16_t>& dense,
     dense[index_of(sample.position, probe.world.size())] = sample.material;
 }
 
-void write_box(test::UpdateProbe& probe, std::vector<std::uint16_t>& dense, model::IVec3 origin,
-               model::IVec3 size) {
+void write_box(test::UpdateProbe& probe, std::vector<std::uint16_t>& dense, model::Vec3i origin,
+               model::Vec3i size) {
     const auto material = material_index(probe.world, "update_second");
-    const bool uniform = size == model::IVec3{16, 16, 16};
+    const bool uniform = size == model::Vec3i{16, 16, 16};
     if (uniform) {
         probe.world.fill_chunk({origin.x / 16, origin.y / 16, origin.z / 16}, material);
     }
     for (int index = 0; index < size.x * size.y * size.z; ++index) {
-        const model::IVec3 point{origin.x + index % size.x, origin.y + (index / size.x) % size.y,
+        const model::Vec3i point{origin.x + index % size.x, origin.y + (index / size.x) % size.y,
                                  origin.z + index / size.x / size.y};
         if (uniform) {
             dense[index_of(point, probe.world.size())] = material;
@@ -187,7 +187,7 @@ std::size_t preserve_geometry_during_entity_changes(test::UpdateProbe& probe, st
 
 std::size_t shared_chunk_edit_contract(test::UpdateProbe& probe, std::size_t type,
                                        std::size_t entity) {
-    const model::IVec3 point{31, 47, 47};
+    const model::Vec3i point{31, 47, 47};
     const auto index =
         index_of({point.x / 16, point.y / 16, point.z / 16}, model::chunk_size(probe.world.size()));
     const auto before = test::update_chunks(probe.compute).at(index);
@@ -290,10 +290,10 @@ void partial_group_contract(test::UpdateProbe& probe) {
 }
 
 void wide_dispatch_contract(test::UpdateProbe& probe) {
-    constexpr std::uint32_t count = 32769;
-    std::vector<std::uint32_t> voxels(count * 32U);
-    std::vector<std::uint32_t> offsets(count);
-    for (std::uint32_t index = 0; index < count; ++index) {
+    constexpr std::uint32_t kCount = 32769;
+    std::vector<std::uint32_t> voxels(kCount * 32U);
+    std::vector<std::uint32_t> offsets(kCount);
+    for (std::uint32_t index = 0; index < kCount; ++index) {
         offsets[index] = index * 32U;
         voxels[offsets[index]] = 0xFFFFU;
     }
@@ -320,7 +320,7 @@ void wide_dispatch_contract(test::UpdateProbe& probe) {
     std::cout << "32769 voxel-record dispatch and 70000-group indirect preparation passed\n";
 }
 
-void verify_initial_queue_planes(renderer::WorldCompute& compute, model::IVec3 groups) {
+void verify_initial_queue_planes(renderer::WorldCompute& compute, model::Vec3i groups) {
     const auto count = static_cast<std::size_t>(groups.x) * groups.y * groups.z;
     const auto queues = test::update_words(compute, "boundGroupQueues", count * 3);
     const auto masks = test::update_words(compute, "boundGroupMasks", count * 3);
@@ -343,25 +343,25 @@ void large_initial_queue_contract(renderer::Device& device, const std::filesyste
     // It is kernel coverage, not a full-world rendering or performance test:
     // only the three initial queue planes and masks are allocated (48 MiB each).
     // No chunk images, later queue levels, world generation or limit override is used.
-    constexpr model::IVec3 groups{256, 64, 256};
-    constexpr std::uint32_t count = 256U * 64U * 256U;
-    constexpr vk::DeviceSize bytes = vk::DeviceSize{count} * 3 * sizeof(std::uint32_t);
+    constexpr model::Vec3i kGroups{256, 64, 256};
+    constexpr std::uint32_t kCount = 256U * 64U * 256U;
+    constexpr vk::DeviceSize kBytes = vk::DeviceSize{kCount} * 3 * sizeof(std::uint32_t);
     renderer::BufferMap buffers;
     renderer::ChunkImages chunks;
     renderer::WorldCompute compute(device, shaders, buffers, chunks);
-    compute.allocate("boundGroupQueues", bytes);
-    compute.allocate("boundGroupMasks", bytes);
+    compute.allocate("boundGroupQueues", kBytes);
+    compute.allocate("boundGroupMasks", kBytes);
     renderer::UniformValues values;
-    renderer::set_value(values, "groupSizeX", groups.x);
-    renderer::set_value(values, "groupSizeY", groups.y);
-    renderer::set_value(values, "groupSizeZ", groups.z);
+    renderer::set_value(values, "groupSizeX", kGroups.x);
+    renderer::set_value(values, "groupSizeY", kGroups.y);
+    renderer::set_value(values, "groupSizeZ", kGroups.z);
     renderer::set_value(values, "boundsInitOffset", 0U);
-    renderer::set_value(values, "boundGroupQueueMaxSize", count);
-    const auto dispatch = renderer::update_grid((count + 63U) / 64U);
+    renderer::set_value(values, "boundGroupQueueMaxSize", kCount);
+    const auto dispatch = renderer::update_grid((kCount + 63U) / 64U);
     require_update(dispatch == vk::Extent3D{32768, 2, 1},
                    "Large initial queue did not partition its 65536 workgroups into two rows");
     compute.run("world_data_boundsCalc_addInitialGroupsToBoundQueue", dispatch, values);
-    verify_initial_queue_planes(compute, groups);
+    verify_initial_queue_planes(compute, kGroups);
     require_update(!chunks.geometry && !chunks.entities && buffers.size() == 2,
                    "Initializer coverage unexpectedly allocated a world or extra queue levels");
     require_update(device.validation_errors.load() == 0,

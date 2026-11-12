@@ -28,6 +28,8 @@ if(ENGINE_DESKTOP)
     ac_test(options_test sandbox)
     target_link_libraries(options_test PRIVATE engine::rendering.settings engine::rendering.vulkan)
 else()
-    ac_inactive_component(app.sandbox "ENGINE_DESKTOP=OFF: desktop composition not compiled"
+    add_library(sandbox INTERFACE)
+    ac_application(sandbox app.sandbox)
+    engine_inactive_sources(sandbox "Sandbox requires the desktop build"
         ${app_sources} ${app_test_sources})
 endif()

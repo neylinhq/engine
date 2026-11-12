@@ -39,12 +39,12 @@ foundation::geometry::Box bounds(const Fragment& fragment) {
     return {lower, upper};
 }
 
-std::uint64_t key(model::IVec3 position) {
+std::uint64_t key(model::Vec3i position) {
     return static_cast<std::uint64_t>(position.x) | (static_cast<std::uint64_t>(position.y) << 21) |
            (static_cast<std::uint64_t>(position.z) << 42);
 }
 
-void merge_coordinate(CoordinateMap& voxels, model::IVec3 position, WeightedCoordinate value) {
+void merge_coordinate(CoordinateMap& voxels, model::Vec3i position, WeightedCoordinate value) {
     if (value.weight == 0) {
         return;
     }
@@ -60,7 +60,7 @@ void merge_coordinate(CoordinateMap& voxels, model::IVec3 position, WeightedCoor
     }
 }
 
-void raster_column(CoordinateMap& voxels, const Raster& raster, model::IVec3 column,
+void raster_column(CoordinateMap& voxels, const Raster& raster, model::Vec3i column,
                    ClipWorkspace& workspace) {
     Vec3 center{column.x + 0.5, column.y + 0.5, column.z + 0.5};
     const auto axis = raster.axes[2];
@@ -76,7 +76,7 @@ void raster_column(CoordinateMap& voxels, const Raster& raster, model::IVec3 col
         std::min(raster.resolution - 1, static_cast<int>(std::floor(height + radius)));
     for (auto coordinate = lower; coordinate <= upper; ++coordinate) {
         center[axis] = coordinate;
-        const model::IVec3 position{static_cast<int>(center.x), static_cast<int>(center.y),
+        const model::Vec3i position{static_cast<int>(center.x), static_cast<int>(center.y),
                                     static_cast<int>(center.z)};
         merge_coordinate(voxels, position,
                          clip_voxel(raster.fragment, position, raster.original_area, workspace));

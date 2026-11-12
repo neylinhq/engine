@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_IMPORT_HPP
+#define ENGINE_WORLD_STORAGE_SRC_IMPORT_HPP
 
 #include <engine/world/storage/storage.hpp>
 
@@ -10,7 +11,7 @@
 namespace engine::world::storage {
 
 struct ColorVoxel {
-    model::IVec3 position;
+    model::Vec3i position;
     std::uint32_t color = 0;
 };
 
@@ -21,9 +22,11 @@ struct Triangle {
     std::shared_ptr<const Image> texture;
 };
 
-[[nodiscard]] model::Model colored_model(model::IVec3 size, std::span<const ColorVoxel> voxels,
+[[nodiscard]] model::Model colored_model(model::Vec3i size, std::span<const ColorVoxel> voxels,
                                          int palette_size);
 [[nodiscard]] std::vector<Triangle> read_obj(const std::filesystem::path& path);
 [[nodiscard]] std::vector<Triangle> read_stl(const std::filesystem::path& path);
 
 } // namespace engine::world::storage
+
+#endif

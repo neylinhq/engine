@@ -6,7 +6,7 @@
 
 namespace engine::world::model {
 
-IVec3 chunk_size(IVec3 size) {
+Vec3i chunk_size(Vec3i size) {
     if (size.x < 1 || size.y < 1 || size.z < 1 || size.x > 16384 || size.y > 16384 ||
         size.z > 16384) {
         throw std::runtime_error("NAADF dimensions must be in 1..16384");
@@ -14,7 +14,7 @@ IVec3 chunk_size(IVec3 size) {
     return {(size.x + 15) / 16, (size.y + 15) / 16, (size.z + 15) / 16};
 }
 
-std::size_t volume(IVec3 size) {
+std::size_t volume(Vec3i size) {
     if (size.x < 1 || size.y < 1 || size.z < 1) {
         throw std::runtime_error("Volume dimensions must be positive");
     }
@@ -27,21 +27,21 @@ std::size_t volume(IVec3 size) {
     return x * y * z;
 }
 
-std::size_t flatten(IVec3 position, IVec3 size) {
+std::size_t flatten(Vec3i position, Vec3i size) {
     return static_cast<std::size_t>(position.x) +
            static_cast<std::size_t>(size.x) *
                (static_cast<std::size_t>(position.y) +
                 static_cast<std::size_t>(size.y) * static_cast<std::size_t>(position.z));
 }
 
-IVec3 unflatten(std::size_t index, IVec3 size) {
+Vec3i unflatten(std::size_t index, Vec3i size) {
     const auto x = static_cast<std::size_t>(size.x);
     const auto y = static_cast<std::size_t>(size.y);
     return {static_cast<int>(index % x), static_cast<int>((index / x) % y),
             static_cast<int>(index / (x * y))};
 }
 
-bool inside(IVec3 position, IVec3 size) {
+bool inside(Vec3i position, Vec3i size) {
     return position.x >= 0 && position.y >= 0 && position.z >= 0 && position.x < size.x &&
            position.y < size.y && position.z < size.z;
 }
@@ -53,16 +53,16 @@ std::uint32_t checked_pointer(std::size_t value) {
     return static_cast<std::uint32_t>(value);
 }
 
-std::uint16_t voxel_at(const Model& model, IVec3 position) {
+std::uint16_t voxel_at(const Model& model, Vec3i position) {
     if (!inside(position, model.size)) {
         return 0;
     }
-    const IVec3 chunk{position.x / 16, position.y / 16, position.z / 16};
+    const Vec3i chunk{position.x / 16, position.y / 16, position.z / 16};
     auto word = model.chunks[flatten(chunk, chunk_size(model.size))];
     if ((word >> 30) != 2) {
         return (word >> 30) == 1 ? static_cast<std::uint16_t>(word & 0x7FFFU) : 0;
     }
-    const IVec3 block{position.x % 16 / 4, position.y % 16 / 4, position.z % 16 / 4};
+    const Vec3i block{position.x % 16 / 4, position.y % 16 / 4, position.z % 16 / 4};
     word = model.blocks[(word & 0x3FFFFFFFU) + flatten(block, {4, 4, 4})];
     if ((word >> 30) != 2) {
         return (word >> 30) == 1 ? static_cast<std::uint16_t>(word & 0x7FFFU) : 0;
@@ -88,9 +88,9 @@ void validate_node(std::uint32_t word, std::size_t count, std::size_t width,
 }
 
 void apply_sample(std::unordered_map<std::size_t, DenseChunk>& chunks, const Sample& sample,
-                  IVec3 dimensions) {
-    const IVec3 chunk{sample.position.x / 16, sample.position.y / 16, sample.position.z / 16};
-    const IVec3 local{sample.position.x % 16, sample.position.y % 16, sample.position.z % 16};
+                  Vec3i dimensions) {
+    const Vec3i chunk{sample.position.x / 16, sample.position.y / 16, sample.position.z / 16};
+    const Vec3i local{sample.position.x % 16, sample.position.y % 16, sample.position.z % 16};
     chunks[flatten(chunk, dimensions)][flatten(local, {16, 16, 16})] = sample.material;
 }
 
@@ -122,7 +122,7 @@ void validate(const Model& model) {
     }
 }
 
-Model build_model(IVec3 size, std::vector<Material> materials, const std::vector<Sample>& samples) {
+Model build_model(Vec3i size, std::vector<Material> materials, const std::vector<Sample>& samples) {
     Model result;
     result.size = size;
     result.materials = std::move(materials);

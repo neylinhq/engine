@@ -47,10 +47,11 @@ ac_test(jpeg_test world_storage)
 target_link_libraries(jpeg_test PRIVATE engine::world.storage)
 add_executable(world_import_test tests/unit/import_test.cpp)
 ac_test(world_import_test world_storage)
+engine_assets(world_storage world_import_test tests/fixtures/import)
 target_link_libraries(world_import_test PRIVATE engine::world.storage engine::world.model engine::foundation.geometry)
 target_compile_definitions(world_import_test PRIVATE
     ENGINE_WORLD_STORAGE_TEST_RESOURCES="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/import")
-add_executable(world_model_benchmark benchmarks/world_benchmark.cpp)
+add_executable(world_model_benchmark benchmarks/world_bench.cpp)
 ac_test(world_model_benchmark world_storage)
 target_link_libraries(world_model_benchmark PRIVATE engine::world.storage engine::world.editing
     engine::world.model engine::foundation.geometry)
@@ -61,3 +62,4 @@ target_link_libraries(palette_test PRIVATE engine::world.storage engine::world.m
 add_executable(jpeg_malformed_test tests/unit/jpeg_malformed_test.cpp)
 ac_test(jpeg_malformed_test world_storage)
 target_link_libraries(jpeg_malformed_test PRIVATE engine::world.storage)
+engine_assets(world_storage jpeg_test tests/fixtures/jpeg)

@@ -7,9 +7,9 @@
 namespace {
 
 using engine::world::model::GeneratedWorld;
-using engine::world::model::IVec3;
 using engine::world::model::Material;
 using engine::world::model::Model;
+using engine::world::model::Vec3i;
 using engine::world::model::World;
 
 void require(bool condition, const char* message) {
@@ -79,7 +79,7 @@ void test_adoption() {
     World world;
     world.adopt_generated(generated(world));
     require(world.view().gpu_authoritative, "Generated world did not select GPU authority");
-    require(world.size() == IVec3{64, 64, 64} && world.actual_size() == IVec3{32, 16, 16},
+    require(world.size() == Vec3i{64, 64, 64} && world.actual_size() == Vec3i{32, 16, 16},
             "Generation lost padded or requested dimensions");
     require(world.at({1, 1, 1}) == 2 && world.at({17, 1, 1}) == 2,
             "GPU mirror lost deduplicated source data");
@@ -92,7 +92,7 @@ void test_adoption() {
     world.acknowledge_changes();
     require(world.view().invalidated_chunks.empty(), "Acknowledged GPU frontier persists");
     const auto hit = world.trace({-1, 1.5, 1.5}, {1, 0, 0});
-    require(hit.hit && hit.voxel == IVec3{1, 1, 1} && hit.distance == 2,
+    require(hit.hit && hit.voxel == Vec3i{1, 1, 1} && hit.distance == 2,
             "Raw pre-bounds query mirror cannot trace the nearest surface");
 }
 

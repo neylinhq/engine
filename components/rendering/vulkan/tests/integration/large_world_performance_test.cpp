@@ -12,6 +12,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
+#include <thread>
 
 namespace {
 namespace rendering = engine::rendering;
@@ -26,7 +27,7 @@ struct Options {
     std::filesystem::path pass_output;
     std::filesystem::path screenshot;
     std::filesystem::path edit_output;
-    model::IVec3 size{256, 256, 256};
+    model::Vec3i size{256, 256, 256};
     unsigned frames = 32;
     unsigned warmup = 8;
     unsigned budget = 32768;
@@ -355,13 +356,13 @@ std::string_view mode_name(rendering::settings::RenderVersion mode) {
     return mode == rendering::settings::RenderVersion::base ? "base" : "path_tracer";
 }
 
-void extent_metadata(std::string_view name, model::IVec3 size) {
+void extent_metadata(std::string_view name, model::Vec3i size) {
     std::cerr << name << '=' << size.x << ',' << size.y << ',' << size.z << '\n';
 }
 
 void generation_metadata(const Options& options, const model::Model& source) {
     const auto segment = static_cast<int>(options.segment_groups) * 64;
-    const model::IVec3 padded{(options.size.x + segment - 1) / segment * segment,
+    const model::Vec3i padded{(options.size.x + segment - 1) / segment * segment,
                               (options.size.y + segment - 1) / segment * segment,
                               (options.size.z + segment - 1) / segment * segment};
     const auto groups = std::uint64_t(padded.x / 64) * (padded.y / 64) * (padded.z / 64);
@@ -390,7 +391,7 @@ rendering::vulkan::Configuration configuration(const Options& options) {
 }
 
 struct Harness {
-    model::World world;
+    model::World world{std::thread::hardware_concurrency()};
     camera::Camera view;
     window::Window window;
     rendering::vulkan::Renderer renderer;

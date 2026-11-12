@@ -10,5 +10,7 @@ if(ENGINE_DESKTOP)
     target_link_libraries(platform_window PUBLIC engine::interaction.input engine::platform.window_state
         PRIVATE glfw Vulkan::Vulkan)
 else()
-    ac_inactive_component(platform.window "ENGINE_DESKTOP=OFF: GLFW provider not compiled" ${window_sources})
+    add_library(platform_window INTERFACE)
+    ac_component(platform_window platform.window)
+    engine_inactive_sources(platform_window "GLFW adapter requires the desktop build" ${window_sources})
 endif()

@@ -171,13 +171,13 @@ void frame(Gif& gif, Reader& reader) {
         gif.palette = color_table(reader, 2U << (frame.flags & 7U));
     }
     const auto indices = decompress(reader, static_cast<std::size_t>(frame.width) * frame.height);
-    constexpr std::array<unsigned, 4> starts{0, 4, 2, 1};
-    constexpr std::array<unsigned, 4> strides{8, 8, 4, 2};
+    constexpr std::array<unsigned, 4> kStarts{0, 4, 2, 1};
+    constexpr std::array<unsigned, 4> kStrides{8, 8, 4, 2};
     const auto interlaced = (frame.flags & 64U) != 0;
     std::size_t source = 0;
     for (unsigned pass = 0; pass < (interlaced ? 4U : 1U); ++pass) {
-        const auto stride = interlaced ? strides[pass] : 1U;
-        for (unsigned row = interlaced ? starts[pass] : 0U; row < frame.height; row += stride) {
+        const auto stride = interlaced ? kStrides[pass] : 1U;
+        for (unsigned row = interlaced ? kStarts[pass] : 0U; row < frame.height; row += stride) {
             copy_row(gif, frame, row, std::span{indices}.subspan(source, frame.width));
             source += frame.width;
         }

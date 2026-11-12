@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+namespace engine::app::sandbox {
 namespace {
 void require(bool condition, const char* message) {
     if (!condition) {
@@ -111,15 +112,21 @@ void scene_units() {
         require(rejected, "Malformed physical camera was accepted");
     }
 }
-} // namespace
-int main() {
+int run_options_tests() {
     try {
         unicode_arguments();
         unicode_file();
         path_launch();
         scene_units();
+        return 0;
     } catch (const std::exception& error) {
         std::cerr << error.what() << '\n';
         return 1;
     }
+}
+} // namespace
+} // namespace engine::app::sandbox
+
+int main() {
+    return engine::app::sandbox::run_options_tests();
 }

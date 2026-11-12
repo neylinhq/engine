@@ -1,5 +1,5 @@
-#ifndef ENGINE_APP_BENCHMARK_SESSION_HPP
-#define ENGINE_APP_BENCHMARK_SESSION_HPP
+#ifndef ENGINE_APP_BENCHMARK_SRC_MEASUREMENT_SESSION_HPP
+#define ENGINE_APP_BENCHMARK_SRC_MEASUREMENT_SESSION_HPP
 #include "../scenario/scenario.hpp"
 #include <chrono>
 #include <engine/platform/process/process.hpp>
@@ -9,6 +9,7 @@
 #include <memory>
 #include <optional>
 #include <stdexcept>
+#include <thread>
 namespace engine::app::benchmark {
 using Clock = std::chrono::steady_clock;
 template <typename T> T take(std::expected<T, std::string> value) {
@@ -70,7 +71,7 @@ struct Measurements {
 struct Session {
     Options options;
     Scenario scenario;
-    world::model::World world;
+    world::model::World world{std::thread::hardware_concurrency()};
     std::unique_ptr<platform::window::Window> window;
     std::unique_ptr<rendering::vulkan::Renderer> renderer;
     std::optional<motion::camera::Camera> camera;

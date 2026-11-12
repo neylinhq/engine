@@ -3,21 +3,23 @@
 #include <exception>
 #include <iostream>
 #include <vector>
+namespace engine::app::sandbox {
 namespace {
 int run_arguments(int count, char** arguments) {
     try {
-        auto options = engine::app::sandbox::parse_options(count, arguments);
+        auto options = parse_options(count, arguments);
         if (options.help) {
-            engine::app::sandbox::print_usage();
+            print_usage();
             return 0;
         }
-        return engine::app::sandbox::run(std::move(options));
+        return run(std::move(options));
     } catch (const std::exception& error) {
         std::cerr << "Sandbox: " << error.what() << '\n';
         return 1;
     }
 }
 } // namespace
+} // namespace engine::app::sandbox
 #ifdef _WIN32
 int wmain(int count, wchar_t** arguments) {
     try {
@@ -32,7 +34,7 @@ int wmain(int count, wchar_t** arguments) {
         for (auto& value : utf8) {
             values.push_back(value.data());
         }
-        return run_arguments(count, values.data());
+        return engine::app::sandbox::run_arguments(count, values.data());
     } catch (const std::exception& error) {
         std::cerr << "Sandbox: " << error.what() << '\n';
         return 1;
@@ -40,6 +42,6 @@ int wmain(int count, wchar_t** arguments) {
 }
 #else
 int main(int count, char** arguments) {
-    return run_arguments(count, arguments);
+    return engine::app::sandbox::run_arguments(count, arguments);
 }
 #endif

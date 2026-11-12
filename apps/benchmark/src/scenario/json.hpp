@@ -1,5 +1,5 @@
-#ifndef ENGINE_APP_BENCHMARK_JSON_HPP
-#define ENGINE_APP_BENCHMARK_JSON_HPP
+#ifndef ENGINE_APP_BENCHMARK_SRC_SCENARIO_JSON_HPP
+#define ENGINE_APP_BENCHMARK_SRC_SCENARIO_JSON_HPP
 #include "scenario.hpp"
 #include <initializer_list>
 #include <string_view>
@@ -8,7 +8,7 @@ void keys(const json::object& object, std::initializer_list<std::string_view> al
 [[nodiscard]] unsigned integer(const json::value& value, unsigned minimum, unsigned maximum);
 [[nodiscard]] double real(const json::value& value, double minimum, double maximum);
 [[nodiscard]] std::string text(const json::value& value);
-[[nodiscard]] world::model::IVec3 voxel(const json::value& value);
+[[nodiscard]] world::model::Vec3i voxel(const json::value& value);
 [[nodiscard]] foundation::geometry::Vec3 vector(const json::value& value);
 [[nodiscard]] std::string read_text(const std::filesystem::path& path);
 [[nodiscard]] std::filesystem::path relative_file(const json::value& value,

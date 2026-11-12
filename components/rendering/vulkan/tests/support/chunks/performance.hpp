@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_CHUNKS_PERFORMANCE_HPP
+#define ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_CHUNKS_PERFORMANCE_HPP
 
 #include "pattern.hpp"
 
@@ -59,3 +60,5 @@ class ChunkLayoutPerformance {
 };
 
 } // namespace engine::rendering::vulkan::test
+
+#endif

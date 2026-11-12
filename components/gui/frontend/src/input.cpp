@@ -14,12 +14,12 @@ bool configure_input(bool enabled) {
     io.ClearEventsQueue();
     io.ClearInputKeys();
     io.ClearInputMouse();
-    constexpr auto blocked = ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoKeyboard |
-                             ImGuiConfigFlags_NoMouseCursorChange;
+    constexpr auto kBlocked = ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NoKeyboard |
+                              ImGuiConfigFlags_NoMouseCursorChange;
     if (enabled) {
-        io.ConfigFlags &= ~blocked;
+        io.ConfigFlags &= ~kBlocked;
     } else {
-        io.ConfigFlags |= blocked;
+        io.ConfigFlags |= kBlocked;
         ImGui::SetWindowFocus(nullptr);
     }
     return true;

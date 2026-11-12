@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_MESH_CLIPPING_HPP
+#define ENGINE_WORLD_STORAGE_SRC_MESH_CLIPPING_HPP
 
 #include "../import.hpp"
 
@@ -19,7 +20,9 @@ struct ClipWorkspace {
     std::vector<Fragment> next;
 };
 
-[[nodiscard]] WeightedCoordinate clip_voxel(const Fragment& fragment, model::IVec3 voxel,
+[[nodiscard]] WeightedCoordinate clip_voxel(const Fragment& fragment, model::Vec3i voxel,
                                             float original_area, ClipWorkspace& workspace);
 
 } // namespace engine::world::storage
+
+#endif

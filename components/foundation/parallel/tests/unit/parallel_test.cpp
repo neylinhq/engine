@@ -7,7 +7,7 @@
 
 int main() {
     std::array<std::atomic<unsigned>, 4096> visits{};
-    engine::foundation::parallel::for_each_index(visits.size(),
+    engine::foundation::parallel::for_each_index(visits.size(), 2,
                                                  [&](std::size_t index) { ++visits[index]; });
     for (const auto& visit : visits) {
         if (visit != 1) {
@@ -16,7 +16,7 @@ int main() {
     }
     bool caught = false;
     try {
-        engine::foundation::parallel::for_each_index(visits.size(), [](std::size_t index) {
+        engine::foundation::parallel::for_each_index(visits.size(), 2, [](std::size_t index) {
             if (index == 117) {
                 throw std::runtime_error("worker failure");
             }

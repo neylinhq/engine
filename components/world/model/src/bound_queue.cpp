@@ -5,8 +5,8 @@
 namespace engine::world::model {
 namespace {
 
-constexpr std::array<unsigned, 6> masks{0x3D, 0x3E, 0x37, 0x3B, 0x1F, 0x2F};
-constexpr std::array<IVec3, 6> directions{
+constexpr std::array<unsigned, 6> kMasks{0x3D, 0x3E, 0x37, 0x3B, 0x1F, 0x2F};
+constexpr std::array<Vec3i, 6> kDirections{
     {{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}}};
 
 bool empty(ChunkBounds field, std::size_t index) {
@@ -30,27 +30,27 @@ unsigned matching(std::uint32_t neighbor, std::uint32_t current) {
     return result;
 }
 
-bool relax(ChunkBounds field, std::size_t index, IVec3 position) {
+bool relax(ChunkBounds field, std::size_t index, Vec3i position) {
     auto& current = field.chunks[index];
     const auto old = current;
     for (unsigned direction = 0; direction < 6; ++direction) {
-        const auto offset = directions[direction];
-        const IVec3 next{position.x + offset.x, position.y + offset.y, position.z + offset.z};
+        const auto offset = kDirections[direction];
+        const Vec3i next{position.x + offset.x, position.y + offset.y, position.z + offset.z};
         if (!inside(next, field.size) || ((current >> (direction * 5)) & 31U) == 31) {
             continue;
         }
         const auto neighbor = flatten(next, field.size);
         if (empty(field, neighbor) &&
-            (matching(field.chunks[neighbor], current) & masks[direction]) == masks[direction]) {
+            (matching(field.chunks[neighbor], current) & kMasks[direction]) == kMasks[direction]) {
             current += 1U << (direction * 5);
         }
     }
     return old != current;
 }
 
-void schedule_neighbors(ChunkBounds field, BoundWork& work, IVec3 position) {
-    for (auto offset : directions) {
-        const IVec3 next{position.x + offset.x, position.y + offset.y, position.z + offset.z};
+void schedule_neighbors(ChunkBounds field, BoundWork& work, Vec3i position) {
+    for (auto offset : kDirections) {
+        const Vec3i next{position.x + offset.x, position.y + offset.y, position.z + offset.z};
         if (inside(next, field.size)) {
             const auto index = flatten(next, field.size);
             if (empty(field, index)) {
@@ -61,11 +61,11 @@ void schedule_neighbors(ChunkBounds field, BoundWork& work, IVec3 position) {
 }
 
 struct Region {
-    IVec3 lower;
-    IVec3 upper;
+    Vec3i lower;
+    Vec3i upper;
 };
 
-Region affected_region(IVec3 size, std::span<const std::size_t> changed) {
+Region affected_region(Vec3i size, std::span<const std::size_t> changed) {
     Region region{size, {0, 0, 0}};
     for (auto index : changed) {
         const auto position = unflatten(index, size);
@@ -89,11 +89,11 @@ void invalidate_bounds(ChunkBounds bounds, std::span<const std::size_t> changed,
         return;
     }
     const auto region = affected_region(bounds.size, changed);
-    const IVec3 extent{region.upper.x - region.lower.x + 1, region.upper.y - region.lower.y + 1,
+    const Vec3i extent{region.upper.x - region.lower.x + 1, region.upper.y - region.lower.y + 1,
                        region.upper.z - region.lower.z + 1};
     for (std::size_t local = 0; local < volume(extent); ++local) {
         const auto relative = unflatten(local, extent);
-        const IVec3 position{region.lower.x + relative.x, region.lower.y + relative.y,
+        const Vec3i position{region.lower.x + relative.x, region.lower.y + relative.y,
                              region.lower.z + relative.z};
         const auto index = flatten(position, bounds.size);
         if ((bounds.chunks[index] >> 30) == 0) {

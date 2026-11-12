@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_SRC_WORLD_UPDATES_GROUPS_HPP
+#define ENGINE_RENDERING_VULKAN_SRC_WORLD_UPDATES_GROUPS_HPP
 
 #include <engine/world/model/types.hpp>
 
@@ -12,20 +13,20 @@ namespace engine::rendering::vulkan {
 
 using GroupRecord = std::array<std::uint32_t, 2>;
 
-[[nodiscard]] world::model::IVec3 aadf_group_dimensions(world::model::IVec3 chunks);
+[[nodiscard]] world::model::Vec3i aadf_group_dimensions(world::model::Vec3i chunks);
 
 // Original ChangeHandler's CPU frontier; the resulting limits are applied by
 // worldChange, and all persistent AADF growth remains GPU work.
 class GroupChanges {
   public:
-    void initialize(world::model::IVec3 chunks);
-    [[nodiscard]] world::model::IVec3 dimensions() const;
+    void initialize(world::model::Vec3i chunks);
+    [[nodiscard]] world::model::Vec3i dimensions() const;
     [[nodiscard]] std::uint32_t count() const;
     [[nodiscard]] std::span<const GroupRecord> build(std::span<const std::uint32_t> chunks);
 
   private:
-    world::model::IVec3 chunks_;
-    world::model::IVec3 groups_;
+    world::model::Vec3i chunks_;
+    world::model::Vec3i groups_;
     std::vector<std::uint32_t> distances_;
     std::vector<std::uint32_t> changed_;
     std::deque<std::uint32_t> pending_;
@@ -38,3 +39,5 @@ class GroupChanges {
 };
 
 } // namespace engine::rendering::vulkan
+
+#endif

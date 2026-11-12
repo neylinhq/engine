@@ -1,5 +1,5 @@
-#ifndef ENGINE_APP_BENCHMARK_SCENARIO_HPP
-#define ENGINE_APP_BENCHMARK_SCENARIO_HPP
+#ifndef ENGINE_APP_BENCHMARK_SRC_SCENARIO_SCENARIO_HPP
+#define ENGINE_APP_BENCHMARK_SRC_SCENARIO_SCENARIO_HPP
 #include "../command.hpp"
 #include <boost/json.hpp>
 #include <engine/foundation/geometry/vector.hpp>
@@ -20,20 +20,20 @@ struct Event {
     unsigned frame = 0;
     Operation operation = Operation::brush;
     world::editing::Brush brush;
-    world::model::IVec3 voxel;
+    world::model::Vec3i voxel;
     foundation::geometry::Vec3 position;
     std::filesystem::path model;
     std::string entity;
     std::uint16_t material = 1;
 };
 struct Probe {
-    world::model::IVec3 voxel;
+    world::model::Vec3i voxel;
     std::uint16_t material = 0;
 };
 struct Scenario {
     std::string name;
     std::filesystem::path scene;
-    world::model::IVec3 empty_size{256, 256, 256};
+    world::model::Vec3i empty_size{256, 256, 256};
     double voxel_size = 1;
     unsigned frames = 600;
     unsigned warmup_frames = 4000;

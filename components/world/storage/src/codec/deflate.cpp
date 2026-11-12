@@ -51,15 +51,15 @@ void symbol(BitWriter& output, unsigned value) {
     }
 }
 
-constexpr std::array<unsigned, 29> length_base{3,  4,  5,  6,   7,   8,   9,   10,  11, 13,
+constexpr std::array<unsigned, 29> kLengthBase{3,  4,  5,  6,   7,   8,   9,   10,  11, 13,
                                                15, 17, 19, 23,  27,  31,  35,  43,  51, 59,
                                                67, 83, 99, 115, 131, 163, 195, 227, 258};
-constexpr std::array<unsigned, 29> length_extra{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2,
+constexpr std::array<unsigned, 29> kLengthExtra{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2,
                                                 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0};
-constexpr std::array<unsigned, 30> distance_base{
+constexpr std::array<unsigned, 30> kDistanceBase{
     1,   2,   3,   4,   5,   7,    9,    13,   17,   25,   33,   49,   65,    97,    129,
     193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577};
-constexpr std::array<unsigned, 30> distance_extra{0, 0, 0,  0,  1,  1,  2,  2,  3,  3,
+constexpr std::array<unsigned, 30> kDistanceExtra{0, 0, 0,  0,  1,  1,  2,  2,  3,  3,
                                                   4, 4, 5,  5,  6,  6,  7,  7,  8,  8,
                                                   9, 9, 10, 10, 11, 11, 12, 12, 13, 13};
 
@@ -77,12 +77,12 @@ struct Match {
 };
 
 void emit_match(BitWriter& output, Match match) {
-    const auto length = interval(length_base, match.length);
+    const auto length = interval(kLengthBase, match.length);
     symbol(output, 257 + length);
-    output.bits(match.length - length_base[length], length_extra[length]);
-    const auto distance = interval(distance_base, match.distance);
+    output.bits(match.length - kLengthBase[length], kLengthExtra[length]);
+    const auto distance = interval(kDistanceBase, match.distance);
     output.huffman(distance, 5);
-    output.bits(match.distance - distance_base[distance], distance_extra[distance]);
+    output.bits(match.distance - kDistanceBase[distance], kDistanceExtra[distance]);
 }
 
 class MatchWindow {

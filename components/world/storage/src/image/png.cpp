@@ -29,11 +29,11 @@ void header(Png& png, Reader& reader) {
     const auto compression = reader.u8();
     const auto filter = reader.u8();
     png.interlace = reader.u8();
-    constexpr std::array<unsigned, 7> channels{1, 0, 3, 1, 2, 0, 4};
-    if (png.type >= channels.size() || channels[png.type] == 0) {
+    constexpr std::array<unsigned, 7> kChannels{1, 0, 3, 1, 2, 0, 4};
+    if (png.type >= kChannels.size() || kChannels[png.type] == 0) {
         throw std::runtime_error("Invalid PNG color type");
     }
-    png.channels = channels[png.type];
+    png.channels = kChannels[png.type];
     if (png.image.width == 0 || png.image.height == 0 || png.image.width > 32768 ||
         png.image.height > 32768 || compression != 0 || filter != 0 || png.interlace > 1) {
         throw std::runtime_error("Unsupported PNG dimensions or header");

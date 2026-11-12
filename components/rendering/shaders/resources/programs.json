@@ -66,277 +66,277 @@
   "programs": [
     {
       "name": "_dataCopy_copyData",
-      "source": "dataCopy.slang",
+      "source": "data_copy.slang",
       "entry": "copyData",
       "stage": "compute"
     },
     {
       "name": "albedo_renderFinal_MainVS",
-      "source": "render/versions/albedo/renderFinal.slang",
+      "source": "render/albedo/render_final.slang",
       "entry": "MainVS",
       "stage": "vertex"
     },
     {
       "name": "albedo_renderFinal_MainPS",
-      "source": "render/versions/albedo/renderFinal.slang",
+      "source": "render/albedo/render_final.slang",
       "entry": "MainPS",
       "stage": "fragment"
     },
     {
       "name": "albedo_renderFirstHit_calcFirstHit",
-      "source": "render/versions/albedo/renderFirstHit.slang",
+      "source": "render/albedo/render_first_hit.slang",
       "entry": "calcFirstHit",
       "stage": "compute"
     },
     {
       "name": "albedo_renderTaaSampleReverse_reprojectOldSamples",
-      "source": "render/versions/albedo/renderTaaSampleReverse.slang",
+      "source": "render/albedo/render_taa_sample_reverse.slang",
       "entry": "reprojectOldSamples",
       "stage": "compute"
     },
     {
       "name": "base_rayQueueCalc_calcRayQueue",
-      "source": "render/versions/base/rayQueueCalc.slang",
+      "source": "render/base/ray_queue_calc.slang",
       "entry": "calcRayQueue",
       "stage": "compute"
     },
     {
       "name": "base_rayQueueCalc_calcRayQueueStore",
-      "source": "render/versions/base/rayQueueCalc.slang",
+      "source": "render/base/ray_queue_calc.slang",
       "entry": "calcRayQueueStore",
       "stage": "compute"
     },
     {
       "name": "base_renderAtmosphere_precomputeAtmosphere",
-      "source": "render/versions/base/renderAtmosphere.slang",
+      "source": "render/base/render_atmosphere.slang",
       "entry": "precomputeAtmosphere",
       "stage": "compute"
     },
     {
       "name": "base_renderDenoiseSplit_calcDenoiseHorizontal",
-      "source": "render/versions/base/renderDenoiseSplit.slang",
+      "source": "render/base/render_denoise_split.slang",
       "entry": "calcDenoiseHorizontal",
       "stage": "compute"
     },
     {
       "name": "base_renderDenoiseSplit_calcDenoiseVertical",
-      "source": "render/versions/base/renderDenoiseSplit.slang",
+      "source": "render/base/render_denoise_split.slang",
       "entry": "calcDenoiseVertical",
       "stage": "compute"
     },
     {
       "name": "base_renderFinal_MainVS",
-      "source": "render/versions/base/renderFinal.slang",
+      "source": "render/base/render_final.slang",
       "entry": "MainVS",
       "stage": "vertex"
     },
     {
       "name": "base_renderFinal_MainPS",
-      "source": "render/versions/base/renderFinal.slang",
+      "source": "render/base/render_final.slang",
       "entry": "MainPS",
       "stage": "fragment"
     },
     {
       "name": "base_renderFirstHit_calcFirstHit",
-      "source": "render/versions/base/renderFirstHit.slang",
+      "source": "render/base/render_first_hit.slang",
       "entry": "calcFirstHit",
       "stage": "compute"
     },
     {
       "name": "base_renderGlobalIllum_calcGlobalIlum",
-      "source": "render/versions/base/renderGlobalIllum.slang",
+      "source": "render/base/render_global_illum.slang",
       "entry": "calcGlobalIlum",
       "stage": "compute"
     },
     {
       "name": "base_renderSampleRefine_clearBucketsAndCalcMask",
-      "source": "render/versions/base/renderSampleRefine.slang",
+      "source": "render/base/render_sample_refine.slang",
       "entry": "clearBucketsAndCalcMask",
       "stage": "compute"
     },
     {
       "name": "base_renderSampleRefine_computeValidHistory",
-      "source": "render/versions/base/renderSampleRefine.slang",
+      "source": "render/base/render_sample_refine.slang",
       "entry": "computeValidHistory",
       "stage": "compute"
     },
     {
       "name": "base_renderSampleRefine_countValidDataAndRefine",
-      "source": "render/versions/base/renderSampleRefine.slang",
+      "source": "render/base/render_sample_refine.slang",
       "entry": "countValidDataAndRefine",
       "stage": "compute"
     },
     {
       "name": "base_renderSampleRefine_countInvalidData",
-      "source": "render/versions/base/renderSampleRefine.slang",
+      "source": "render/base/render_sample_refine.slang",
       "entry": "countInvalidData",
       "stage": "compute"
     },
     {
       "name": "base_renderSampleRefine_refineBuckets",
-      "source": "render/versions/base/renderSampleRefine.slang",
+      "source": "render/base/render_sample_refine.slang",
       "entry": "refineBuckets",
       "stage": "compute"
     },
     {
       "name": "base_renderSpatialResampling_calcSpatialResampling",
-      "source": "render/versions/base/renderSpatialResampling.slang",
+      "source": "render/base/render_spatial_resampling.slang",
       "entry": "calcSpatialResampling",
       "stage": "compute"
     },
     {
       "name": "base_renderTaaSampleReverse_reprojectOldSamples",
-      "source": "render/versions/base/renderTaaSampleReverse.slang",
+      "source": "render/base/render_taa_sample_reverse.slang",
       "entry": "reprojectOldSamples",
       "stage": "compute"
     },
     {
       "name": "base_renderTaaSampleReverse_calcNewTaaSample",
-      "source": "render/versions/base/renderTaaSampleReverse.slang",
+      "source": "render/base/render_taa_sample_reverse.slang",
       "entry": "calcNewTaaSample",
       "stage": "compute"
     },
     {
       "name": "pathTracer_renderAtmosphere_precomputeAtmosphere",
-      "source": "render/versions/path_tracer/renderAtmosphere.slang",
+      "source": "render/path_tracer/render_atmosphere.slang",
       "entry": "precomputeAtmosphere",
       "stage": "compute"
     },
     {
       "name": "pathTracer_renderFinal_MainVS",
-      "source": "render/versions/path_tracer/renderFinal.slang",
+      "source": "render/path_tracer/render_final.slang",
       "entry": "MainVS",
       "stage": "vertex"
     },
     {
       "name": "pathTracer_renderFinal_MainPS",
-      "source": "render/versions/path_tracer/renderFinal.slang",
+      "source": "render/path_tracer/render_final.slang",
       "entry": "MainPS",
       "stage": "fragment"
     },
     {
       "name": "pathTracer_renderFirstHit_calcFirstHit",
-      "source": "render/versions/path_tracer/renderFirstHit.slang",
+      "source": "render/path_tracer/render_first_hit.slang",
       "entry": "calcFirstHit",
       "stage": "compute"
     },
     {
       "name": "pathTracer_renderGlobalIllum_calcGlobalIlum",
-      "source": "render/versions/path_tracer/renderGlobalIllum.slang",
+      "source": "render/path_tracer/render_global_illum.slang",
       "entry": "calcGlobalIlum",
       "stage": "compute"
     },
     {
       "name": "world_data_boundsCalc_addInitialGroupsToBoundQueue",
-      "source": "world/data/boundsCalc.slang",
+      "source": "world/data/bounds_calc.slang",
       "entry": "addInitialGroupsToBoundQueue",
       "stage": "compute"
     },
     {
       "name": "world_data_boundsCalc_prepareGroupBounds",
-      "source": "world/data/boundsCalc.slang",
+      "source": "world/data/bounds_calc.slang",
       "entry": "prepareGroupBounds",
       "stage": "compute"
     },
     {
       "name": "world_data_boundsCalc_computeGroupBounds",
-      "source": "world/data/boundsCalc.slang",
+      "source": "world/data/bounds_calc.slang",
       "entry": "computeGroupBounds",
       "stage": "compute"
     },
     {
       "name": "world_data_chunkCalc_calcBlockFromRawData",
-      "source": "world/data/chunkCalc.slang",
+      "source": "world/data/chunk_calc.slang",
       "entry": "calcBlockFromRawData",
       "stage": "compute"
     },
     {
       "name": "world_data_chunkCalc_computeVoxelBounds",
-      "source": "world/data/chunkCalc.slang",
+      "source": "world/data/chunk_calc.slang",
       "entry": "computeVoxelBounds",
       "stage": "compute"
     },
     {
       "name": "world_data_chunkCalc_computeBlockBounds",
-      "source": "world/data/chunkCalc.slang",
+      "source": "world/data/chunk_calc.slang",
       "entry": "computeBlockBounds",
       "stage": "compute"
     },
     {
       "name": "world_data_chunkCalc_chunkCopyToCpu",
-      "source": "world/data/chunkCalc.slang",
+      "source": "world/data/chunk_calc.slang",
       "entry": "chunkCopyToCpu",
       "stage": "compute"
     },
     {
       "name": "world_data_entityUpdate_updateChunks",
-      "source": "world/data/entityUpdate.slang",
+      "source": "world/data/entity_update.slang",
       "entry": "updateChunks",
       "stage": "compute"
     },
     {
       "name": "world_data_entityUpdate_copyEntityChunkInstances",
-      "source": "world/data/entityUpdate.slang",
+      "source": "world/data/entity_update.slang",
       "entry": "copyEntityChunkInstances",
       "stage": "compute"
     },
     {
       "name": "world_data_entityUpdate_copyEntityHistory",
-      "source": "world/data/entityUpdate.slang",
+      "source": "world/data/entity_update.slang",
       "entry": "copyEntityHistory",
       "stage": "compute"
     },
     {
       "name": "world_data_mapCopy_copyMap",
-      "source": "world/data/mapCopy.slang",
+      "source": "world/data/map_copy.slang",
       "entry": "copyMap",
       "stage": "compute"
     },
     {
       "name": "world_data_mapCopy_testHash",
-      "source": "world/data/mapCopy.slang",
+      "source": "world/data/map_copy.slang",
       "entry": "testHash",
       "stage": "compute"
     },
     {
       "name": "world_data_worldChange_applyGroupChange",
-      "source": "world/data/worldChange.slang",
+      "source": "world/data/world_change.slang",
       "entry": "applyGroupChange",
       "stage": "compute"
     },
     {
       "name": "world_data_worldChange_applyChunkChange",
-      "source": "world/data/worldChange.slang",
+      "source": "world/data/world_change.slang",
       "entry": "applyChunkChange",
       "stage": "compute"
     },
     {
       "name": "world_data_worldChange_applyBlockChange",
-      "source": "world/data/worldChange.slang",
+      "source": "world/data/world_change.slang",
       "entry": "applyBlockChange",
       "stage": "compute"
     },
     {
       "name": "world_data_worldChange_applyVoxelChange",
-      "source": "world/data/worldChange.slang",
+      "source": "world/data/world_change.slang",
       "entry": "applyVoxelChange",
       "stage": "compute"
     },
     {
       "name": "world_generator_generatorModel_fillChunkDataWithModelData16",
-      "source": "world/generator/generatorModel.slang",
+      "source": "world/generator/generator_model.slang",
       "entry": "fillChunkDataWithModelData16",
       "stage": "compute"
     },
     {
       "name": "world_model_typeMapping_mapTypesWithState",
-      "source": "world/model/typeMapping.slang",
+      "source": "world/model/type_mapping.slang",
       "entry": "mapTypesWithState",
       "stage": "compute"
     },
     {
       "name": "world_model_typeMapping_mapTypes16",
-      "source": "world/model/typeMapping.slang",
+      "source": "world/model/type_mapping.slang",
       "entry": "mapTypes16",
       "stage": "compute"
     }

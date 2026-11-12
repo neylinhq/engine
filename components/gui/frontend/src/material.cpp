@@ -47,18 +47,18 @@ bool optical_fields(world::model::Material& material) {
     return changed;
 }
 bool base_selector(world::model::Material& material) {
-    constexpr std::array<const char*, 4> names{"Diffuse", "Emissive", "MetallicRough",
-                                               "MetallicMirror"};
+    constexpr std::array<const char*, 4> kNames{"Diffuse", "Emissive", "MetallicRough",
+                                                "MetallicMirror"};
     const auto old = static_cast<std::size_t>(material.base);
-    if (!ImGui::BeginCombo("Material Base", old < names.size() ? names[old] : "Unknown")) {
+    if (!ImGui::BeginCombo("Material Base", old < kNames.size() ? kNames[old] : "Unknown")) {
         return false;
     }
     bool changed = false;
-    for (std::size_t index = 0; index < names.size(); ++index) {
+    for (std::size_t index = 0; index < kNames.size(); ++index) {
         if (index == 3 && material.layer != world::model::MaterialLayer::none) {
             continue;
         }
-        if (ImGui::Selectable(names[index], index == old)) {
+        if (ImGui::Selectable(kNames[index], index == old)) {
             changed = true;
             material.base = static_cast<world::model::MaterialBase>(index);
             if (index == 2) {

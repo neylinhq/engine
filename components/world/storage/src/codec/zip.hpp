@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_CODEC_ZIP_HPP
+#define ENGINE_WORLD_STORAGE_SRC_CODEC_ZIP_HPP
 
 #include "binary.hpp"
 
@@ -15,3 +16,5 @@ namespace engine::world::storage {
 [[nodiscard]] std::vector<std::byte> deflate(std::span<const std::byte> bytes);
 
 } // namespace engine::world::storage
+
+#endif

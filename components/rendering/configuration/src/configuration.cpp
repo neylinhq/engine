@@ -1,6 +1,6 @@
+#include <engine/rendering/configuration/configuration.hpp>
 #include "settings.hpp"
 #include <algorithm>
-#include <engine/rendering/configuration/configuration.hpp>
 namespace engine::rendering::configuration {
 void validate_settings(settings::Settings& settings) {
     auto& general = settings.general;
@@ -24,11 +24,6 @@ void validate_settings(settings::Settings& settings) {
     path.max_samples = std::clamp(path.max_samples, 1, 8192);
 }
 
-const json::object& object_setting(const json::object& object, std::string_view key) {
-    static const json::object empty;
-    const auto* value = object.if_contains(key);
-    return value ? value->as_object() : empty;
-}
 namespace {
 void known_keys(const json::object& input, const json::object& known) {
     for (const auto& member : input) {
@@ -49,13 +44,19 @@ settings::Settings parse(std::string_view text, bool strict) {
     if (strict) {
         known_keys(root, json::parse(serialize(result)).as_object());
     }
-    const auto& general = object_setting(root, "general");
-    read_setting(general, "exposure", result.general.exposure);
-    read_setting(general, "toneMappingFac", result.general.tone_mapping);
-    read_setting(general, "fov", result.general.fov);
-    read_setting(general, "lockTo60fps", result.general.lock_to_60);
-    read_render(object_setting(root, "render"), result.render);
-    read_atmosphere(object_setting(root, "atmosphere"), result.atmosphere);
+    if (const auto* group = root.if_contains("general")) {
+        const auto& general = group->as_object();
+        read_setting(general, "exposure", result.general.exposure);
+        read_setting(general, "toneMappingFac", result.general.tone_mapping);
+        read_setting(general, "fov", result.general.fov);
+        read_setting(general, "lockTo60fps", result.general.lock_to_60);
+    }
+    if (const auto* group = root.if_contains("render")) {
+        read_render(group->as_object(), result.render);
+    }
+    if (const auto* group = root.if_contains("atmosphere")) {
+        read_atmosphere(group->as_object(), result.atmosphere);
+    }
     auto checked = result;
     validate_settings(checked);
     if (strict && checked != result) {

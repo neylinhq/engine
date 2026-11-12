@@ -141,9 +141,9 @@ void identify(Session& session) {
     const auto executable = platform::process::executable();
     results.build = {{"executable", platform::process::path_text(executable)},
                      {"executable_sha256", platform::process::file_sha256(executable)},
-                     {"compiler", ENGINE_BENCHMARK_COMPILER},
-                     {"configuration", ENGINE_BENCHMARK_BUILD_TYPE},
-                     {"engine_version", ENGINE_BENCHMARK_VERSION},
+                     {"compiler", ENGINE_APP_BENCHMARK_COMPILER},
+                     {"configuration", ENGINE_APP_BENCHMARK_BUILD_TYPE},
+                     {"engine_version", ENGINE_APP_BENCHMARK_VERSION},
                      {"shaders", shaders(session.scenario.renderer.shaders)}};
 }
 } // namespace engine::app::benchmark

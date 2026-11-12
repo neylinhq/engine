@@ -11,7 +11,7 @@
 | Зависимость | Назначение | Уведомление |
 |---|---|---|
 | Boost.JSON | Чтение и запись JSON | [Boost Software License 1.0](licenses/boost.txt) |
-| OpenSSL Crypto | SHA-256 файлов и отчётов benchmark | [Apache 2.0 и включённые уведомления](licenses/openssl.txt) |
+| OpenSSL Crypto | SHA-256 файлов и отчётов Benchmark в Linux | [Apache 2.0 и включённые уведомления](licenses/openssl.txt) |
 | GLFW | Окно, события ввода и поверхность Vulkan | [Лицензия GLFW](licenses/glfw.txt) |
 | Dear ImGui | Интерфейс Sandbox | [MIT](licenses/imgui.txt) |
 | Вспомогательный код в составе ImGui | Внутренние средства ImGui | [Уведомления](licenses/imgui_bundled_stb.txt) |

@@ -1,5 +1,5 @@
-#ifndef ENGINE_GUI_FRONTEND_PATH_HPP
-#define ENGINE_GUI_FRONTEND_PATH_HPP
+#ifndef ENGINE_GUI_FRONTEND_SRC_FILES_PATH_HPP
+#define ENGINE_GUI_FRONTEND_SRC_FILES_PATH_HPP
 #include <filesystem>
 #include <string>
 #include <string_view>

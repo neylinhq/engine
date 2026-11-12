@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_STORAGE_HPP
+#define ENGINE_WORLD_STORAGE_STORAGE_HPP
 
 #include <engine/world/model/types.hpp>
 
@@ -33,3 +34,5 @@ struct PathNode {
 void save_path(const std::filesystem::path& path, std::span<const PathNode> nodes);
 
 } // namespace engine::world::storage
+
+#endif

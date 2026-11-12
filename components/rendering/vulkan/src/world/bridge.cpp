@@ -24,7 +24,7 @@ world::model::GeneratedWorld mirror(GenerationResult generated) {
 } // namespace
 
 std::expected<world::model::GeneratedWorld, std::string>
-Renderer::generate_world(const world::model::Model& source, world::model::IVec3 requested,
+Renderer::generate_world(const world::model::Model& source, world::model::Vec3i requested,
                          int segment_groups) {
     try {
         return impl_->generate_world(source, requested, segment_groups);
@@ -35,7 +35,7 @@ Renderer::generate_world(const world::model::Model& source, world::model::IVec3 
 
 std::expected<void, std::string> Renderer::generate_world(world::model::World& target,
                                                           const world::model::Model& source,
-                                                          world::model::IVec3 requested,
+                                                          world::model::Vec3i requested,
                                                           int segment_groups) {
     try {
         static_cast<void>(impl_->generate_world(source, requested, segment_groups, &target));
@@ -54,7 +54,7 @@ std::vector<ComputeExecution> Renderer::world_executions() const {
 }
 
 world::model::GeneratedWorld Renderer::Impl::generate_world(const world::model::Model& source,
-                                                            world::model::IVec3 requested,
+                                                            world::model::Vec3i requested,
                                                             int segment_groups,
                                                             world::model::World* target) {
     device.logical->waitIdle();

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_SRC_WORLD_UPDATES_HPP
+#define ENGINE_RENDERING_VULKAN_SRC_WORLD_UPDATES_HPP
 
 #include "../world_updates/groups.hpp"
 
@@ -13,7 +14,7 @@ class WorldCompute;
 class WorldUpdates {
   public:
     explicit WorldUpdates(WorldCompute& compute);
-    void initialize(world::model::IVec3 chunks);
+    void initialize(world::model::Vec3i chunks);
     void apply(const FrameInput& input);
     void entities(const FrameInput& input, unsigned history_index);
     void bounds(unsigned budget);
@@ -22,7 +23,7 @@ class WorldUpdates {
   private:
     WorldCompute& compute_;
     GroupChanges changes_;
-    world::model::IVec3 chunks_;
+    world::model::Vec3i chunks_;
     std::uint32_t frame_ = 0x7FFFFFFFU;
     std::uint64_t entity_revision_ = ~std::uint64_t{0};
     std::uint64_t entity_voxel_revision_ = ~std::uint64_t{0};
@@ -33,3 +34,5 @@ class WorldUpdates {
 };
 
 } // namespace engine::rendering::vulkan
+
+#endif

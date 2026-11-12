@@ -1,22 +1,151 @@
 {
   "version": 6,
-  "cmakeMinimumRequired": {"major": 3, "minor": 27, "patch": 0},
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 4,
+    "patch": 5
+  },
   "configurePresets": [
-    {"name": "debug", "generator": "Ninja", "binaryDir": "${sourceDir}/out/debug",
-     "cacheVariables": {"CMAKE_BUILD_TYPE": "Debug", "ARCHCHECK_CONFIGURATION": "debug"}},
-    {"name": "release", "inherits": "debug", "binaryDir": "${sourceDir}/out/release",
-     "cacheVariables": {"CMAKE_BUILD_TYPE": "Release", "ARCHCHECK_CONFIGURATION": "release"}},
-    {"name": "sanitizers", "inherits": "debug", "binaryDir": "${sourceDir}/out/sanitizers",
-     "cacheVariables": {"ENGINE_SANITIZERS": "ON"}}
+    {
+      "name": "engine",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/${presetName}",
+      "toolchainFile": "${sourceDir}/out/${presetName}/conan/conan_toolchain.cmake",
+      "cacheVariables": {
+        "ARCHCHECK_CONFIGURATION": "${presetName}"
+      }
+    },
+    {
+      "name": "debug",
+      "hidden": true,
+      "inherits": "engine",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "inherits": "engine",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "ENGINE_GPU_TESTS": true
+      }
+    },
+    {
+      "name": "linux",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "windows-debug",
+      "inherits": [
+        "debug",
+        "windows"
+      ]
+    },
+    {
+      "name": "windows-release",
+      "inherits": [
+        "release",
+        "windows"
+      ]
+    },
+    {
+      "name": "linux-debug",
+      "inherits": [
+        "debug",
+        "linux"
+      ]
+    },
+    {
+      "name": "linux-release",
+      "inherits": [
+        "release",
+        "linux"
+      ]
+    },
+    {
+      "name": "sanitizers",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "ENGINE_SANITIZERS": true
+      }
+    }
   ],
   "buildPresets": [
-    {"name": "debug", "configurePreset": "debug"},
-    {"name": "release", "configurePreset": "release"},
-    {"name": "sanitizers", "configurePreset": "sanitizers"}
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release"
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "sanitizers",
+      "configurePreset": "sanitizers"
+    }
   ],
   "testPresets": [
-    {"name": "debug", "configurePreset": "debug", "output": {"outputOnFailure": true}},
-    {"name": "release", "configurePreset": "release", "output": {"outputOnFailure": true}},
-    {"name": "sanitizers", "configurePreset": "sanitizers", "output": {"outputOnFailure": true}}
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "sanitizers",
+      "configurePreset": "sanitizers",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
   ]
 }

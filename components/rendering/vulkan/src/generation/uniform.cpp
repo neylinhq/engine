@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 namespace engine::rendering::vulkan {
-bool uniform_source(const world::model::Model& source, world::model::IVec3 requested,
+bool uniform_source(const world::model::Model& source, world::model::Vec3i requested,
                     int segment_groups) {
     if (segment_groups < 1 || segment_groups > 8 || requested != source.size) {
         return false;

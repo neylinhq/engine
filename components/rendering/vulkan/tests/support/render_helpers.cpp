@@ -28,8 +28,8 @@ struct ProjectionCase {
 };
 
 std::vector<ProjectionCase> projection_cases() {
-    constexpr auto infinity = std::numeric_limits<float>::infinity();
-    constexpr auto nan = std::numeric_limits<float>::quiet_NaN();
+    constexpr auto kInfinity = std::numeric_limits<float>::infinity();
+    constexpr auto kNan = std::numeric_limits<float>::quiet_NaN();
     return {{{0, 0, 0.5F, 0}, {1, 1, 58, 3}},
             {{0, 1, 0.5F, 0}, {1, 1, 6, 1}},
             {{0, -1, 0.5F, 0}, {1, 0, kAbsent, kAbsent}},
@@ -46,9 +46,9 @@ std::vector<ProjectionCase> projection_cases() {
             {{0, 0, 1.01F, 0}, {1, 0, kAbsent, kAbsent}},
             {{-1.01F, 0, 0.5F, 0}, {1, 0, kAbsent, kAbsent}},
             {{0, 1.01F, 0.5F, 0}, {1, 0, kAbsent, kAbsent}},
-            {{infinity, 0, 0.5F, 0}, {0, 0, kAbsent, kAbsent}},
-            {{0, nan, 0.5F, 0}, {0, 0, kAbsent, kAbsent}},
-            {{0, 0, infinity, 0}, {0, 0, kAbsent, kAbsent}}};
+            {{kInfinity, 0, 0.5F, 0}, {0, 0, kAbsent, kAbsent}},
+            {{0, kNan, 0.5F, 0}, {0, 0, kAbsent, kAbsent}},
+            {{0, 0, kInfinity, 0}, {0, 0, kAbsent, kAbsent}}};
 }
 
 Matrix scaled_identity(float scale) {
@@ -94,10 +94,10 @@ void projection_contract(WorldCompute& compute, const Matrix& matrix, bool zero_
 
 void upload_atmosphere(WorldCompute& compute) {
     // Half-precision fixture colors encode the LUT column/row and a constant blue.
-    constexpr std::array<std::uint32_t, 5> half{0, 0x3C00U, 0x4000U, 0x4200U, 0x4400U};
+    constexpr std::array<std::uint32_t, 5> kHalf{0, 0x3C00U, 0x4000U, 0x4200U, 0x4400U};
     std::array<std::array<std::uint32_t, 3>, 25> cells{};
     for (std::size_t index = 0; index < cells.size(); ++index) {
-        cells[index] = {half[index % 5] | (half[index / 5] << 16), 0x3C003C00U, 0x3C003C00U};
+        cells[index] = {kHalf[index % 5] | (kHalf[index / 5] << 16), 0x3C003C00U, 0x3C003C00U};
     }
     compute.upload("atmosphereComp", std::as_bytes(std::span(cells)));
 }
@@ -136,8 +136,8 @@ void atmosphere_contract(WorldCompute& compute) {
 void math_contract(WorldCompute& compute) {
     const std::array<ProbeInput, 3> inputs{
         {{1.5F, 1, 2, 10}, {1.5F, 0, 3, 10}, {1.5F, 0.5F, 0, 10}}};
-    constexpr std::array<float, 3> reflectance{0.04F, 1, 0.07F};
-    constexpr float gaussian_peak = 0.00159154943F;
+    constexpr std::array<float, 3> kReflectance{0.04F, 1, 0.07F};
+    constexpr float kGaussianPeak = 0.00159154943F;
     std::array<float, 3> gaussian{};
     const auto actual = dispatch(compute, "probeMath", inputs, {});
     for (std::size_t index = 0; index < inputs.size(); ++index) {
@@ -145,7 +145,7 @@ void math_contract(WorldCompute& compute) {
         const auto positive = std::bit_cast<float>(actual[index][1]);
         const auto negative = std::bit_cast<float>(actual[index][2]);
         if (actual[index][3] != 1 || !std::isfinite(fresnel) || !std::isfinite(positive) ||
-            !std::isfinite(negative) || std::abs(fresnel - reflectance[index]) > 1e-5F ||
+            !std::isfinite(negative) || std::abs(fresnel - kReflectance[index]) > 1e-5F ||
             positive <= 0 || negative <= 0 || std::abs(positive - negative) > 1e-7F) {
             throw std::runtime_error("Production Fresnel/Gaussian differs in case " +
                                      std::to_string(index));
@@ -153,7 +153,7 @@ void math_contract(WorldCompute& compute) {
         gaussian[index] = positive;
     }
     if (!(gaussian[1] < gaussian[0] && gaussian[0] < gaussian[2]) ||
-        std::abs(gaussian[2] - gaussian_peak) > 1e-7F) {
+        std::abs(gaussian[2] - kGaussianPeak) > 1e-7F) {
         throw std::runtime_error("Production Gaussian is not symmetric around the expected peak");
     }
 }

@@ -39,7 +39,7 @@ std::array<std::uint32_t, 5> instance_record(const EntityInstance& instance, con
                 ((static_cast<std::uint32_t>(type.size.z) & 15U) << 28)};
 }
 
-foundation::geometry::Box instance_bounds(const EntityInstance& instance, IVec3 size) {
+foundation::geometry::Box instance_bounds(const EntityInstance& instance, Vec3i size) {
     foundation::geometry::Box result{{1e30, 1e30, 1e30}, {-1e30, -1e30, -1e30}};
     for (unsigned corner = 0; corner < 8; ++corner) {
         const Vec3 point{(corner & 1) != 0 ? static_cast<double>(size.x) : 0,
@@ -56,21 +56,21 @@ foundation::geometry::Box instance_bounds(const EntityInstance& instance, IVec3 
 
 using ChunkLists = std::map<std::size_t, std::vector<std::uint32_t>>;
 
-void add_to_chunks(ChunkLists& lists, foundation::geometry::Box box, IVec3 size,
+void add_to_chunks(ChunkLists& lists, foundation::geometry::Box box, Vec3i size,
                    std::uint32_t index) {
-    const IVec3 lower{std::max(0, static_cast<int>(std::floor(box.lower.x / 16))),
+    const Vec3i lower{std::max(0, static_cast<int>(std::floor(box.lower.x / 16))),
                       std::max(0, static_cast<int>(std::floor(box.lower.y / 16))),
                       std::max(0, static_cast<int>(std::floor(box.lower.z / 16)))};
-    const IVec3 upper{std::min(size.x - 1, static_cast<int>(std::floor(box.upper.x / 16))),
+    const Vec3i upper{std::min(size.x - 1, static_cast<int>(std::floor(box.upper.x / 16))),
                       std::min(size.y - 1, static_cast<int>(std::floor(box.upper.y / 16))),
                       std::min(size.z - 1, static_cast<int>(std::floor(box.upper.z / 16)))};
-    const IVec3 extent{upper.x - lower.x + 1, upper.y - lower.y + 1, upper.z - lower.z + 1};
+    const Vec3i extent{upper.x - lower.x + 1, upper.y - lower.y + 1, upper.z - lower.z + 1};
     if (extent.x <= 0 || extent.y <= 0 || extent.z <= 0) {
         return;
     }
     for (std::size_t cell = 0; cell < volume(extent); ++cell) {
         const auto offset = unflatten(cell, extent);
-        const IVec3 position{lower.x + offset.x, lower.y + offset.y, lower.z + offset.z};
+        const Vec3i position{lower.x + offset.x, lower.y + offset.y, lower.z + offset.z};
         auto& list = lists[flatten(position, size)];
         if (list.size() == 255) {
             throw std::runtime_error("More than 255 entities overlap a chunk");

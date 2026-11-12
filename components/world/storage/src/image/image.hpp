@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_IMAGE_IMAGE_HPP
+#define ENGINE_WORLD_STORAGE_SRC_IMAGE_IMAGE_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -29,3 +30,5 @@ struct TextureCoordinate {
 [[nodiscard]] std::uint32_t sample_image(const Image& image, TextureCoordinate coordinate);
 
 } // namespace engine::world::storage
+
+#endif

@@ -1,3 +1,5 @@
+#include <engine/world/model/world.hpp>
+
 #include "state.hpp"
 
 #include <algorithm>
@@ -7,7 +9,7 @@
 namespace engine::world::model {
 namespace {
 
-IVec3 padded_size(IVec3 size, int groups) {
+Vec3i padded_size(Vec3i size, int groups) {
     static_cast<void>(chunk_size(size));
     if (groups < 1 || groups > 8) {
         throw std::runtime_error("World generation segment must be 1..8 groups");
@@ -18,7 +20,7 @@ IVec3 padded_size(IVec3 size, int groups) {
             ((size.z + segment - 1) / segment) * segment};
 }
 
-std::vector<std::uint32_t> resize_chunks(const Model& model, IVec3 dimensions) {
+std::vector<std::uint32_t> resize_chunks(const Model& model, Vec3i dimensions) {
     const auto source = chunk_size(model.size);
     std::vector<std::uint32_t> result(volume(dimensions));
     for (std::size_t index = 0; index < model.chunks.size(); ++index) {
@@ -117,7 +119,8 @@ void compact_palette(Model& model) {
 
 } // namespace
 
-World::World() : state_(std::make_unique<State>()) {
+World::World(unsigned worker_count)
+    : state_(std::make_unique<State>()), worker_count_(worker_count) {
     static std::atomic<std::uint64_t> context = 1;
     state_->material_context = context.fetch_add(1);
     state_->model.materials.push_back({});
@@ -127,7 +130,7 @@ World::~World() = default;
 World::World(World&&) noexcept = default;
 World& World::operator=(World&&) noexcept = default;
 
-void World::replace(Model model, IVec3 requested_size, int segment_groups) {
+void World::replace(Model model, Vec3i requested_size, int segment_groups) {
     validate(model);
     auto next = std::make_unique<State>();
     next->material_context = state_->material_context;
@@ -203,11 +206,11 @@ WorldView World::view() const {
             state_->gpu_authoritative};
 }
 
-IVec3 World::size() const {
+Vec3i World::size() const {
     return state_->model.size;
 }
 
-IVec3 World::actual_size() const {
+Vec3i World::actual_size() const {
     return state_->actual_size;
 }
 
@@ -215,11 +218,11 @@ double World::compression_factor() const {
     return state_->compression_factor;
 }
 
-std::uint16_t World::at(IVec3 position) const {
+std::uint16_t World::at(Vec3i position) const {
     if (!inside(position, size())) {
         return 0;
     }
-    const IVec3 chunk{position.x / 16, position.y / 16, position.z / 16};
+    const Vec3i chunk{position.x / 16, position.y / 16, position.z / 16};
     const auto found = state_->edits.find(flatten(chunk, chunk_size(size())));
     if (found != state_->edits.end()) {
         return found->second.voxels
@@ -230,14 +233,14 @@ std::uint16_t World::at(IVec3 position) const {
     return voxel_at(state_->model, position);
 }
 
-void World::set(IVec3 position, std::uint16_t material) {
+void World::set(Vec3i position, std::uint16_t material) {
     if (!inside(position, size())) {
         return;
     }
     if (material >= state_->model.materials.size()) {
         throw std::runtime_error("Selected material is outside palette");
     }
-    const IVec3 chunk{position.x / 16, position.y / 16, position.z / 16};
+    const Vec3i chunk{position.x / 16, position.y / 16, position.z / 16};
     const auto index = flatten(chunk, chunk_size(size()));
     auto found = state_->edits.find(index);
     if (found == state_->edits.end() || !found->second.voxels) {

@@ -4,8 +4,8 @@
 #define FLATTEN_INDEX(pos, strideY, strideZ) ((pos).z * (strideZ) + (pos).y * (strideY) + (pos).x)
 
 #include "../../settings.slang"
-#include "commonConstants.slang"
-#include "commonRenderPipeline.slang"
-#include "commonRayTracing.slang"
-#include "commonColorCompression.slang"
-#include "commonOther.slang"
+#include "common_constants.slang"
+#include "common_render_pipeline.slang"
+#include "common_ray_tracing.slang"
+#include "common_color_compression.slang"
+#include "common_other.slang"

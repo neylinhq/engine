@@ -80,9 +80,9 @@ void reflection_contract(std::filesystem::path path) {
     const auto valid = read_reflection(path);
     require(valid.uniform_size == 32 && valid.uniforms.at("value").offset == 12,
             "Valid reflected uniform lost its offset or alignment");
-    constexpr auto maximum = std::numeric_limits<std::uint32_t>::max();
-    const std::array ranges{std::array<std::uint32_t, 2>{maximum - 3, 8},
-                            std::array<std::uint32_t, 2>{maximum - 16, 2}};
+    constexpr auto kMaximum = std::numeric_limits<std::uint32_t>::max();
+    const std::array ranges{std::array<std::uint32_t, 2>{kMaximum - 3, 8},
+                            std::array<std::uint32_t, 2>{kMaximum - 16, 2}};
     for (const auto& range : ranges) {
         write_reflection(path, range[0], range[1]);
         bool rejected = false;

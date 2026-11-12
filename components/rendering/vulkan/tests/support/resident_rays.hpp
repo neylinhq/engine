@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_RESIDENT_RAYS_HPP
+#define ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_RESIDENT_RAYS_HPP
 
 #include "update_probe.hpp"
 
@@ -22,3 +23,5 @@ class ResidentRays {
 };
 
 } // namespace engine::rendering::vulkan::test
+
+#endif

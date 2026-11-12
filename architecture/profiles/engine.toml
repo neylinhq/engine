@@ -1,0 +1,263 @@
+schema = "archcheck.profile.v1"
+id = "engine"
+contract = "1.0"
+owner = "ilunsenti"
+reason = "Engine service files, build parameters, resources and process-wide counters"
+
+[[registrations]]
+id = "agent_instructions"
+kind = "service_path"
+path = "AGENTS.md"
+purpose = "Repository instructions for contributors and coding tools"
+
+[[registrations]]
+id = "world_material_context"
+kind = "global_state"
+purpose = "Allocate distinct material context IDs for worlds created in one process"
+initialization = "Constant initialization to the first valid context ID"
+destruction = "The atomic counter has no external resources"
+synchronization = "World constructors reserve IDs with atomic fetch_add"
+match = { path_pattern = 'components/world/model/src/world[.]cpp', name_pattern = 'context', kinds = ["VarDecl"] }
+
+[[registrations]]
+id = "temporary_file_sequence"
+kind = "global_state"
+purpose = "Distinguish temporary output paths allocated within one process"
+initialization = "Constant initialization to zero"
+destruction = "The atomic counter has no external resources"
+synchronization = "Temporary path allocation increments the sequence with atomic fetch_add"
+match = { path_pattern = 'components/world/storage/src/codec/binary[.]cpp', name_pattern = 'sequence', kinds = ["VarDecl"] }
+
+[[registrations]]
+id = "compiler_parameters"
+kind = "conditional_macro"
+purpose = "CMake build mode and native Windows compiler definitions"
+configurations = ["*"]
+value_pattern = '1|'
+function_like = false
+match = { path_pattern = '(apps|components)/.*', name_pattern = 'NDEBUG|_DEBUG|WIN32|_WINDOWS' }
+
+[[registrations]]
+id = "glfw_header_selection"
+kind = "conditional_macro"
+purpose = "GLFW adapters select Vulkan declarations and suppress OpenGL headers"
+configurations = ["*"]
+value_pattern = '1|'
+function_like = false
+match = { path_pattern = 'components/(platform/window|gui/frontend|rendering/vulkan)/src/.*', name_pattern = 'GLFW_INCLUDE_(NONE|VULKAN)' }
+
+[[registrations]]
+id = "windows_min_max"
+kind = "conditional_macro"
+purpose = "Keep Windows SDK macros from replacing C++ min and max functions"
+configurations = ["windows/windows-debug", "windows/windows-release"]
+value_pattern = '1|'
+function_like = false
+match = { path_pattern = 'components/platform/process/src/.*', name_pattern = 'NOMINMAX' }
+
+[[overrides]]
+id = "windows_crt_entry_points"
+rule = "NAME.NAMESPACE"
+configurations = ["windows/windows-debug", "windows/windows-release"]
+exempt = true
+match = { kinds = ["FunctionDecl"], path_pattern = 'apps/(benchmark/(src/main|tests/integration/scenario_test)|sandbox/src/main)[.]cpp', qualified_name_pattern = 'wmain' }
+
+[[overrides]]
+id = "compiler_macro_names"
+rule = "NAME.MACRO"
+configurations = ["*"]
+pattern = 'NDEBUG|_DEBUG|WIN32|_WINDOWS'
+match = { kinds = ["MacroDefinition"], path_pattern = '(apps|components)/.*', name_pattern = 'NDEBUG|_DEBUG|WIN32|_WINDOWS' }
+
+[[overrides]]
+id = "glfw_macro_names"
+rule = "NAME.MACRO"
+configurations = ["*"]
+pattern = 'GLFW_INCLUDE_(NONE|VULKAN)'
+match = { kinds = ["MacroDefinition"], path_pattern = 'components/(platform/window|gui/frontend|rendering/vulkan)/src/.*', name_pattern = 'GLFW_INCLUDE_(NONE|VULKAN)' }
+
+[[overrides]]
+id = "windows_sdk_macro_name"
+rule = "NAME.MACRO"
+configurations = ["windows/windows-debug", "windows/windows-release"]
+pattern = 'NOMINMAX'
+match = { kinds = ["MacroDefinition"], path_pattern = 'components/platform/process/src/.*', name_pattern = 'NOMINMAX' }
+
+[[registrations]]
+id = "benchmark_build_identity"
+kind = "conditional_macro"
+purpose = "Identify the compiler, configuration and version in benchmark results"
+configurations = ["*"]
+value_pattern = '"[^"]*"'
+function_like = false
+match = { path_pattern = 'apps/benchmark/src/.*', name_pattern = 'ENGINE_APP_BENCHMARK_(COMPILER|BUILD_TYPE|VERSION)' }
+
+[[registrations]]
+id = "vulkan_test_build_identity"
+kind = "conditional_macro"
+purpose = "Identify the configuration in the Vulkan performance test output"
+configurations = ["*"]
+value_pattern = '"(Debug|Release)"'
+function_like = false
+match = { path_pattern = 'components/rendering/vulkan/tests/integration/large_world_performance_test[.]cpp', name_pattern = 'ENGINE_RENDERING_VULKAN_PERFORMANCE_BUILD_TYPE' }
+
+[[registrations]]
+id = "import_fixture_directory"
+kind = "conditional_macro"
+purpose = "Default location of the source fixtures for the import test"
+configurations = ["*"]
+value_pattern = '"[^"]*"'
+function_like = false
+match = { path_pattern = 'components/world/storage/tests/unit/import_test[.]cpp', name_pattern = 'ENGINE_WORLD_STORAGE_TEST_RESOURCES' }
+
+[[registrations]]
+id = "slang_shaders"
+kind = "file_format"
+purpose = "Slang sources compiled to SPIR-V by slangc"
+extension = ".slang"
+match = { path_pattern = 'components/rendering/shaders/resources/shaders/.*' }
+handler_pattern = 'engine_shaders'
+
+[[registrations]]
+id = "shader_programs"
+kind = "file_format"
+purpose = "Program and binding manifest loaded by the Vulkan renderer"
+extension = ".json"
+match = { path_pattern = 'components/rendering/shaders/resources/programs[.]json' }
+handler_pattern = 'engine_shaders'
+
+[[registrations]]
+id = "slang_test_probes"
+kind = "file_format"
+purpose = "Slang probes compiled for Vulkan integration tests"
+extension = ".slang"
+match = { path_pattern = 'components/rendering/vulkan/resources/tests/.*_probe[.]slang' }
+handler_pattern = 'engine_(ray|helper)_probe|rendering_vulkan'
+
+[[registrations]]
+id = "benchmark_data"
+kind = "file_format"
+purpose = "Benchmark scenarios and JSON schemas used by the CLI package"
+extension = ".json"
+match = { path_pattern = 'apps/benchmark/(resources/scenarios|schemas)/.*' }
+handler_pattern = 'benchmark'
+
+[[registrations]]
+id = "import_bmp"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".bmp"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_cvox"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".cvox"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_gif"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".gif"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_mtl"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".mtl"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_obj"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".obj"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_png"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".png"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_ppm"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".ppm"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_raw"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".raw"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_rgb"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".rgb"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_stl"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".stl"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_vl32"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".vl32"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "import_vox"
+kind = "file_format"
+purpose = "World import fixtures and reference image data"
+extension = ".vox"
+match = { path_pattern = 'components/world/storage/tests/fixtures/import/.*' }
+handler_pattern = 'world_import_test'
+
+[[registrations]]
+id = "jpeg_jpg"
+kind = "file_format"
+purpose = "JPEG inputs and reference data for decoder tests"
+extension = ".jpg"
+match = { path_pattern = 'components/world/storage/tests/fixtures/jpeg/.*' }
+handler_pattern = 'jpeg_test'
+
+[[registrations]]
+id = "jpeg_json"
+kind = "file_format"
+purpose = "JPEG inputs and reference data for decoder tests"
+extension = ".json"
+match = { path_pattern = 'components/world/storage/tests/fixtures/jpeg/.*' }
+handler_pattern = 'jpeg_test'
+
+[[registrations]]
+id = "jpeg_rgb"
+kind = "file_format"
+purpose = "JPEG inputs and reference data for decoder tests"
+extension = ".rgb"
+match = { path_pattern = 'components/world/storage/tests/fixtures/jpeg/.*' }
+handler_pattern = 'jpeg_test'

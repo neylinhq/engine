@@ -1,10 +1,11 @@
-#ifndef ENGINE_APP_SANDBOX_APPLICATION_HPP
-#define ENGINE_APP_SANDBOX_APPLICATION_HPP
+#ifndef ENGINE_APP_SANDBOX_SRC_APPLICATION_HPP
+#define ENGINE_APP_SANDBOX_SRC_APPLICATION_HPP
 #include "options.hpp"
 #include <engine/gui/frontend/frontend.hpp>
 #include <engine/rendering/vulkan/renderer.hpp>
 #include <future>
 #include <optional>
+#include <thread>
 namespace engine::app::sandbox {
 struct PendingImport {
     gui::frontend::Request request;
@@ -12,7 +13,7 @@ struct PendingImport {
 };
 struct Application {
     Options options;
-    world::model::World world;
+    world::model::World world{std::thread::hardware_concurrency()};
     rendering::settings::Settings settings;
     std::unique_ptr<platform::window::Window> window;
     std::unique_ptr<rendering::vulkan::Renderer> renderer;
@@ -41,7 +42,7 @@ struct Application {
 };
 [[nodiscard]] int run(Options options);
 void initialize(Application& app);
-void generate_world(Application& app, world::model::Model source, world::model::IVec3 requested,
+void generate_world(Application& app, world::model::Model source, world::model::Vec3i requested,
                     int segment_groups);
 void frame(Application& app, double seconds);
 void handle_requests(Application& app, const std::vector<gui::frontend::Request>& requests);

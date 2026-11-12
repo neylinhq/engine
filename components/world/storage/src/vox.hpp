@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_VOX_HPP
+#define ENGINE_WORLD_STORAGE_SRC_VOX_HPP
 
 #include "codec/binary.hpp"
 
@@ -14,11 +15,11 @@ using Dictionary = std::map<std::string, std::string>;
 
 struct VoxTransform {
     std::array<int, 9> rotation{1, 0, 0, 0, 1, 0, 0, 0, 1};
-    model::IVec3 translation;
+    model::Vec3i translation;
 };
 
 struct VoxShape {
-    model::IVec3 size;
+    model::Vec3i size;
     std::vector<model::Sample> samples;
 };
 
@@ -36,7 +37,7 @@ struct VoxScene {
     std::vector<model::Material> palette;
     std::map<int, VoxNode> nodes;
     std::set<int> hidden_layers;
-    model::IVec3 pending_size;
+    model::Vec3i pending_size;
 };
 
 [[nodiscard]] Dictionary vox_dictionary(Reader& reader);
@@ -44,3 +45,5 @@ struct VoxScene {
 void read_vox_node(VoxScene& scene, const std::string& kind, Reader& reader);
 
 } // namespace engine::world::storage
+
+#endif

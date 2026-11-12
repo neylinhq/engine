@@ -31,7 +31,7 @@ struct Request {
     Operation operation = Operation::open_world;
     std::filesystem::path path;
     world::storage::ImportOptions import_options;
-    world::model::IVec3 requested_size;
+    world::model::Vec3i requested_size;
     int segment_groups = 4;
 };
 struct Editing {

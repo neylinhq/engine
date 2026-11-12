@@ -1,7 +1,7 @@
+#include <engine/platform/window/window.hpp>
 #include "window_impl.hpp"
 #include <algorithm>
 #include <bit>
-#include <engine/platform/window/window.hpp>
 #include <stdexcept>
 namespace engine::platform::window {
 std::string last_error(const char* operation) {

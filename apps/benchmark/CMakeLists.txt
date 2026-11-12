@@ -15,15 +15,15 @@ if(ENGINE_DESKTOP)
     ac_application(benchmark app.benchmark)
     target_link_libraries(benchmark PRIVATE ${benchmark_dependencies})
     target_compile_definitions(benchmark PRIVATE
-        ENGINE_BENCHMARK_COMPILER="${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
-        ENGINE_BENCHMARK_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
-        ENGINE_BENCHMARK_VERSION="${PROJECT_VERSION}")
+        ENGINE_APP_BENCHMARK_COMPILER="${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+        ENGINE_APP_BENCHMARK_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+        ENGINE_APP_BENCHMARK_VERSION="${PROJECT_VERSION}")
     if(MINGW)
         target_link_options(benchmark PRIVATE -municode)
     endif()
     add_dependencies(benchmark engine_runtime_shaders)
     install(TARGETS benchmark RUNTIME DESTINATION bin)
-    install(DIRECTORY config/ DESTINATION benchmark/scenarios)
+    install(DIRECTORY resources/scenarios/ DESTINATION benchmark/scenarios)
     install(DIRECTORY schemas/ DESTINATION benchmark/schemas)
     install(DIRECTORY docs/ DESTINATION benchmark/docs)
     add_executable(benchmark_contract_test tests/unit/contract_test.cpp ${scenario_sources} src/report/statistics.cpp)
@@ -37,6 +37,10 @@ if(ENGINE_DESKTOP)
             "${CMAKE_BINARY_DIR}/shaders" "${CMAKE_CURRENT_BINARY_DIR}/integration")
     endif()
 else()
-    ac_inactive_component(app.benchmark "ENGINE_DESKTOP=OFF: Vulkan benchmark not compiled"
+    add_library(benchmark INTERFACE)
+    ac_application(benchmark app.benchmark)
+    engine_inactive_sources(benchmark "GPU benchmark requires the desktop build"
         ${benchmark_sources} tests/unit/contract_test.cpp tests/integration/scenario_test.cpp)
 endif()
+engine_assets(benchmark benchmark resources/scenarios)
+engine_assets(benchmark benchmark schemas)

@@ -1,5 +1,6 @@
 schema = "archcheck.component.v1"
 id = "app.sandbox"
+namespace = "engine::app::sandbox"
 role = "composition"
 owner = "sandbox_application"
 purpose = "Compose original NAADF world, editing, camera, persistence, Vulkan renderer and ImGui interface."

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_SRC_WORLD_COMPUTE_HPP
+#define ENGINE_RENDERING_VULKAN_SRC_WORLD_COMPUTE_HPP
 
 #include "../state.hpp"
 
@@ -71,3 +72,5 @@ void update_compute_binding(WorldCompute& context, Program& program, ComputeBind
                             const UniformValues& values);
 
 } // namespace engine::rendering::vulkan
+
+#endif

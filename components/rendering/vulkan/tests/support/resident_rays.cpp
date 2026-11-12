@@ -22,7 +22,7 @@ ResidentRay ray(Position origin, Position direction) {
             static_cast<float>(direction.z), 0};
 }
 
-std::vector<ResidentRay> static_rays(world::model::IVec3 size) {
+std::vector<ResidentRay> static_rays(world::model::Vec3i size) {
     std::mt19937 random(0xAADF2026U);
     std::uniform_real_distribution<double> unit(0.01, 0.99);
     std::uniform_real_distribution<double> direction(-1, 1);

@@ -8,17 +8,17 @@
 #include <thread>
 namespace engine::app::sandbox {
 namespace {
-bool original_seed(world::model::IVec3 size) {
+bool original_seed(world::model::Vec3i size) {
     return size.x > 500 && size.y > 200 && size.z > 40;
 }
-motion::camera::Pose starting_pose(world::model::IVec3 size) {
+motion::camera::Pose starting_pose(world::model::Vec3i size) {
     if (original_seed(size)) {
         return {{500, 200, 40}, 0, 0};
     }
     const auto scale = static_cast<double>(std::max({size.x, size.y, size.z, 16}));
     return {{size.x * 0.5, size.y + scale * 0.45, size.z * 0.5 - scale * 1.2}, 0, 0};
 }
-void aim_at_model(motion::camera::Camera& camera, world::model::IVec3 size) {
+void aim_at_model(motion::camera::Camera& camera, world::model::Vec3i size) {
     auto pose = camera.pose();
     const foundation::geometry::Vec3 center{size.x * 0.5, size.y * 0.5, size.z * 0.5};
     const auto direction = center - pose.position;

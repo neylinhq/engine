@@ -6,7 +6,7 @@ namespace engine::rendering::vulkan {
 
 WorldUpdates::WorldUpdates(WorldCompute& compute) : compute_(compute) {}
 
-void WorldUpdates::initialize(world::model::IVec3 chunks) {
+void WorldUpdates::initialize(world::model::Vec3i chunks) {
     validate_aadf_capacity(compute_.device, chunks);
     ready_ = false;
     chunks_ = chunks;

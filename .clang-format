@@ -8,5 +8,6 @@
   "AllowShortFunctionsOnASingleLine": "Empty",
   "AllowShortIfStatementsOnASingleLine": "Never",
   "SortIncludes": "CaseSensitive",
+  "MainIncludeChar": "Any",
   "LineEnding": "LF"
 }

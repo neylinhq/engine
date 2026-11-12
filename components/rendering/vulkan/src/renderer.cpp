@@ -1,3 +1,5 @@
+#include <engine/rendering/vulkan/renderer.hpp>
+
 #include "state.hpp"
 #include "world/compute.hpp"
 #include "world/updates.hpp"

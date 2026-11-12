@@ -146,7 +146,7 @@ void chunk_brush_reference() {
         reference_brush(cells, brush);
         editing::apply_brush(world, brush);
         for (int index = 0; index < 64 * 64 * 64; ++index) {
-            const model::IVec3 position{index % 64, (index / 64) % 64, index / 4096};
+            const model::Vec3i position{index % 64, (index / 64) % 64, index / 4096};
             require(world.at(position) == cells[index],
                     "Chunk brush differs from independent dense voxel reference");
         }

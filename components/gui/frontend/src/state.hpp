@@ -1,5 +1,5 @@
-#ifndef ENGINE_GUI_FRONTEND_STATE_HPP
-#define ENGINE_GUI_FRONTEND_STATE_HPP
+#ifndef ENGINE_GUI_FRONTEND_SRC_STATE_HPP
+#define ENGINE_GUI_FRONTEND_SRC_STATE_HPP
 #include <engine/gui/frontend/frontend.hpp>
 #include <imgui.h>
 #include <optional>

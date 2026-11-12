@@ -18,17 +18,17 @@ std::uint32_t copy_node(Model& destination, const Model& source, std::uint32_t w
     return 0x80000000U | offset;
 }
 
-bool boundary(IVec3 chunk, IVec3 actual_size) {
+bool boundary(Vec3i chunk, Vec3i actual_size) {
     return (chunk.x + 1) * 16 > actual_size.x || (chunk.y + 1) * 16 > actual_size.y ||
            (chunk.z + 1) * 16 > actual_size.z;
 }
 
-void clip_chunk(Model& model, std::size_t index, IVec3 actual_size, BlockPool& pool) {
+void clip_chunk(Model& model, std::size_t index, Vec3i actual_size, BlockPool& pool) {
     auto dense = decode_chunk(model, index);
     const auto chunk = unflatten(index, chunk_size(model.size));
     for (std::size_t voxel = 0; voxel < dense.size(); ++voxel) {
         const auto local = unflatten(voxel, {16, 16, 16});
-        const IVec3 position{chunk.x * 16 + local.x, chunk.y * 16 + local.y,
+        const Vec3i position{chunk.x * 16 + local.x, chunk.y * 16 + local.y,
                              chunk.z * 16 + local.z};
         if (!inside(position, actual_size)) {
             dense[voxel] = 0;
@@ -39,7 +39,7 @@ void clip_chunk(Model& model, std::size_t index, IVec3 actual_size, BlockPool& p
     release_chunk(model, old, pool);
 }
 
-void clip_world_boundary(Model& model, IVec3 actual_size) {
+void clip_world_boundary(Model& model, Vec3i actual_size) {
     if (actual_size.x % 16 == 0 && actual_size.y % 16 == 0 && actual_size.z % 16 == 0) {
         return;
     }
@@ -55,7 +55,7 @@ void clip_world_boundary(Model& model, IVec3 actual_size) {
 
 } // namespace
 
-Model generate_model(Model source, IVec3 actual_size, IVec3 padded_size) {
+Model generate_model(Model source, Vec3i actual_size, Vec3i padded_size) {
     Model result;
     result.name = source.name;
     result.material_context = source.material_context;
@@ -68,11 +68,11 @@ Model generate_model(Model source, IVec3 actual_size, IVec3 padded_size) {
     result.chunks.resize(volume(dimensions));
     for (std::size_t index = 0; index < result.chunks.size(); ++index) {
         const auto position = unflatten(index, dimensions);
-        const IVec3 origin{position.x * 16, position.y * 16, position.z * 16};
+        const Vec3i origin{position.x * 16, position.y * 16, position.z * 16};
         if (!inside(origin, actual_size) || position.y >= source_size.y) {
             continue;
         }
-        const IVec3 repeated{position.x % source_size.x, position.y, position.z % source_size.z};
+        const Vec3i repeated{position.x % source_size.x, position.y, position.z % source_size.z};
         result.chunks[index] =
             copy_node(result, source, source.chunks[flatten(repeated, source_size)]);
     }

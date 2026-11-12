@@ -1,6 +1,6 @@
+#include <engine/motion/path/path.hpp>
 #include <algorithm>
 #include <cmath>
-#include <engine/motion/path/path.hpp>
 #include <utility>
 namespace engine::motion::path {
 namespace {

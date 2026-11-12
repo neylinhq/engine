@@ -36,8 +36,8 @@ bool executable(const std::filesystem::path& path) {
     }
 #ifndef _WIN32
     using std::filesystem::perms;
-    constexpr auto execute = perms::owner_exec | perms::group_exec | perms::others_exec;
-    return (status.permissions() & execute) != perms::none;
+    constexpr auto kExecute = perms::owner_exec | perms::group_exec | perms::others_exec;
+    return (status.permissions() & kExecute) != perms::none;
 #else
     return true;
 #endif
@@ -49,15 +49,15 @@ std::filesystem::path find_executable(std::filesystem::path invocation,
         return resolved(invocation);
     }
 #ifdef _WIN32
-    constexpr char separator = ';';
+    constexpr char kSeparator = ';';
     if (!invocation.has_extension()) {
         invocation += L".exe";
     }
 #else
-    constexpr char separator = ':';
+    constexpr char kSeparator = ':';
 #endif
     for (std::size_t begin = 0; begin <= search_path.size();) {
-        const auto end = search_path.find(separator, begin);
+        const auto end = search_path.find(kSeparator, begin);
         auto directory = search_path.substr(begin, end - begin);
 #ifdef _WIN32
         if (directory.size() > 1 && directory.front() == '"' && directory.back() == '"') {

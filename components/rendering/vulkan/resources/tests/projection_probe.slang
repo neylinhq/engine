@@ -1,6 +1,6 @@
 // Exercises production helpers without adding runtime shader entry points.
-#include "../../../shaders/resources/shaders/render/versions/base/renderSampleRefine.slang"
-#include "../../../shaders/resources/shaders/render/common/atmosphere/atmospherePrecomputed.slang"
+#include "../../../shaders/resources/shaders/render/base/render_sample_refine.slang"
+#include "../../../shaders/resources/shaders/render/atmosphere/atmosphere_precomputed.slang"
 
 [vk::binding(57, 0)] RWStructuredBuffer<uint4> probeOutput;
 [vk::binding(58, 0)] StructuredBuffer<float4> probeInputs;

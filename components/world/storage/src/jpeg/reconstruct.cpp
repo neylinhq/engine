@@ -22,8 +22,8 @@ Cosines make_cosine_table() {
 }
 
 const Cosines& cosine_table() {
-    static const auto table = make_cosine_table();
-    return table;
+    static const auto kTable = make_cosine_table();
+    return kTable;
 }
 
 std::uint8_t channel(double value) {

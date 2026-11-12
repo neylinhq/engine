@@ -8,7 +8,7 @@
 namespace engine::world::editing {
 namespace {
 
-bool covered(model::IVec3 position, const Brush& brush) {
+bool covered(model::Vec3i position, const Brush& brush) {
     const auto x = position.x + 0.5 - brush.center.x;
     const auto y = position.y + 0.5 - brush.center.y;
     const auto z = position.z + 0.5 - brush.center.z;
@@ -18,7 +18,7 @@ bool covered(model::IVec3 position, const Brush& brush) {
     return x * x + y * y + z * z < brush.radius * brush.radius;
 }
 
-double row_radius(const Brush& brush, model::IVec3 start) {
+double row_radius(const Brush& brush, model::Vec3i start) {
     const auto y = start.y + 0.5 - brush.center.y;
     const auto z = start.z + 0.5 - brush.center.z;
     if (brush.tool == Tool::cube) {
@@ -29,7 +29,7 @@ double row_radius(const Brush& brush, model::IVec3 start) {
 }
 
 std::span<std::uint16_t> covered_row(std::span<std::uint16_t, 16> row, const Brush& brush,
-                                     model::IVec3 start) {
+                                     model::Vec3i start) {
     const auto radius = row_radius(brush, start);
     if (radius < 0) {
         return {};
@@ -47,7 +47,7 @@ std::span<std::uint16_t> covered_row(std::span<std::uint16_t, 16> row, const Bru
     return row.subspan(first, end - first);
 }
 
-bool brush_row(std::span<std::uint16_t, 16> row, const Brush& brush, model::IVec3 start) {
+bool brush_row(std::span<std::uint16_t, 16> row, const Brush& brush, model::Vec3i start) {
     const auto cells = covered_row(row, brush, start);
     const auto material = brush.erase ? std::uint16_t{0} : brush.material;
     if (brush.tool != Tool::paint) {
@@ -67,7 +67,7 @@ bool brush_row(std::span<std::uint16_t, 16> row, const Brush& brush, model::IVec
     return changed;
 }
 
-double chunk_distance(model::IVec3 origin, const Brush& brush, bool farthest) {
+double chunk_distance(model::Vec3i origin, const Brush& brush, bool farthest) {
     double distance = 0;
     const std::array centers{brush.center.x, brush.center.y, brush.center.z};
     const std::array starts{origin.x, origin.y, origin.z};
@@ -83,14 +83,14 @@ double chunk_distance(model::IVec3 origin, const Brush& brush, bool farthest) {
 }
 
 struct ChunkResult {
-    model::IVec3 position;
+    model::Vec3i position;
     bool uniform = false;
     std::unique_ptr<std::array<std::uint16_t, 4096>> voxels;
 };
 
 void prepare_chunk(const model::World& world, const Brush& brush, ChunkResult& result) {
     const auto chunk = result.position;
-    const model::IVec3 origin{chunk.x * 16, chunk.y * 16, chunk.z * 16};
+    const model::Vec3i origin{chunk.x * 16, chunk.y * 16, chunk.z * 16};
     const auto limit = brush.tool == Tool::cube ? brush.radius : brush.radius * brush.radius;
     if (chunk_distance(origin, brush, false) >= limit) {
         return;
@@ -102,7 +102,7 @@ void prepare_chunk(const model::World& world, const Brush& brush, ChunkResult& r
     auto voxels = world.chunk_voxels(chunk);
     bool changed = false;
     for (int row = 0; row < 256; ++row) {
-        const model::IVec3 start{origin.x, origin.y + row % 16, origin.z + row / 16};
+        const model::Vec3i start{origin.x, origin.y + row % 16, origin.z + row / 16};
         changed =
             brush_row(std::span<std::uint16_t, 16>(voxels.data() + row * 16, 16), brush, start) ||
             changed;
@@ -144,10 +144,10 @@ void apply_brush(model::World& world, const Brush& brush) {
         return;
     }
     const auto size = world.size();
-    const model::IVec3 lower{lower_bound(brush.center.x, brush.radius, size.x),
+    const model::Vec3i lower{lower_bound(brush.center.x, brush.radius, size.x),
                              lower_bound(brush.center.y, brush.radius, size.y),
                              lower_bound(brush.center.z, brush.radius, size.z)};
-    const model::IVec3 upper{upper_bound(brush.center.x, brush.radius, size.x),
+    const model::Vec3i upper{upper_bound(brush.center.x, brush.radius, size.x),
                              upper_bound(brush.center.y, brush.radius, size.y),
                              upper_bound(brush.center.z, brush.radius, size.z)};
     if (lower.x > upper.x || lower.y > upper.y || lower.z > upper.z) {
@@ -162,7 +162,8 @@ void apply_brush(model::World& world, const Brush& brush) {
         }
     }
     foundation::parallel::for_each_index(
-        chunks.size(), [&](std::size_t index) { prepare_chunk(world, brush, chunks[index]); });
+        chunks.size(), world.worker_count(),
+        [&](std::size_t index) { prepare_chunk(world, brush, chunks[index]); });
     apply_chunks(world, brush, chunks);
     world.commit_edits();
 }

@@ -12,9 +12,9 @@ RG32 (`packed`). Это интеграционная диагностика ко
 Сборка цели и пример небольшого прогона в PowerShell из корня проекта:
 
 ```powershell
-cmake --build out/release --target rendering_chunk_layout_performance_test
+cmake --build out/windows-release --target rendering_chunk_layout_performance_test
 New-Item -ItemType Directory -Path C:\Measurements\chunk-layout
-.\out\release\bin\rendering_chunk_layout_performance_test.exe --shaders out/release/components/rendering/vulkan --size 64 64 64 --rays 1025 --frames 2 --warmup 1 --layout split --validation > C:\Measurements\chunk-layout\split.csv 2> C:\Measurements\chunk-layout\split.meta
+.\out\windows-release\bin\rendering_chunk_layout_performance_test.exe --shaders out/windows-release/components/rendering/vulkan --size 64 64 64 --rays 1025 --frames 2 --warmup 1 --layout split --validation > C:\Measurements\chunk-layout\split.csv 2> C:\Measurements\chunk-layout\split.meta
 ```
 
 В Linux используется исполняемый файл без расширения `.exe`. Диагностика создаёт

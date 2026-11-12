@@ -19,10 +19,10 @@ DeviceInfo Renderer::device_info() const {
     result.queue_family = impl_->device.family;
     result.timestamp_bits = impl_->device.timestamp_bits;
     result.timestamp_period_nanoseconds = base.limits.timestampPeriod;
-    constexpr std::string_view hex = "0123456789abcdef";
+    constexpr std::string_view kHex = "0123456789abcdef";
     for (const auto byte : properties.get<vk::PhysicalDeviceIDProperties>().deviceUUID) {
-        result.uuid += hex[byte >> 4];
-        result.uuid += hex[byte & 15];
+        result.uuid += kHex[byte >> 4];
+        result.uuid += kHex[byte & 15];
     }
     return result;
 }

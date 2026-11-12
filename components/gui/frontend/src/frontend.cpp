@@ -1,3 +1,5 @@
+#include <engine/gui/frontend/frontend.hpp>
+
 #include "state.hpp"
 #include <utility>
 namespace engine::gui::frontend {

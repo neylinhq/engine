@@ -8,17 +8,17 @@ void albedo_settings(rendering::settings::Albedo& settings) {
     ImGui::Checkbox("TAA Jitter", &settings.taa_jitter);
 }
 void base_settings(rendering::settings::Base& settings) {
-    constexpr auto log = ImGuiSliderFlags_Logarithmic;
+    constexpr auto kLog = ImGuiSliderFlags_Logarithmic;
     ImGui::SliderInt("Bounces", &settings.bounce_count, 0, 10);
     ImGui::SliderInt("Resampling max frames", &settings.global_illumination_max_accumulation, 1,
                      128);
     ImGui::SliderInt("Taa max frames", &settings.taa_sample_max_age, 1, 32);
-    ImGui::SliderFloat("Resampling radius", &settings.spatial_resample_size, 2, 500, "%.5g", log);
+    ImGui::SliderFloat("Resampling radius", &settings.spatial_resample_size, 2, 500, "%.5g", kLog);
     ImGui::SliderInt("Spatial max visibility", &settings.spatial_visibility_max_depth, 0, 80);
-    ImGui::SliderFloat("Denoise Threshold", &settings.denoise_threshold, 0.1F, 500, "%.5g", log);
-    ImGui::SliderFloat("Varying radius factor", &settings.radius_lit_factor, 0, 1000, "%.3g", log);
+    ImGui::SliderFloat("Denoise Threshold", &settings.denoise_threshold, 0.1F, 500, "%.5g", kLog);
+    ImGui::SliderFloat("Varying radius factor", &settings.radius_lit_factor, 0, 1000, "%.3g", kLog);
     ImGui::SliderFloat("Noise suppression", &settings.noise_suppression_factor, 0.01F, 100, "%.3g",
-                       log);
+                       kLog);
     ImGui::Checkbox("Varying resampling radius", &settings.varying_resampling_radius);
     ImGui::Checkbox("TAA Jitter", &settings.taa_jitter);
     ImGui::Checkbox("Sample leveling", &settings.sample_leveling);
@@ -33,14 +33,14 @@ void path_settings(rendering::settings::PathTracer& settings) {
     ImGui::Checkbox("Atmosphere interaction", &settings.atmosphere_interaction);
 }
 void render_version(UiState& state, rendering::settings::Render& settings) {
-    constexpr std::array names{"Albedo", "Base", "PathTracer"};
-    if (!ImGui::BeginCombo("Render version", names[static_cast<std::size_t>(settings.version)])) {
+    constexpr std::array kNames{"Albedo", "Base", "PathTracer"};
+    if (!ImGui::BeginCombo("Render version", kNames[static_cast<std::size_t>(settings.version)])) {
         return;
     }
-    for (std::size_t index = 0; index < names.size(); ++index) {
+    for (std::size_t index = 0; index < kNames.size(); ++index) {
         const auto version = static_cast<rendering::settings::RenderVersion>(index);
         const auto selected = settings.version == version;
-        if (ImGui::Selectable(names[index], selected)) {
+        if (ImGui::Selectable(kNames[index], selected)) {
             settings.version = version;
             enqueue(state, Operation::restart_render);
         }

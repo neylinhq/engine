@@ -21,7 +21,7 @@ struct TraceState {
     double end = 0;
 };
 
-Cell box_cell(IVec3 position, int width, std::uint32_t word, unsigned bits) {
+Cell box_cell(Vec3i position, int width, std::uint32_t word, unsigned bits) {
     Cell result;
     const std::array<int, 3> coordinates{position.x, position.y, position.z};
     const auto mask = (1U << bits) - 1;
@@ -35,8 +35,8 @@ Cell box_cell(IVec3 position, int width, std::uint32_t word, unsigned bits) {
     return result;
 }
 
-Cell node_cell(const Model& model, IVec3 position) {
-    const IVec3 chunk{position.x / 16, position.y / 16, position.z / 16};
+Cell node_cell(const Model& model, Vec3i position) {
+    const Vec3i chunk{position.x / 16, position.y / 16, position.z / 16};
     auto word = model.chunks[flatten(chunk, chunk_size(model.size))];
     if ((word >> 30) == 0) {
         return box_cell(position, 16, word, 5);
@@ -44,7 +44,7 @@ Cell node_cell(const Model& model, IVec3 position) {
     if ((word >> 30) == 1) {
         return {{}, {}, static_cast<std::uint16_t>(word & 0x7FFFU)};
     }
-    const IVec3 block{position.x % 16 / 4, position.y % 16 / 4, position.z % 16 / 4};
+    const Vec3i block{position.x % 16 / 4, position.y % 16 / 4, position.z % 16 / 4};
     word = model.blocks[(word & 0x3FFFFFFFU) + flatten(block, {4, 4, 4})];
     if ((word >> 30) == 0) {
         return box_cell(position, 4, word, 2);
@@ -60,7 +60,7 @@ Cell node_cell(const Model& model, IVec3 position) {
     return box_cell(position, 1, word, 2);
 }
 
-bool enter_world(TraceState& trace, IVec3 size) {
+bool enter_world(TraceState& trace, Vec3i size) {
     const std::array<int, 3> dimensions{size.x, size.y, size.z};
     for (unsigned axis = 0; axis < 3; ++axis) {
         const auto direction = trace.direction[axis];
@@ -121,7 +121,7 @@ Hit World::trace(Vec3 origin, Vec3 direction, double max_distance) const {
     }
     for (unsigned step = 0; step < 1000 && trace.distance <= trace.end; ++step) {
         const auto point = origin + direction * (trace.distance + 1e-7);
-        const IVec3 voxel{static_cast<int>(std::floor(point.x)),
+        const Vec3i voxel{static_cast<int>(std::floor(point.x)),
                           static_cast<int>(std::floor(point.y)),
                           static_cast<int>(std::floor(point.z))};
         if (!inside(voxel, size())) {

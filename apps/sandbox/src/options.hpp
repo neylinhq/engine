@@ -1,5 +1,5 @@
-#ifndef ENGINE_APP_SANDBOX_OPTIONS_HPP
-#define ENGINE_APP_SANDBOX_OPTIONS_HPP
+#ifndef ENGINE_APP_SANDBOX_SRC_OPTIONS_HPP
+#define ENGINE_APP_SANDBOX_SRC_OPTIONS_HPP
 #include <array>
 #include <engine/rendering/settings/settings.hpp>
 #include <engine/rendering/vulkan/renderer.hpp>

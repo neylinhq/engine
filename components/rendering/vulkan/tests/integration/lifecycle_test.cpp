@@ -77,7 +77,7 @@ struct Harness {
         view.clear_changed();
     }
 
-    void load(model::Model source, model::IVec3 requested, bool return_mirror = false) {
+    void load(model::Model source, model::Vec3i requested, bool return_mirror = false) {
         auto mapped = world.prepare_generation(std::move(source));
         if (return_mirror) {
             world.adopt_generated(take(renderer.generate_world(mapped, requested, 1)));

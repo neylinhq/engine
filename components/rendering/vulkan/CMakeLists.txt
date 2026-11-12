@@ -56,12 +56,15 @@ foreach(test_sources IN ITEMS ray_test_sources generation_test_sources compute_t
     list(APPEND ${test_sources} tests/support/chunks/layout.hpp)
 endforeach()
 if(ENGINE_DESKTOP)
+    get_target_property(engine_shader_inputs rendering_shaders ENGINE_SHADER_INPUTS)
     add_library(rendering_vulkan STATIC ${renderer_sources})
     ac_component(rendering_vulkan rendering.vulkan)
+    target_compile_definitions(rendering_vulkan PRIVATE GLFW_INCLUDE_NONE)
     target_include_directories(rendering_vulkan PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
     target_link_libraries(rendering_vulkan
         PUBLIC engine::platform.window engine::world.model engine::motion.camera engine::rendering.settings
         PRIVATE engine::foundation.geometry Vulkan::Vulkan glfw engine_imgui Boost::json)
+    ac_nonlink_dependency(rendering_vulkan rendering_shaders runtime)
     add_dependencies(rendering_vulkan engine_shaders)
     add_executable(rendering_contracts_test ${contract_sources})
     ac_test(rendering_contracts_test rendering_vulkan "${CMAKE_CURRENT_BINARY_DIR}/contract.png")
@@ -113,6 +116,8 @@ if(ENGINE_DESKTOP)
     set(ray_probe_reflection "${CMAKE_CURRENT_BINARY_DIR}/trace_probe.json")
     add_custom_target(engine_ray_probe DEPENDS ${ray_probe_outputs})
     add_custom_target(engine_helper_probe DEPENDS ${helper_probe_outputs})
+    ac_asset(rendering_vulkan resources/tests/trace_probe.slang engine_ray_probe)
+    ac_asset(rendering_vulkan resources/tests/projection_probe.slang engine_helper_probe)
     add_executable(rendering_ray_test ${ray_test_sources})
     ac_register(rendering_ray_test rendering.vulkan TRUE)
     target_link_libraries(rendering_ray_test PRIVATE engine::rendering.vulkan
@@ -169,7 +174,11 @@ if(ENGINE_DESKTOP)
             "${CMAKE_BINARY_DIR}/shaders" "${CMAKE_BINARY_DIR}/frame_wait_captures")
     endif()
 else()
-    ac_inactive_component(rendering.vulkan "ENGINE_DESKTOP=OFF: Vulkan adapter not compiled"
+    add_library(rendering_vulkan INTERFACE)
+    ac_component(rendering_vulkan rendering.vulkan)
+    ac_asset(rendering_vulkan resources/tests/trace_probe.slang rendering_vulkan)
+    ac_asset(rendering_vulkan resources/tests/projection_probe.slang rendering_vulkan)
+    engine_inactive_sources(rendering_vulkan "Vulkan adapter requires the desktop build"
         ${renderer_sources} ${contract_sources} ${lifecycle_sources} ${ray_test_sources}
         ${generation_test_sources} ${mutation_test_sources} ${compute_test_sources}
         ${performance_test_sources} ${chunk_performance_test_sources} ${frame_wait_sources})

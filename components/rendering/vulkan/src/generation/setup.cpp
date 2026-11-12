@@ -10,7 +10,7 @@
 namespace engine::rendering::vulkan {
 namespace {
 
-world::model::IVec3 segment_counts(world::model::IVec3 requested, int side) {
+world::model::Vec3i segment_counts(world::model::Vec3i requested, int side) {
     if (requested.x < 1 || requested.y < 1 || requested.z < 1) {
         throw std::invalid_argument("GPU generation requires positive world dimensions");
     }
@@ -67,7 +67,7 @@ void chunk_image(GenerationState& state) {
 } // namespace
 
 GenerationState generation_state(WorldCompute& compute, const world::model::Model& source,
-                                 world::model::IVec3 requested, int segment_groups) {
+                                 world::model::Vec3i requested, int segment_groups) {
     world::model::validate(source);
     if (segment_groups < 1 || segment_groups > 8) {
         throw std::invalid_argument("Generation group size must be in 1..8");

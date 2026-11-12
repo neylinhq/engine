@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_SRC_WORLD_UPDATES_SUPPORT_HPP
+#define ENGINE_RENDERING_VULKAN_SRC_WORLD_UPDATES_SUPPORT_HPP
 
 #include "../frame/values.hpp"
 #include "../world/compute.hpp"
@@ -11,7 +12,7 @@
 
 namespace engine::rendering::vulkan {
 
-inline void validate_aadf_capacity(const Device& device, world::model::IVec3 chunks) {
+inline void validate_aadf_capacity(const Device& device, world::model::Vec3i chunks) {
     const auto groups = aadf_group_dimensions(chunks);
     const auto count = std::uint64_t(groups.x) * groups.y * groups.z;
     const auto bytes = count * 96U * sizeof(std::uint32_t);
@@ -34,7 +35,7 @@ inline void validate_aadf_capacity(const Device& device, world::model::IVec3 chu
     return {std::min(groups, 32768U), (groups + 32767U) / 32768U, 1};
 }
 
-[[nodiscard]] inline UniformValues update_values(world::model::IVec3 chunks,
+[[nodiscard]] inline UniformValues update_values(world::model::Vec3i chunks,
                                                  const GroupChanges& changes) {
     const auto groups = changes.dimensions();
     UniformValues values;
@@ -50,7 +51,7 @@ inline void validate_aadf_capacity(const Device& device, world::model::IVec3 chu
 
 [[nodiscard]] inline std::vector<GroupRecord> chunk_records(std::span<const std::uint32_t> indices,
                                                             std::span<const std::uint32_t> words,
-                                                            world::model::IVec3 size) {
+                                                            world::model::Vec3i size) {
     std::vector<GroupRecord> records;
     records.reserve(indices.size());
     for (const auto index : indices) {
@@ -81,3 +82,5 @@ payload_records(std::span<const std::uint32_t> offsets, std::span<const std::uin
 }
 
 } // namespace engine::rendering::vulkan
+
+#endif

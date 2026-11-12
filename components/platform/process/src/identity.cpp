@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <thread>
 #ifdef _WIN32
-#define NOMINMAX
 #include <windows.h>
 #else
 #include <sys/utsname.h>

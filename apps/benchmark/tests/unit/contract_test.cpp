@@ -2,6 +2,7 @@
 #include "../../src/scenario/json.hpp"
 #include <cmath>
 #include <iostream>
+namespace engine::app::benchmark {
 namespace {
 using namespace engine::app::benchmark;
 void require(bool value) {
@@ -113,8 +114,7 @@ void brush_limits() {
         rejected(value);
     }
 }
-} // namespace
-int main() {
+int run_contract_tests() {
     try {
         scenarios();
         statistics();
@@ -125,4 +125,10 @@ int main() {
         std::cerr << error.what() << '\n';
         return 1;
     }
+}
+} // namespace
+} // namespace engine::app::benchmark
+
+int main() {
+    return engine::app::benchmark::run_contract_tests();
 }

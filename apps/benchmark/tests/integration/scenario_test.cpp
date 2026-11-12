@@ -7,6 +7,7 @@
 #include <iterator>
 #include <set>
 #include <stdexcept>
+namespace engine::app::benchmark {
 namespace {
 namespace json = boost::json;
 namespace process = engine::platform::process;
@@ -199,16 +200,17 @@ int checked(const std::vector<std::string>& arguments) {
     }
 }
 } // namespace
+} // namespace engine::app::benchmark
 #ifdef _WIN32
 int wmain(int count, wchar_t** values) {
     std::vector<std::string> arguments;
     for (int index = 0; index < count; ++index) {
-        arguments.push_back(process::path_text(values[index]));
+        arguments.push_back(engine::platform::process::path_text(values[index]));
     }
-    return checked(arguments);
+    return engine::app::benchmark::checked(arguments);
 }
 #else
 int main(int count, char** values) {
-    return checked(std::vector<std::string>(values, values + count));
+    return engine::app::benchmark::checked(std::vector<std::string>(values, values + count));
 }
 #endif

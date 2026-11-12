@@ -1,5 +1,5 @@
 // Diagnostic entry point: execute the production NAADF traversal on supplied rays.
-#include "render/rayTracing.slang"
+#include "render/ray_tracing.slang"
 
 [vk::binding(57, 0)] StructuredBuffer<float4> test_rays;
 [vk::binding(58, 0)] RWStructuredBuffer<uint4> test_results;

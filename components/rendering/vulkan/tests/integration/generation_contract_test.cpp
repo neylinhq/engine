@@ -34,7 +34,7 @@ engine::platform::window::Window create_window() {
     return std::move(*result);
 }
 
-std::uint16_t expected_at(const model::Model& source, model::IVec3 requested, model::IVec3 point) {
+std::uint16_t expected_at(const model::Model& source, model::Vec3i requested, model::Vec3i point) {
     if (point.x >= requested.x || point.y >= requested.y || point.z >= requested.z ||
         point.y >= model::chunk_size(source.size).y * 16) {
         return 0;
@@ -48,7 +48,7 @@ void compare_voxels(const model::Model& source, const renderer::GenerationResult
     const auto size = result.model.size;
     const auto count = std::uint64_t(size.x) * size.y * size.z;
     for (std::uint64_t index = 0; index < count; ++index) {
-        const model::IVec3 point{static_cast<int>(index % size.x),
+        const model::Vec3i point{static_cast<int>(index % size.x),
                                  static_cast<int>((index / size.x) % size.y),
                                  static_cast<int>(index / (size.x * size.y))};
         const auto expected = expected_at(source, result.actual_size, point);
@@ -148,7 +148,7 @@ void compare_bounds(renderer::WorldCompute& compute, const renderer::GenerationR
             "GPU local AADF programs did not populate reserved empty ranges");
 }
 
-std::uint16_t source_material(int pattern, model::IVec3 point) {
+std::uint16_t source_material(int pattern, model::Vec3i point) {
     if (pattern == 0) {
         return 0;
     }
@@ -170,7 +170,7 @@ model::Model source_model(int pattern) {
     const int side = pattern == 3 ? 64 : 16;
     std::vector<model::Sample> samples;
     for (int index = 0; index < side * side * side; ++index) {
-        const model::IVec3 point{index % side, (index / side) % side, index / (side * side)};
+        const model::Vec3i point{index % side, (index / side) % side, index / (side * side)};
         const auto material = source_material(pattern, point);
         if (material != 0) {
             samples.push_back({point, material});
@@ -180,15 +180,15 @@ model::Model source_model(int pattern) {
 }
 
 struct QueueCapacityCase {
-    model::IVec3 requested;
-    model::IVec3 chunks;
+    model::Vec3i requested;
+    model::Vec3i chunks;
     std::uint64_t bytes;
 };
 
 QueueCapacityCase unsupported_queue(const renderer::Device& device) {
-    constexpr std::uint64_t reported_bytes = 1610612736;
-    if (device.properties.limits.maxStorageBufferRange < reported_bytes) {
-        return {{16129, 3841, 16129}, {1024, 256, 1024}, reported_bytes};
+    constexpr std::uint64_t kReportedBytes = 1610612736;
+    if (device.properties.limits.maxStorageBufferRange < kReportedBytes) {
+        return {{16129, 3841, 16129}, {1024, 256, 1024}, kReportedBytes};
     }
     // A 6 GiB queue exceeds the real uint32 Vulkan limit without changing cached capabilities.
     return {{16129, 16129, 16129}, {1024, 1024, 1024}, 6442450944ULL};
@@ -236,13 +236,13 @@ void queue_capacity_contract(renderer::WorldCompute& compute) {
               << "; prior GPU world remained readable\n";
 }
 
-void run_case(renderer::WorldCompute& compute, int pattern, model::IVec3 size) {
+void run_case(renderer::WorldCompute& compute, int pattern, model::Vec3i size) {
     const auto source = source_model(pattern);
     const auto result = renderer::generate_world(compute, source, size, 1);
     compare_voxels(source, result);
     compare_hash(result);
     compare_bounds(compute, result);
-    if (pattern == 2 && size == model::IVec3{64, 16, 64}) {
+    if (pattern == 2 && size == model::Vec3i{64, 16, 64}) {
         require(result.logical_voxels == 128 && result.block_words == 1088,
                 "Repeated mixed block was not deduplicated to one allocation");
         require(result.compression == 1024, "Repeated-block compression differs from 1024");
@@ -282,7 +282,7 @@ void check_segment_settings(renderer::WorldCompute& compute) {
          {std::pair{3, 27U}, std::pair{5, 64U}, std::pair{6, 216U}, std::pair{7, 343U}}) {
         const auto result = renderer::generate_world(compute, source, {1, 1, 1}, groups);
         const auto side = groups * 64;
-        require(result.model.size == model::IVec3{side, side, side},
+        require(result.model.size == model::Vec3i{side, side, side},
                 "Physical segment limit changed logical world padding");
         require(result.segments == segments,
                 "Generation did not split segments to the physical storage limit");
@@ -301,7 +301,7 @@ void check_segment_settings(renderer::WorldCompute& compute) {
 void sampled_source(const model::Model& source, const renderer::GenerationResult& result) {
     std::uint32_t state = 0x12345678U;
     for (unsigned sample = 0; sample < 100000; ++sample) {
-        model::IVec3 point;
+        model::Vec3i point;
         for (auto* coordinate : {&point.x, &point.y, &point.z}) {
             state = state * 1664525U + 1013904223U;
             *coordinate = static_cast<int>(state >> 8);
@@ -336,15 +336,15 @@ model::Model capacity_source() {
 }
 
 void source_capacity_contract(renderer::WorldCompute& compute) {
-    constexpr std::uint32_t range = 128U * 1024U * 1024U;
+    constexpr std::uint32_t kRange = 128U * 1024U * 1024U;
     const auto maximum = compute.device.properties.limits.maxStorageBufferRange;
-    if (maximum < range) {
+    if (maximum < kRange) {
         return;
     }
-    compute.device.properties.limits.maxStorageBufferRange = range;
+    compute.device.properties.limits.maxStorageBufferRange = kRange;
     const auto source = capacity_source();
     const auto result = renderer::generate_world(compute, source, source.size, 6);
-    require(result.model.size == model::IVec3{384, 384, 384} && result.segments == 8,
+    require(result.model.size == model::Vec3i{384, 384, 384} && result.segments == 8,
             "Source plus next-segment reserve exceeded the storage range");
     require(result.logical_voxels == source.voxels.size() * 2 &&
                 result.block_words == source.blocks.size() && result.compression == 1,
@@ -356,21 +356,21 @@ void source_capacity_contract(renderer::WorldCompute& compute) {
 
 void collision_contract(renderer::WorldCompute& compute) {
     std::vector<model::Sample> samples;
-    constexpr int count = 512;
-    for (int index = 0; index < count; ++index) {
-        const model::IVec3 base{(index % 8) * 4, ((index / 8) % 8) * 4, (index / 64) * 4};
+    constexpr int kCount = 512;
+    for (int index = 0; index < kCount; ++index) {
+        const model::Vec3i base{(index % 8) * 4, ((index / 8) % 8) * 4, (index / 64) * 4};
         samples.push_back({base, static_cast<std::uint16_t>(index + 1)});
         samples.push_back(
-            {{base.x + 1, base.y, base.z}, static_cast<std::uint16_t>(31 * (count - index))});
+            {{base.x + 1, base.y, base.z}, static_cast<std::uint16_t>(31 * (kCount - index))});
     }
     const auto source =
-        model::build_model({32, 32, 32}, std::vector<model::Material>(31 * count + 1), samples);
+        model::build_model({32, 32, 32}, std::vector<model::Material>(31 * kCount + 1), samples);
     // Every distinct block has exactly the same original 31-polynomial hash.
     const auto result = renderer::generate_world(compute, source, {32, 32, 32}, 1);
     compare_voxels(source, result);
     compare_hash(result);
     compare_bounds(compute, result);
-    require(result.logical_voxels == (count + 1) * 64,
+    require(result.logical_voxels == (kCount + 1) * 64,
             "Collision chain lost distinct mixed blocks");
     require(result.compression == 1, "Hash collision was treated as a duplicate block");
     std::cout << "512 distinct same-hash blocks survived allocation and GPU rehash\n";
@@ -424,7 +424,7 @@ std::vector<std::uint32_t> image_words(renderer::WorldCompute& compute,
     return {words, words + count};
 }
 
-void uniform_contract(renderer::WorldCompute& compute, model::IVec3 size) {
+void uniform_contract(renderer::WorldCompute& compute, model::Vec3i size) {
     model::Model source;
     source.size = size;
     source.materials.resize(4);

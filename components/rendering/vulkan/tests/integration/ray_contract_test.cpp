@@ -24,7 +24,7 @@ Ray ray(model::Vec3 origin, model::Vec3 direction) {
             static_cast<float>(direction.z), 0};
 }
 
-void append_box(std::vector<model::Sample>& samples, model::IVec3 origin, model::IVec3 size,
+void append_box(std::vector<model::Sample>& samples, model::Vec3i origin, model::Vec3i size,
                 std::uint16_t material) {
     const auto count = size.x * size.y * size.z;
     for (int index = 0; index < count; ++index) {
@@ -113,11 +113,11 @@ model::Vec3 rotate_y(model::Vec3 point, double angle) {
 
 struct EntityOracle {
     model::Vec3 position;
-    model::IVec3 size;
+    model::Vec3i size;
     std::uint16_t material = 0;
 };
 
-std::optional<double> box_hit(model::Vec3 origin, model::Vec3 direction, model::IVec3 size) {
+std::optional<double> box_hit(model::Vec3 origin, model::Vec3 direction, model::Vec3i size) {
     const model::Vec3 maximum{static_cast<double>(size.x), static_cast<double>(size.y),
                               static_cast<double>(size.z)};
     double near = 0;
@@ -171,7 +171,7 @@ void compare_entities(std::span<const Ray> rays, std::span<const RayRecord> reco
     std::cout << rays.size() << " entity GPU rays matched independent rotated-box oracle\n";
 }
 
-model::Model entity_model(model::IVec3 size, std::string name) {
+model::Model entity_model(model::Vec3i size, std::string name) {
     std::vector<model::Sample> samples;
     append_box(samples, {}, size, 1);
     std::vector<model::Material> materials(2);

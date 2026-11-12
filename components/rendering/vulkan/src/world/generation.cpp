@@ -5,7 +5,7 @@
 namespace engine::rendering::vulkan {
 
 GenerationResult generate_world(WorldCompute& compute, const world::model::Model& source,
-                                world::model::IVec3 requested, int segment_groups) {
+                                world::model::Vec3i requested, int segment_groups) {
     if (uniform_source(source, requested, segment_groups)) {
         return import_uniform(compute, source);
     }

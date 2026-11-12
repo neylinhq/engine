@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_TRACE_PROBE_HPP
+#define ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_TRACE_PROBE_HPP
 
 #include "../../src/gpu/device.hpp"
 #include "../../src/program/reflection.hpp"
@@ -43,3 +44,5 @@ struct TraceProbe {
 };
 
 } // namespace engine::rendering::vulkan::test
+
+#endif

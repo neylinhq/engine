@@ -8,9 +8,9 @@
 
 namespace {
 
-using engine::world::model::IVec3;
 using engine::world::model::Sample;
 using engine::world::model::Vec3;
+using engine::world::model::Vec3i;
 using engine::world::model::World;
 
 void require(bool condition, const char* message) {
@@ -30,7 +30,7 @@ std::vector<Sample> samples() {
     return result;
 }
 
-double intersect(Vec3 origin, Vec3 direction, IVec3 voxel) {
+double intersect(Vec3 origin, Vec3 direction, Vec3i voxel) {
     const std::array<int, 3> position{voxel.x, voxel.y, voxel.z};
     double near = 0;
     double far = 100000;
@@ -170,7 +170,7 @@ void test_library_persistence() {
             "Saved world did not compact original used palette to local indices");
 }
 
-std::vector<unsigned> occupancy_prefix(const World& world, IVec3 dimensions) {
+std::vector<unsigned> occupancy_prefix(const World& world, Vec3i dimensions) {
     const auto stride_x = static_cast<std::size_t>(dimensions.x + 1);
     const auto stride_y = stride_x * static_cast<std::size_t>(dimensions.y + 1);
     std::vector<unsigned> prefix(stride_y * static_cast<std::size_t>(dimensions.z + 1));
@@ -192,7 +192,7 @@ std::vector<unsigned> occupancy_prefix(const World& world, IVec3 dimensions) {
     return prefix;
 }
 
-unsigned box_count(std::span<const unsigned> prefix, IVec3 dimensions, IVec3 lower, IVec3 upper) {
+unsigned box_count(std::span<const unsigned> prefix, Vec3i dimensions, Vec3i lower, Vec3i upper) {
     const auto stride_x = static_cast<std::size_t>(dimensions.x + 1);
     const auto stride_y = stride_x * static_cast<std::size_t>(dimensions.y + 1);
     int result = 0;
@@ -221,13 +221,13 @@ void verify_bounds(const World& world) {
             require(word == 0, "Entity-occupied chunk retains unsafe empty extent");
             continue;
         }
-        const IVec3 position{static_cast<int>(index % dimensions.x),
+        const Vec3i position{static_cast<int>(index % dimensions.x),
                              static_cast<int>(index / dimensions.x % dimensions.y),
                              static_cast<int>(index / dimensions.x / dimensions.y)};
-        const IVec3 lower{position.x - static_cast<int>(word & 31U),
+        const Vec3i lower{position.x - static_cast<int>(word & 31U),
                           position.y - static_cast<int>((word >> 10) & 31U),
                           position.z - static_cast<int>((word >> 20) & 31U)};
-        const IVec3 upper{position.x + static_cast<int>((word >> 5) & 31U) + 1,
+        const Vec3i upper{position.x + static_cast<int>((word >> 5) & 31U) + 1,
                           position.y + static_cast<int>((word >> 15) & 31U) + 1,
                           position.z + static_cast<int>((word >> 25) & 31U) + 1};
         require(lower.x >= 0 && lower.y >= 0 && lower.z >= 0 && upper.x <= dimensions.x &&

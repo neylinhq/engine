@@ -150,11 +150,11 @@ Trees dynamic_trees(Bits& bits) {
     const auto literal_count = bits.read(5) + 257;
     const auto distance_count = bits.read(5) + 1;
     const auto code_count = bits.read(4) + 4;
-    constexpr std::array<unsigned, 19> order{16, 17, 18, 0, 8,  7, 9,  6, 10, 5,
-                                             11, 4,  12, 3, 13, 2, 14, 1, 15};
+    constexpr std::array<unsigned, 19> kOrder{16, 17, 18, 0, 8,  7, 9,  6, 10, 5,
+                                              11, 4,  12, 3, 13, 2, 14, 1, 15};
     std::array<unsigned, 19> code_lengths{};
     for (unsigned index = 0; index < code_count; ++index) {
-        code_lengths[order[index]] = bits.read(3);
+        code_lengths[kOrder[index]] = bits.read(3);
     }
     const Huffman code_tree{code_lengths};
     std::vector<unsigned> lengths;
@@ -187,24 +187,24 @@ void emit(Output& output, unsigned value) {
 }
 
 void back_reference(Bits& bits, const Trees& trees, Output& output, unsigned symbol) {
-    constexpr std::array<unsigned, 29> lengths{3,  4,  5,  6,   7,   8,   9,   10,  11, 13,
-                                               15, 17, 19, 23,  27,  31,  35,  43,  51, 59,
-                                               67, 83, 99, 115, 131, 163, 195, 227, 258};
-    constexpr std::array<unsigned, 29> length_bits{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2,
+    constexpr std::array<unsigned, 29> kLengths{3,  4,  5,  6,   7,   8,   9,   10,  11, 13,
+                                                15, 17, 19, 23,  27,  31,  35,  43,  51, 59,
+                                                67, 83, 99, 115, 131, 163, 195, 227, 258};
+    constexpr std::array<unsigned, 29> kLengthBits{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2,
                                                    2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0};
-    constexpr std::array<unsigned, 30> distances{
+    constexpr std::array<unsigned, 30> kDistances{
         1,   2,   3,   4,   5,   7,    9,    13,   17,   25,   33,   49,   65,    97,    129,
         193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577};
     if (symbol < 257 || symbol > 285) {
         throw std::runtime_error("Invalid DEFLATE length code");
     }
-    const auto length = lengths[symbol - 257] + bits.read(length_bits[symbol - 257]);
+    const auto length = kLengths[symbol - 257] + bits.read(kLengthBits[symbol - 257]);
     const auto distance_code = trees.distances.decode(bits);
-    if (distance_code >= distances.size()) {
+    if (distance_code >= kDistances.size()) {
         throw std::runtime_error("Invalid DEFLATE distance code");
     }
     const auto extra = distance_code < 4 ? 0 : distance_code / 2 - 1;
-    const auto distance = distances[distance_code] + bits.read(extra);
+    const auto distance = kDistances[distance_code] + bits.read(extra);
     if (distance > output.bytes.size() || output.bytes.size() + length > output.limit) {
         throw std::runtime_error("Invalid DEFLATE back reference");
     }

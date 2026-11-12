@@ -3,7 +3,6 @@
 #include <memory>
 #include <stdexcept>
 #ifdef _WIN32
-#define NOMINMAX
 #include <windows.h>
 #else
 #include <csignal>

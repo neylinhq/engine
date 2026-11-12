@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_MESH_RASTER_HPP
+#define ENGINE_WORLD_STORAGE_SRC_MESH_RASTER_HPP
 
 #include "../import.hpp"
 
@@ -8,3 +9,5 @@ namespace engine::world::storage {
                                                     int resolution);
 
 } // namespace engine::world::storage
+
+#endif

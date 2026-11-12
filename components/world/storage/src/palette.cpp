@@ -123,14 +123,14 @@ void minibatch_step(std::span<const model::Vec3> colors, std::span<const std::si
 
 void train_minibatches(std::span<const model::Vec3> colors, std::vector<model::Vec3>& palette,
                        std::mt19937& random) {
-    constexpr std::size_t batch_size = 50000;
+    constexpr std::size_t kBatchSize = 50000;
     std::vector<std::size_t> indices(colors.size());
     std::iota(indices.begin(), indices.end(), 0);
     std::vector<std::uint64_t> counts(palette.size());
     for (;;) {
         const auto previous = palette;
-        shuffle_batch(indices, batch_size, random);
-        minibatch_step(colors, std::span(indices).first(batch_size), palette, counts);
+        shuffle_batch(indices, kBatchSize, random);
+        minibatch_step(colors, std::span(indices).first(kBatchSize), palette, counts);
         if (converged(previous, palette)) {
             return;
         }
@@ -167,7 +167,7 @@ model::Material material(model::Vec3 color) {
 
 } // namespace
 
-model::Model colored_model(model::IVec3 size, std::span<const ColorVoxel> voxels,
+model::Model colored_model(model::Vec3i size, std::span<const ColorVoxel> voxels,
                            int palette_size) {
     palette_size = std::clamp(palette_size, 1, 32767);
     std::map<std::uint32_t, model::Vec3> unique;

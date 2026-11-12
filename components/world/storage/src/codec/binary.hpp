@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_WORLD_STORAGE_SRC_CODEC_BINARY_HPP
+#define ENGINE_WORLD_STORAGE_SRC_CODEC_BINARY_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -56,3 +57,5 @@ void write_file(const std::filesystem::path& path, std::span<const std::byte> by
 [[nodiscard]] std::string extension_text(const std::filesystem::path& path);
 
 } // namespace engine::world::storage
+
+#endif

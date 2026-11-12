@@ -5,7 +5,7 @@
 #include <exception>
 namespace engine::app::sandbox {
 namespace {
-world::model::IVec3 integer(foundation::geometry::Vec3 position) {
+world::model::Vec3i integer(foundation::geometry::Vec3 position) {
     return {static_cast<int>(std::floor(position.x)), static_cast<int>(std::floor(position.y)),
             static_cast<int>(std::floor(position.z))};
 }

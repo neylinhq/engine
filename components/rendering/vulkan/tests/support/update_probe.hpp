@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_UPDATE_PROBE_HPP
+#define ENGINE_RENDERING_VULKAN_TESTS_SUPPORT_UPDATE_PROBE_HPP
 
 #include "../../src/world/compute.hpp"
 #include "../../src/world/updates.hpp"
@@ -26,10 +27,12 @@ struct UpdateProbe {
 
     explicit UpdateProbe(const std::filesystem::path& shaders,
                          ChunkLayout layout = ChunkLayout::automatic);
-    void load(world::model::Model source, world::model::IVec3 size);
+    void load(world::model::Model source, world::model::Vec3i size);
     void flush(unsigned history_index, unsigned budget = 32768);
     void settle(unsigned budget = 32768, unsigned frames = 20);
     [[nodiscard]] world::model::Model snapshot();
 };
 
 } // namespace engine::rendering::vulkan::test
+
+#endif

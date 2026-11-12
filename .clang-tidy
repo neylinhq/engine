@@ -1,0 +1,6 @@
+Checks: '-*,readability-function-cognitive-complexity'
+InheritParentConfig: false
+CheckOptions:
+  readability-function-cognitive-complexity.Threshold: 15
+  readability-function-cognitive-complexity.DescribeBasicIncrements: true
+  readability-function-cognitive-complexity.IgnoreMacros: false

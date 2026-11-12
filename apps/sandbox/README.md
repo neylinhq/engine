@@ -9,12 +9,12 @@
 Из корня проекта после сборки:
 
 ```powershell
-.\out\release\bin\sandbox.exe
-.\out\release\bin\sandbox.exe --scene C:\Scenes\world.cvox --voxel-size 1
-.\out\release\bin\sandbox.exe --help
+.\out\windows-release\bin\sandbox.exe
+.\out\windows-release\bin\sandbox.exe --scene C:\Scenes\world.cvox --voxel-size 1
+.\out\windows-release\bin\sandbox.exe --help
 ```
 
-В Linux исполняемый файл находится в `out/release/bin/sandbox`.
+В Linux исполняемый файл находится в `out/linux-release/bin/sandbox`.
 Карты хранятся вне проекта. `--scene` принимает CVox, VOX, VL32, OBJ и STL
 и создаёт мир по размеру импортированной модели. В интерфейсе `File > Open`
 открывает CVox, а отдельные команды импорта — VOX, VL32 и сетки OBJ/STL.
@@ -24,7 +24,7 @@
 принимает позицию в метрах и углы в радианах. Например:
 
 ```powershell
-.\out\release\bin\sandbox.exe --scene C:\Scenes\strata-03125.cvox --voxel-size 0.03125 --camera "256,104,112,0,-0.08"
+.\out\windows-release\bin\sandbox.exe --scene C:\Scenes\strata-03125.cvox --voxel-size 0.03125 --camera "256,104,112,0,-0.08"
 ```
 
 `--settings FILE.json` выбирает файл настроек; по умолчанию используется
@@ -62,7 +62,7 @@ Erase удаляет геометрию, Continuous повторяет дейс�
 ## Рендер и захват кадров
 
 ```powershell
-.\out\release\bin\sandbox.exe --scene C:\Scenes\world.cvox --width 640 --height 360 --mode albedo --frames 8 --no-ui --screenshot C:\Captures\albedo.png --validation
+.\out\windows-release\bin\sandbox.exe --scene C:\Scenes\world.cvox --width 640 --height 360 --mode albedo --frames 8 --no-ui --screenshot C:\Captures\albedo.png --validation
 ```
 
 `--frames 0` означает интерактивный режим. `--screenshot` без положительного

@@ -89,7 +89,7 @@ UpdateProbe::UpdateProbe(const std::filesystem::path& shaders, ChunkLayout layou
     : window(create_window()), device(window, true, layout),
       compute(device, shaders, buffers, chunks), updates(compute) {}
 
-void UpdateProbe::load(world::model::Model source, world::model::IVec3 size) {
+void UpdateProbe::load(world::model::Model source, world::model::Vec3i size) {
     source = world.prepare_generation(std::move(source));
     auto result = generate_world(compute, source, size, 1);
     updates.initialize(world::model::chunk_size(result.model.size));

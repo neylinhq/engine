@@ -16,7 +16,8 @@ struct PreparedBatch {
     std::unique_ptr<PackedChunk[]> storage;
 };
 
-PreparedBatch prepare_edits(const std::unordered_map<std::size_t, ChunkEdit>& edits, bool raw) {
+PreparedBatch prepare_edits(const std::unordered_map<std::size_t, ChunkEdit>& edits, bool raw,
+                            unsigned worker_count) {
     PreparedBatch prepared;
     std::size_t count = 0;
     for (const auto& [index, edit] : edits) {
@@ -30,12 +31,13 @@ PreparedBatch prepare_edits(const std::unordered_map<std::size_t, ChunkEdit>& ed
         prepared.entries.push_back(
             {index, &edit, edit.voxels ? &prepared.storage[next++] : nullptr});
     }
-    foundation::parallel::for_each_index(prepared.entries.size(), [&](std::size_t index) {
-        const auto& item = prepared.entries[index];
-        if (item.edit->voxels) {
-            pack_chunk(*item.edit->voxels, raw, *item.packed);
-        }
-    });
+    foundation::parallel::for_each_index(prepared.entries.size(), worker_count,
+                                         [&](std::size_t index) {
+                                             const auto& item = prepared.entries[index];
+                                             if (item.edit->voxels) {
+                                                 pack_chunk(*item.edit->voxels, raw, *item.packed);
+                                             }
+                                         });
     return prepared;
 }
 
@@ -45,7 +47,7 @@ void World::commit_edits() {
     if (state_->edits.empty()) {
         return;
     }
-    auto prepared = prepare_edits(state_->edits, state_->pool.raw_updates);
+    auto prepared = prepare_edits(state_->edits, state_->pool.raw_updates, worker_count_);
     std::vector<std::size_t> changed;
     for (const auto& item : prepared.entries) {
         const auto index = item.index;

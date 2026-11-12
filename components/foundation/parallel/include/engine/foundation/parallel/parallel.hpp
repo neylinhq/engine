@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENGINE_FOUNDATION_PARALLEL_PARALLEL_HPP
+#define ENGINE_FOUNDATION_PARALLEL_PARALLEL_HPP
 
 #include <algorithm>
 #include <atomic>
@@ -31,14 +32,15 @@ template <typename Function> struct Batch {
 } // namespace detail
 
 template <typename Function>
-void for_each_index(std::size_t count, Function function, std::size_t minimum_count = 128) {
+void for_each_index(std::size_t count, unsigned worker_count, Function function,
+                    std::size_t minimum_count = 128) {
     if (count < minimum_count) {
         for (std::size_t index = 0; index < count; ++index) {
             function(index);
         }
         return;
     }
-    const auto workers = std::clamp(std::thread::hardware_concurrency(), 1u, 8u);
+    const auto workers = std::clamp(worker_count, 1u, 8u);
     detail::Batch<Function> batch{count, function};
     std::vector<std::exception_ptr> errors(workers);
     std::vector<std::jthread> threads;
@@ -54,3 +56,5 @@ void for_each_index(std::size_t count, Function function, std::size_t minimum_co
 }
 
 } // namespace engine::foundation::parallel
+
+#endif

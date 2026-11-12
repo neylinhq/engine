@@ -9,7 +9,7 @@ namespace {
 using Cell = std::array<std::uint32_t, 64>;
 using Point = std::array<int, 3>;
 
-Point coordinates(std::uint32_t index, world::model::IVec3 size) {
+Point coordinates(std::uint32_t index, world::model::Vec3i size) {
     return {static_cast<int>(index % size.x), static_cast<int>((index / size.x) % size.y),
             static_cast<int>(index / size.x / size.y)};
 }
@@ -97,7 +97,7 @@ void verify_local_bounds(const world::model::Model& raw, const world::model::Mod
     }
 }
 
-void verify_chunk_bounds(world::model::IVec3 size, std::span<const GroupRecord> chunks) {
+void verify_chunk_bounds(world::model::Vec3i size, std::span<const GroupRecord> chunks) {
     std::vector<Point> occupied;
     for (std::uint32_t index = 0; index < chunks.size(); ++index) {
         if ((chunks[index][0] >> 30) != 0 || chunks[index][1] != 0) {
