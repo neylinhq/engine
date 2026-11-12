@@ -10,5 +10,5 @@ except where applicable law provides otherwise.
 
 Third-party code and materials, including code derived from NAADF, remain
 subject to their respective licenses. This notice does not restrict rights
-granted under those licenses. The notices are included in docs/licenses/ in
-the source tree and licenses/ in installed packages.
+granted under those licenses. The notices are included in licenses/ in the source tree
+and in installed packages.

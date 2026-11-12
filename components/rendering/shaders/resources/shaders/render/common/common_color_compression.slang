@@ -1,4 +1,4 @@
-// Ported from NAADF (TU Wien, 2026), MIT. See docs/licenses/naadf.txt.
+// Ported from NAADF (TU Wien, 2026), MIT. See licenses/naadf.txt.
 #ifndef __COMMON_COLOR_COMPRESSION__
 #define __COMMON_COLOR_COMPRESSION__
 #include "common_ray_tracing.slang"

@@ -25,4 +25,4 @@ Slang создаёт JSON с описанием типов, смещений uni
 Рендерер выбирает представление по возможностям устройства. Требования описаны
 в [документации Vulkan](../vulkan/README.md). Источник алгоритмов —
 [NAADF](https://github.com/cg-tuwien/NAADF); уведомление MIT находится
-в [docs/licenses/naadf.txt](../../../docs/licenses/naadf.txt).
+в [licenses/naadf.txt](../../../licenses/naadf.txt).

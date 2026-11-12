@@ -20,9 +20,14 @@ if(ENGINE_DESKTOP)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/shaders/" DESTINATION bin/shaders)
     install(FILES docs/runtime.md DESTINATION . RENAME README.md)
     install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION .)
-    install(DIRECTORY "${PROJECT_SOURCE_DIR}/docs/licenses/" DESTINATION licenses)
-    install(FILES "${PROJECT_SOURCE_DIR}/docs/third_party_notices.md"
-        DESTINATION . RENAME THIRD_PARTY_NOTICES.md)
+    install(DIRECTORY "${PROJECT_SOURCE_DIR}/licenses/" DESTINATION licenses)
+    set(notices_source "${PROJECT_SOURCE_DIR}/docs/third_party_notices.md")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${notices_source}")
+    file(READ "${notices_source}" notices)
+    string(REPLACE "](../licenses/" "](licenses/" installed_notices "${notices}")
+    file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/THIRD_PARTY_NOTICES.md"
+        CONTENT "${installed_notices}" @ONLY)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/THIRD_PARTY_NOTICES.md" DESTINATION .)
     add_executable(options_test src/options.cpp src/options.hpp src/io/path.hpp
         src/io/executable.hpp src/io/executable.cpp tests/unit/options_test.cpp)
     ac_test(options_test sandbox)

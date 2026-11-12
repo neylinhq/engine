@@ -1,4 +1,4 @@
-// Ported from NAADF (TU Wien, 2026), MIT. See docs/licenses/naadf.txt.
+// Ported from NAADF (TU Wien, 2026), MIT. See licenses/naadf.txt.
 #define GroupSizeX 64
 #define EMPTY_BLOCK 0x0
 

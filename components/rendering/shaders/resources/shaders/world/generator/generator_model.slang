@@ -1,4 +1,4 @@
-// Ported from NAADF (TU Wien, 2026), MIT. See docs/licenses/naadf.txt.
+// Ported from NAADF (TU Wien, 2026), MIT. See licenses/naadf.txt.
 
 [vk::binding(15, 0)] RWStructuredBuffer<uint> chunkData;
 [vk::binding(16, 0)] RWTexture3D<uint> chunkDataTex3D;
