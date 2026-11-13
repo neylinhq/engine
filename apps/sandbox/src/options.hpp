@@ -16,8 +16,8 @@ struct Options {
     int width = 1600;
     int height = 900;
     unsigned frames = 0;
-    double voxel_metres = 1;
-    std::optional<std::array<double, 5>> camera_metres;
+    double voxel_meters = 1;
+    std::optional<std::array<double, 5>> camera_meters;
     bool hidden = false;
     bool no_ui = false;
     bool validation = false;

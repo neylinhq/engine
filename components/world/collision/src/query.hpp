@@ -13,16 +13,16 @@ using foundation::geometry::Vec3;
 struct CapsuleQuery {
     motion::character::Capsule capsule;
     Vec3 displacement;
-    double voxel_metres;
+    double voxel_meters;
     Box bounds;
 };
 
 [[nodiscard]] CapsuleQuery make_query(motion::character::Capsule capsule, Vec3 displacement,
-                                      double voxel_metres);
+                                      double voxel_meters);
 [[nodiscard]] std::optional<motion::character::SweepHit> cast_solid(const CapsuleQuery& query,
                                                                     Box solid, double max_fraction);
 [[nodiscard]] std::optional<motion::character::Penetration>
-overlap_solid(motion::character::Capsule capsule, Box solid, double voxel_metres);
+overlap_solid(motion::character::Capsule capsule, Box solid, double voxel_meters);
 
 } // namespace engine::world::collision
 

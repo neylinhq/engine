@@ -53,7 +53,7 @@ class Camera {
     [[nodiscard]] std::expected<void, std::string> reframe(double world_side);
     void rotate(PointerDelta motion);
     void fly(FlightIntent intent, double wall_seconds);
-    void translate(Vec3 axis, double metres);
+    void translate(Vec3 axis, double meters);
     void clear_changed();
     [[nodiscard]] Pose pose() const;
     [[nodiscard]] Basis basis() const;

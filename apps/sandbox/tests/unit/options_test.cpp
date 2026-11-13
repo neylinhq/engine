@@ -93,8 +93,8 @@ void scene_units() {
             "Walking must be selected explicitly at startup");
     const auto options = parse(std::array<std::string, 5>{"engine", "--voxel-size", "0.03125",
                                                           "--camera", "256,104,112,0,-0.08"});
-    require(options.voxel_metres == 1.0 / 32 && options.camera_metres &&
-                *options.camera_metres == std::array<double, 5>{256, 104, 112, 0, -0.08},
+    require(options.voxel_meters == 1.0 / 32 && options.camera_meters &&
+                *options.camera_meters == std::array<double, 5>{256, 104, 112, 0, -0.08},
             "Fine-voxel scene lost its physical camera or voxel scale");
     for (const auto* bad : {"0", "-0.01", "nan", "inf", "1.01"}) {
         bool rejected = false;

@@ -13,25 +13,25 @@
 
 groupshared uint cachedCell[64];
 
-uint checkMatchingBounds(uint neighbour, uint curVoxel, const uint shiftOffset, const uint shiftCount, const uint shiftMask)
+uint checkMatchingBounds(uint neighbor, uint curVoxel, const uint shiftOffset, const uint shiftCount, const uint shiftMask)
 {
     uint mask = 0;
-    mask |= (((neighbour >> (shiftOffset + shiftCount * 0)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 0)) & shiftMask)) << 0; //-x  
-    mask |= (((neighbour >> (shiftOffset + shiftCount * 1)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 1)) & shiftMask)) << 1; //+x
-    mask |= (((neighbour >> (shiftOffset + shiftCount * 2)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 2)) & shiftMask)) << 2; //-y
-    mask |= (((neighbour >> (shiftOffset + shiftCount * 3)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 3)) & shiftMask)) << 3; //+y
-    mask |= (((neighbour >> (shiftOffset + shiftCount * 4)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 4)) & shiftMask)) << 4; //-z
-    mask |= (((neighbour >> (shiftOffset + shiftCount * 5)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 5)) & shiftMask)) << 5; //+z
+    mask |= (((neighbor >> (shiftOffset + shiftCount * 0)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 0)) & shiftMask)) << 0; //-x
+    mask |= (((neighbor >> (shiftOffset + shiftCount * 1)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 1)) & shiftMask)) << 1; //+x
+    mask |= (((neighbor >> (shiftOffset + shiftCount * 2)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 2)) & shiftMask)) << 2; //-y
+    mask |= (((neighbor >> (shiftOffset + shiftCount * 3)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 3)) & shiftMask)) << 3; //+y
+    mask |= (((neighbor >> (shiftOffset + shiftCount * 4)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 4)) & shiftMask)) << 4; //-z
+    mask |= (((neighbor >> (shiftOffset + shiftCount * 5)) & shiftMask) >= ((curVoxel >> (shiftOffset + shiftCount * 5)) & shiftMask)) << 5; //+z
     
     return mask;
 }
 
 void addBoundsVoxelsOrBlocks(uint localIndex, uint mask, int directionOffset, uint boundsLocation, const uint stateLocation, const uint stateMask, inout uint curVoxel)
 {
-    uint neighbour = cachedCell[localIndex + directionOffset];
-    if (((neighbour >> stateLocation) & stateMask) == 0)
+    uint neighbor = cachedCell[localIndex + directionOffset];
+    if (((neighbor >> stateLocation) & stateMask) == 0)
     {
-        if ((checkMatchingBounds(neighbour, curVoxel, 0, 2, 0x3) & mask) == mask)
+        if ((checkMatchingBounds(neighbor, curVoxel, 0, 2, 0x3) & mask) == mask)
             curVoxel += 1 << boundsLocation;
     }
 }

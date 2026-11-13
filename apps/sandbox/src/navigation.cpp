@@ -41,13 +41,13 @@ void walk(Application& app, const interaction::input::Actions& actions, double s
                                                forward * actions.forward + right * actions.right,
                                            .run = actions.boost,
                                            .jump_pressed = actions.jump_pressed};
-    const world::collision::Terrain terrain{app.world.view(), app.options.voxel_metres};
+    const world::collision::Terrain terrain{app.world.view(), app.options.voxel_meters};
     if (const auto result = app.character->advance(terrain, intent, seconds); !result) {
         app.metrics.status = result.error();
         return;
     }
     auto next = pose;
-    next.position = app.character->state().eye / app.options.voxel_metres;
+    next.position = app.character->state().eye / app.options.voxel_meters;
     if (const auto result = app.camera->set_pose(next); !result) {
         app.metrics.status = result.error();
     }
@@ -55,16 +55,16 @@ void walk(Application& app, const interaction::input::Actions& actions, double s
 } // namespace
 void start_walking(Application& app) {
     auto pose = app.camera->pose();
-    const auto eye = pose.position * app.options.voxel_metres;
+    const auto eye = pose.position * app.options.voxel_meters;
     motion::character::Motor character(
         eye - foundation::geometry::Vec3{0, motion::character::kEyeHeight, 0});
-    const world::collision::Terrain terrain{app.world.view(), app.options.voxel_metres};
+    const world::collision::Terrain terrain{app.world.view(), app.options.voxel_meters};
     if (const auto placed = character.advance(terrain, {}, 0); !placed) {
         app.character.reset();
         app.metrics.status = "Cannot enter walk mode: " + placed.error();
         return;
     }
-    pose.position = character.state().eye / app.options.voxel_metres;
+    pose.position = character.state().eye / app.options.voxel_meters;
     if (const auto positioned = app.camera->set_pose(pose); !positioned) {
         app.character.reset();
         app.metrics.status = positioned.error();

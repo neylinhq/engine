@@ -11,7 +11,7 @@ namespace engine::world::collision {
 // Holds a view of committed data for a single character update. World mutation invalidates it.
 class Terrain final : public motion::character::Collision {
   public:
-    Terrain(model::WorldView view, double voxel_metres);
+    Terrain(model::WorldView view, double voxel_meters);
     [[nodiscard]] std::optional<motion::character::SweepHit>
     sweep(motion::character::Capsule capsule, foundation::geometry::Vec3 displacement,
           motion::character::SweepFilter filter = {}) const override;
@@ -20,7 +20,7 @@ class Terrain final : public motion::character::Collision {
 
   private:
     model::WorldView view_;
-    double voxel_metres_;
+    double voxel_meters_;
 };
 
 } // namespace engine::world::collision

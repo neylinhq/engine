@@ -103,20 +103,20 @@ void addBoundsGroup(int3 chunkPos, int3 directionOffset, uint mask, uint boundsL
     {
         return;
     }
-    int3 neighbourChunkPos = chunkPos + directionOffset;
-    if (any(neighbourChunkPos < 0) || neighbourChunkPos.x >= (int) chunkSizeX || neighbourChunkPos.y >= (int) chunkSizeY || neighbourChunkPos.z >= (int) chunkSizeZ)
+    int3 neighborChunkPos = chunkPos + directionOffset;
+    if (any(neighborChunkPos < 0) || neighborChunkPos.x >= (int) chunkSizeX || neighborChunkPos.y >= (int) chunkSizeY || neighborChunkPos.z >= (int) chunkSizeZ)
     {
         curChunk += 1 << boundsLocation;
         return;
     }
     
-    uint2 neighbourWords = load_chunk_atomic(neighbourChunkPos);
-    uint neighbour = neighbourWords.x;
-    uint neighbourEntities = neighbourWords.y;
+    uint2 neighborWords = load_chunk_atomic(neighborChunkPos);
+    uint neighbor = neighborWords.x;
+    uint neighborEntities = neighborWords.y;
     
-    if ((neighbour >> 30) == BLOCK_STATE_UNIFORM_EMPTY && neighbourEntities == 0)
+    if ((neighbor >> 30) == BLOCK_STATE_UNIFORM_EMPTY && neighborEntities == 0)
     {
-        if ((checkMatchingBounds(neighbour, curChunk, 0, 5, 0x1F) & mask) == mask)
+        if ((checkMatchingBounds(neighbor, curChunk, 0, 5, 0x1F) & mask) == mask)
             curChunk += 1 << boundsLocation;
     }
 }

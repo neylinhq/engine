@@ -137,15 +137,15 @@ Capsule body_at(Vec3 feet) {
 }
 
 std::optional<Vec3> recover_position(const Collision& collision, Vec3 feet) {
-    double travelled = 0;
+    double traveled = 0;
     for (int iteration = 0; iteration < kMaxContacts; ++iteration) {
         const auto hit = collision.penetration(body_at(feet));
         if (!hit) {
             return feet;
         }
         const auto distance = hit->depth + kRecoveryClearance;
-        travelled += distance;
-        if (hit->normal == Vec3{} || travelled > kRecoveryLimit) {
+        traveled += distance;
+        if (hit->normal == Vec3{} || traveled > kRecoveryLimit) {
             return std::nullopt;
         }
         feet = feet + hit->normal * distance;

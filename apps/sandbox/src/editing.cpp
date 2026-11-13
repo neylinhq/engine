@@ -101,7 +101,7 @@ void update_editing(Application& app, const interaction::input::Actions& actions
         world::model::PlacementGuard guard{};
         world::collision::CapsulePlacement placement{};
         if (app.character) {
-            placement = {app.character->capsule(), app.options.voxel_metres};
+            placement = {app.character->capsule(), app.options.voxel_meters};
             guard = placement.guard();
         }
         app.brush_active = apply_tool(app, hit, seconds, guard);

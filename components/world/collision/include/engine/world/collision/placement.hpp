@@ -8,7 +8,7 @@ namespace engine::world::collision {
 
 struct CapsulePlacement {
     motion::character::Capsule capsule;
-    double voxel_metres;
+    double voxel_meters;
 
     // The placement must outlive the guarded edit.
     [[nodiscard]] model::PlacementGuard guard() const&;

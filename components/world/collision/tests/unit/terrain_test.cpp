@@ -15,7 +15,7 @@ namespace engine::world::collision {
 namespace {
 
 namespace character = motion::character;
-constexpr double kVoxelMetres = 0.0625;
+constexpr double kVoxelMeters = 0.0625;
 
 void require(bool condition, const char* message) {
     if (!condition) {
@@ -35,7 +35,7 @@ void advance(character::Motor& motor, const Terrain& field, character::Intent in
 void sweeps() {
     model::World world;
     world.replace(model::build_model({32, 32, 32}, {{}, {}}, {{{4, 0, 4}, 1}, {{4, 4, 4}, 1}}));
-    const Terrain field{world.view(), kVoxelMetres};
+    const Terrain field{world.view(), kVoxelMeters};
     const character::Capsule above{{0.28125, 0.5, 0.28125}, 0.08, 0.25};
     const auto floor = field.sweep(above, {0, -0.5, 0});
     require(floor && floor->normal.y > 0.99 && std::abs(floor->point.y - 0.3125) < 1e-5 &&
@@ -44,7 +44,7 @@ void sweeps() {
     const character::SweepFilter below_upper_voxel{
         [](const character::SweepHit& hit, const void*) { return hit.point.y < 0.25; }};
     const auto lower = field.sweep(above, {0, -0.5, 0}, below_upper_voxel);
-    require(lower && lower->normal.y > 0.99 && std::abs(lower->point.y - kVoxelMetres) < 1e-5,
+    require(lower && lower->normal.y > 0.99 && std::abs(lower->point.y - kVoxelMeters) < 1e-5,
             "A rejected contact prevented the sweep from finding a lower surface");
     const character::Capsule before{{0.1, 0.24, 0.28125}, 0.08, 0.25};
     const auto wall = field.sweep(before, {0.6, 0, 0});
@@ -74,9 +74,9 @@ character::State traverse_doorway(int opening_voxels, double lateral_offset, boo
         }
     }
     world.replace(model::build_model({32, 32, 64}, {{}, {}}, samples));
-    const Terrain field{world.view(), kVoxelMetres};
-    const auto start_x = (kLeftWall + opening_voxels * 0.5) * kVoxelMetres + lateral_offset;
-    character::Motor motor({start_x, kVoxelMetres + 0.005, 0.5});
+    const Terrain field{world.view(), kVoxelMeters};
+    const auto start_x = (kLeftWall + opening_voxels * 0.5) * kVoxelMeters + lateral_offset;
+    character::Motor motor({start_x, kVoxelMeters + 0.005, 0.5});
     const character::Intent forward{.horizontal = {0, 0, 1}, .run = run};
     advance(motor, field, forward, run ? 55 : 90);
     return motor.state();
@@ -85,10 +85,10 @@ character::State traverse_doorway(int opening_voxels, double lateral_offset, boo
 void doorway_clearance() {
     const auto walking = traverse_doorway(16, 0.125, false);
     require(walking.feet.z > 3 && walking.grounded,
-            "Walking slightly off center did not clear the one-metre doorway");
+            "Walking slightly off center did not clear the one-meter doorway");
     const auto running = traverse_doorway(16, -0.125, true);
     require(running.feet.z > 3 && running.grounded,
-            "Running slightly off center did not clear the one-metre doorway");
+            "Running slightly off center did not clear the one-meter doorway");
     const auto blocked = traverse_doorway(10, 0, false);
     require(blocked.feet.z < 1.5 && blocked.grounded,
             "Character walked through a doorway narrower than the capsule");
@@ -115,16 +115,16 @@ model::Model obstacle(int step_voxels, bool ceiling = false) {
 void steps_and_ceiling() {
     model::World world;
     const character::Intent forward{.horizontal = {0, 0, 1}};
-    const character::Vec3 start{1, kVoxelMetres + 0.02, 0.5};
+    const character::Vec3 start{1, kVoxelMeters + 0.02, 0.5};
     world.replace(obstacle(4));
     character::Motor stepping(start);
-    advance(stepping, Terrain{world.view(), kVoxelMetres}, forward, 100);
+    advance(stepping, Terrain{world.view(), kVoxelMeters}, forward, 100);
     require(stepping.state().feet.z > 2 && stepping.state().grounded &&
-                std::abs(stepping.state().feet.y - (5 * kVoxelMetres + 0.02)) < 0.003,
+                std::abs(stepping.state().feet.y - (5 * kVoxelMeters + 0.02)) < 0.003,
             "Character could not mount a 25 cm step");
 
     world.replace(obstacle(7));
-    const Terrain stairs{world.view(), kVoxelMetres};
+    const Terrain stairs{world.view(), kVoxelMeters};
     const character::Intent run{.horizontal = {0, 0, 1}, .run = true};
     character::Motor fast(start);
     character::Motor slow(start);
@@ -133,23 +133,23 @@ void steps_and_ceiling() {
         slow.advance(stairs, run, 4 * character::kTick).value();
     }
     require(fast.state().feet.z > 2 && fast.state().grounded &&
-                std::abs(fast.state().feet.y - (8 * kVoxelMetres + 0.02)) < 0.003 &&
+                std::abs(fast.state().feet.y - (8 * kVoxelMeters + 0.02)) < 0.003 &&
                 length(fast.state().feet - slow.state().feet) < 1e-8,
             "Running up a 43.75 cm step depended on frame partition or failed to find support");
 
     world.replace(obstacle(8));
     character::Motor blocked(start);
-    advance(blocked, Terrain{world.view(), kVoxelMetres}, forward, 100);
+    advance(blocked, Terrain{world.view(), kVoxelMeters}, forward, 100);
     require(blocked.state().feet.z < 1.5 && blocked.state().grounded,
             "Character mounted a step above its limit");
 
     world.replace(obstacle(0, true));
     character::Motor jumping(start);
-    const Terrain roof{world.view(), kVoxelMetres};
+    const Terrain roof{world.view(), kVoxelMeters};
     advance(jumping, roof, {.jump_pressed = true}, 1);
     require(jumping.state().velocity.y > 0, "A supported jump did not start");
     advance(jumping, roof, {}, 10);
-    require(jumping.state().feet.y + character::kHeight <= 26 * kVoxelMetres &&
+    require(jumping.state().feet.y + character::kHeight <= 26 * kVoxelMeters &&
                 jumping.state().velocity.y <= 0,
             "Jump passed through the ceiling");
 }
@@ -171,8 +171,8 @@ model::Model staircase() {
 void stairs_and_rest() {
     model::World world;
     world.replace(staircase());
-    const Terrain field{world.view(), kVoxelMetres};
-    character::Motor climbing({1.125, kVoxelMetres + 0.02, 1});
+    const Terrain field{world.view(), kVoxelMeters};
+    character::Motor climbing({1.125, kVoxelMeters + 0.02, 1});
     const character::Intent uphill{.horizontal = {0, 0, 1}};
     for (int tick = 0; tick < 48; ++tick) {
         const auto before = climbing.state();
@@ -214,10 +214,10 @@ void ledge_and_recovery() {
         }
     }
     world.replace(model::build_model({48, 48, 48}, {{}, {}}, samples));
-    const Terrain field{world.view(), kVoxelMetres};
+    const Terrain field{world.view(), kVoxelMeters};
     character::Motor supported({0.9, 1.29, 1.5});
     advance(supported, field, {}, 24);
-    require(supported.state().grounded, "Capsule lost support with its centre over the shelf");
+    require(supported.state().grounded, "Capsule lost support with its center over the shelf");
 
     character::Motor overhang({1.32, 1.29, 1.5});
     advance(overhang, field, {}, 60);
@@ -246,9 +246,9 @@ void wall_slide() {
         }
     }
     world.replace(model::build_model({48, 48, 96}, {{}, {}}, samples));
-    const Terrain field{world.view(), kVoxelMetres};
+    const Terrain field{world.view(), kVoxelMeters};
     const character::Intent into_wall{.horizontal = {1, 0, 1}};
-    character::Motor motor({1.2, kVoxelMetres + 0.02, 0.75});
+    character::Motor motor({1.2, kVoxelMeters + 0.02, 0.75});
     advance(motor, field, into_wall, 110);
     require(motor.state().feet.x + character::kRadius <= 2 && motor.state().feet.z > 3 &&
                 motor.state().velocity.z > 2 && motor.state().grounded,
@@ -267,7 +267,7 @@ void sweep_along_wall_seam() {
     world.replace(model::build_model(
         {48, 48, 48}, {{}, {}},
         {{{32, 7, 23}, 1}, {{32, 7, 24}, 1}, {{32, 8, 23}, 1}, {{32, 8, 24}, 1}}));
-    const Terrain field{world.view(), kVoxelMetres};
+    const Terrain field{world.view(), kVoxelMeters};
     const character::Capsule body{
         {2 - character::kRadius - 0.0037, 0.0945, 1.498}, character::kRadius, character::kHeight};
     require(!field.sweep(body, {0, 0.057, 0.027}),
@@ -279,9 +279,9 @@ void sweep_along_wall_seam() {
 void jump_at_wall() {
     model::World world;
     world.replace(obstacle(40));
-    const Terrain field{world.view(), kVoxelMetres};
+    const Terrain field{world.view(), kVoxelMeters};
     const character::Vec3 forward{0, 0, 1};
-    character::Motor motor({1, kVoxelMetres + 0.02, 0.5});
+    character::Motor motor({1, kVoxelMeters + 0.02, 0.5});
     advance(motor, field, {.horizontal = forward}, 100);
     require(motor.state().grounded && field.sweep(motor.capsule(), forward * 0.01),
             "Jump test failed to reach the wall");
@@ -299,11 +299,11 @@ void guarded_placement() {
     const auto paint = world.add_material({});
     const auto stamp =
         world.add_model(model::build_model({9, 1, 1}, {{}, {}}, {{{0, 0, 0}, 1}, {{8, 0, 0}, 1}}));
-    character::Motor motor({1, kVoxelMetres + 0.02, 1});
-    advance(motor, Terrain{world.view(), kVoxelMetres}, {}, 1);
+    character::Motor motor({1, kVoxelMeters + 0.02, 1});
+    advance(motor, Terrain{world.view(), kVoxelMeters}, {}, 1);
     const auto floor_material = world.at({16, 0, 16});
     const auto revision = world.view().geometry_revision;
-    const CapsulePlacement placement{motor.capsule(), kVoxelMetres};
+    const CapsulePlacement placement{motor.capsule(), kVoxelMeters};
     const auto guard = placement.guard();
 
     for (const auto tool : {editing::Tool::cube, editing::Tool::sphere}) {
@@ -332,10 +332,10 @@ void guarded_placement() {
                                  guard) &&
                 world.at({16, 0, 16}) == 0,
             "The placement guard blocked erasing");
-    advance(motor, Terrain{world.view(), kVoxelMetres}, {}, 1);
+    advance(motor, Terrain{world.view(), kVoxelMeters}, {}, 1);
 
     const CapsulePlacement higher{
-        {{1, 2 * kVoxelMetres, 1}, character::kRadius, character::kHeight}, kVoxelMetres};
+        {{1, 2 * kVoxelMeters, 1}, character::kRadius, character::kHeight}, kVoxelMeters};
     require(editing::apply_brush(world, {editing::Tool::cube, {16.5, 1.5, 16.5}, 0.5, paint},
                                  higher.guard()) &&
                 world.at({16, 1, 16}) == paint,
@@ -351,7 +351,7 @@ void current_geometry() {
         }
     }
     world.replace(model::build_model({64, 64, 64}, {{}, {}}, samples));
-    character::Motor motor({2, kVoxelMetres + 0.005, 2});
+    character::Motor motor({2, kVoxelMeters + 0.005, 2});
     motor.advance(Terrain{world.view(), 0.0625}, {}, character::kTick).value();
     require(motor.state().grounded, "Motor and SDK terrain queries failed to agree on support");
     for (int z = 1; z <= 2; ++z) {

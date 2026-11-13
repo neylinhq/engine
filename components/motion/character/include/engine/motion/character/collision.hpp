@@ -8,7 +8,7 @@ namespace engine::motion::character {
 
 using foundation::geometry::Vec3;
 
-// Upright capsule. The origin is the lowest point, and all lengths are in metres.
+// Upright capsule. The origin is the lowest point, and all lengths are in meters.
 struct Capsule {
     Vec3 feet;
     double radius;

@@ -22,7 +22,7 @@ std::array<double, 5> camera_pose(std::string_view text) {
     for (std::size_t index = 0; index < result.size(); ++index) {
         const auto end = text.find(',');
         if ((end == std::string_view::npos) != (index + 1 == result.size())) {
-            throw std::invalid_argument("Camera requires x,y,z,yaw,pitch in metres/radians");
+            throw std::invalid_argument("Camera requires x,y,z,yaw,pitch in meters/radians");
         }
         result[index] = real(text.substr(0, end));
         if (end != std::string_view::npos) {
@@ -100,9 +100,9 @@ void value_option(Options& result, std::string_view option, std::string_view val
     } else if (option == "--output-path") {
         result.offscreen_output = choice(value, "offscreen", "automatic");
     } else if (option == "--voxel-size") {
-        result.voxel_metres = real(value);
+        result.voxel_meters = real(value);
     } else if (option == "--camera") {
-        result.camera_metres = camera_pose(value);
+        result.camera_meters = camera_pose(value);
     } else {
         throw std::invalid_argument("Unknown option: " + std::string(option));
     }
@@ -141,8 +141,8 @@ Options parse_options(int count, char** arguments) {
     if (result.width < 1 || result.height < 1 || result.width > 16384 || result.height > 16384) {
         throw std::invalid_argument("Window dimensions must be in 1..16384");
     }
-    if (result.voxel_metres < 1.0 / 1024 || result.voxel_metres > 1) {
-        throw std::invalid_argument("Voxel size must be in [1/1024, 1] metres");
+    if (result.voxel_meters < 1.0 / 1024 || result.voxel_meters > 1) {
+        throw std::invalid_argument("Voxel size must be in [1/1024, 1] meters");
     }
     if (!result.screenshot.empty() && result.frames == 0) {
         result.frames = 1;
@@ -159,7 +159,7 @@ void print_usage() {
                  "  --chunk-layout automatic|packed|split (default: automatic)\n"
                  "  --frame-wait deferred|early (default: deferred)\n"
                  "  --output-path automatic|offscreen (default: automatic)\n"
-                 "  --voxel-size METRES  --camera X,Y,Z,YAW,PITCH (metres/radians)  --walk\n"
+                 "  --voxel-size METERS  --camera X,Y,Z,YAW,PITCH (meters/radians)  --walk\n"
                  "WASD fly, mouse look, Shift boost, Space ascend, Ctrl descend.\n"
                  "F toggles walk/flight. In walk mode Shift runs and Space jumps.\n"
                  "Tab or F1 UI/capture, Esc release, F2 path, F11 borderless.\n";

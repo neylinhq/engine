@@ -40,8 +40,8 @@ Box swept_bounds(character::Capsule capsule, Vec3 delta) {
     return {lower, upper};
 }
 
-Vec3 centre_of(Box solid, double voxel_metres) {
-    return (solid.lower + solid.upper) * (0.5 * voxel_metres);
+Vec3 center_of(Box solid, double voxel_meters) {
+    return (solid.lower + solid.upper) * (0.5 * voxel_meters);
 }
 
 sdk::Capsule local_capsule(character::Capsule capsule, Vec3 origin) {
@@ -52,8 +52,8 @@ sdk::Capsule local_capsule(character::Capsule capsule, Vec3 origin) {
 }
 
 // A zero-radius convex proxy for an axis-aligned voxel region.
-std::array<sdk::Vec3, 8> box_points(Box solid, double voxel_metres) {
-    const auto h = to_sdk((solid.upper - solid.lower) * (0.5 * voxel_metres));
+std::array<sdk::Vec3, 8> box_points(Box solid, double voxel_meters) {
+    const auto h = to_sdk((solid.upper - solid.lower) * (0.5 * voxel_meters));
     return {{{h.x, h.y, h.z},
              {-h.x, h.y, h.z},
              {-h.x, -h.y, h.z},
@@ -70,9 +70,9 @@ sdk::DistanceOutput capsule_distance(sdk::ShapeProxy box, sdk::ShapeProxy spine)
     return sdk::shape_distance(&input, &cache, nullptr, 0);
 }
 
-character::Penetration manifold_penetration(Box solid, double voxel_metres,
+character::Penetration manifold_penetration(Box solid, double voxel_meters,
                                             const sdk::Capsule& capsule) {
-    const auto h = to_sdk((solid.upper - solid.lower) * (0.5 * voxel_metres));
+    const auto h = to_sdk((solid.upper - solid.lower) * (0.5 * voxel_meters));
     const auto hull = sdk::make_box_hull(h.x, h.y, h.z);
     std::array<sdk::LocalManifoldPoint, sdk::kMaxManifoldPoints> points{};
     sdk::LocalManifold manifold{.normal = {}, .points = points.data(), .point_count = 0};
@@ -97,7 +97,7 @@ character::Penetration manifold_penetration(Box solid, double voxel_metres,
 
 } // namespace
 
-CapsuleQuery make_query(character::Capsule capsule, Vec3 displacement, double voxel_metres) {
+CapsuleQuery make_query(character::Capsule capsule, Vec3 displacement, double voxel_meters) {
     if (!finite(capsule.feet) || !finite(displacement) || !std::isfinite(capsule.radius) ||
         !std::isfinite(capsule.height) || capsule.radius <= 0 ||
         capsule.height < 2 * capsule.radius) {
@@ -106,18 +106,18 @@ CapsuleQuery make_query(character::Capsule capsule, Vec3 displacement, double vo
     const auto bounds = swept_bounds(capsule, displacement);
     return {capsule,
             displacement,
-            voxel_metres,
-            {bounds.lower / voxel_metres, bounds.upper / voxel_metres}};
+            voxel_meters,
+            {bounds.lower / voxel_meters, bounds.upper / voxel_meters}};
 }
 
 std::optional<character::SweepHit> cast_solid(const CapsuleQuery& query, Box solid,
                                               double max_fraction) {
-    const auto origin = centre_of(solid, query.voxel_metres);
-    const auto vertices = box_points(solid, query.voxel_metres);
+    const auto origin = center_of(solid, query.voxel_meters);
+    const auto vertices = box_points(solid, query.voxel_meters);
     const sdk::ShapeProxy box{vertices.data(), static_cast<int>(vertices.size()), 0};
     const auto capsule = local_capsule(query.capsule, origin);
-    const std::array centres{capsule.center1, capsule.center2};
-    const sdk::ShapeProxy spine{centres.data(), static_cast<int>(centres.size()), 0};
+    const std::array centers{capsule.center1, capsule.center2};
+    const sdk::ShapeProxy spine{centers.data(), static_cast<int>(centers.size()), 0};
     const sdk::ShapeProxy moving{spine.points, spine.count,
                                  capsule.radius + static_cast<float>(kCastPadding)};
     const sdk::ShapeCastPairInput input{box,
@@ -144,12 +144,12 @@ std::optional<character::SweepHit> cast_solid(const CapsuleQuery& query, Box sol
 }
 
 std::optional<character::Penetration> overlap_solid(character::Capsule body, Box solid,
-                                                    double voxel_metres) {
-    const auto vertices = box_points(solid, voxel_metres);
+                                                    double voxel_meters) {
+    const auto vertices = box_points(solid, voxel_meters);
     const sdk::ShapeProxy box{vertices.data(), static_cast<int>(vertices.size()), 0};
-    const auto capsule = local_capsule(body, centre_of(solid, voxel_metres));
-    const std::array centres{capsule.center1, capsule.center2};
-    const sdk::ShapeProxy spine{centres.data(), static_cast<int>(centres.size()), 0};
+    const auto capsule = local_capsule(body, center_of(solid, voxel_meters));
+    const std::array centers{capsule.center1, capsule.center2};
+    const sdk::ShapeProxy spine{centers.data(), static_cast<int>(centers.size()), 0};
     const auto nearest = capsule_distance(box, spine);
     const auto depth = static_cast<double>(capsule.radius) - nearest.distance;
     if (depth <= kPenetrationTolerance) {
@@ -159,7 +159,7 @@ std::optional<character::Penetration> overlap_solid(character::Capsule body, Box
     if (nearest.distance > 0 && normal != Vec3{}) {
         return character::Penetration{normal, depth};
     }
-    return manifold_penetration(solid, voxel_metres, capsule);
+    return manifold_penetration(solid, voxel_meters, capsule);
 }
 
 } // namespace engine::world::collision

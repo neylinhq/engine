@@ -36,7 +36,7 @@ struct Overlap {
 bool collect_penetration(void* context, Box solid) {
     auto& overlap = *static_cast<Overlap*>(context);
     if (const auto contact =
-            overlap_solid(overlap.query.capsule, solid, overlap.query.voxel_metres)) {
+            overlap_solid(overlap.query.capsule, solid, overlap.query.voxel_meters)) {
         if (contact->normal == Vec3{} || !overlap.contact ||
             contact->depth > overlap.contact->depth) {
             overlap.contact = contact;
@@ -47,9 +47,9 @@ bool collect_penetration(void* context, Box solid) {
 
 } // namespace
 
-Terrain::Terrain(model::WorldView view, double voxel_metres)
-    : view_(view), voxel_metres_(voxel_metres) {
-    if (!std::isfinite(voxel_metres) || voxel_metres <= 0) {
+Terrain::Terrain(model::WorldView view, double voxel_meters)
+    : view_(view), voxel_meters_(voxel_meters) {
+    if (!std::isfinite(voxel_meters) || voxel_meters <= 0) {
         throw std::invalid_argument("Voxel size must be positive and finite");
     }
 }
@@ -59,14 +59,14 @@ std::optional<character::SweepHit> Terrain::sweep(character::Capsule capsule, Ve
     if (displacement == Vec3{}) {
         return std::nullopt;
     }
-    const auto query = make_query(capsule, displacement, voxel_metres_);
+    const auto query = make_query(capsule, displacement, voxel_meters_);
     Cast cast{query, filter, std::nullopt};
     static_cast<void>(view_.visit_solids(query.bounds, sweep_solid, &cast));
     return cast.hit;
 }
 
 std::optional<character::Penetration> Terrain::penetration(character::Capsule capsule) const {
-    const auto query = make_query(capsule, {}, voxel_metres_);
+    const auto query = make_query(capsule, {}, voxel_meters_);
     Overlap overlap{query, std::nullopt};
     static_cast<void>(view_.visit_solids(query.bounds, collect_penetration, &overlap));
     return overlap.contact;

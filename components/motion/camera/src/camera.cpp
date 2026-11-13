@@ -83,8 +83,8 @@ void Camera::fly(FlightIntent intent, double wall_seconds) {
     }
     changed_ = changed_ || foundation::geometry::length(pose_.position - before) > 1e-6;
 }
-void Camera::translate(Vec3 axis, double metres) {
-    pose_.position = pose_.position + axis * metres;
+void Camera::translate(Vec3 axis, double meters) {
+    pose_.position = pose_.position + axis * meters;
     changed_ = true;
 }
 void Camera::clear_changed() {

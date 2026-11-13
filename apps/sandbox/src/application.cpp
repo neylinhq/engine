@@ -233,10 +233,10 @@ void reset_camera(Application& app) {
     const auto side = static_cast<double>(std::max({size.x, size.y, size.z, 16}));
     const auto actual_size = app.world.actual_size();
     auto pose = starting_pose(actual_size);
-    if (app.options.camera_metres) {
-        const auto& input = *app.options.camera_metres;
-        pose = {{input[0] / app.options.voxel_metres, input[1] / app.options.voxel_metres,
-                 input[2] / app.options.voxel_metres},
+    if (app.options.camera_meters) {
+        const auto& input = *app.options.camera_meters;
+        pose = {{input[0] / app.options.voxel_meters, input[1] / app.options.voxel_meters,
+                 input[2] / app.options.voxel_meters},
                 input[3],
                 input[4]};
     }
@@ -244,13 +244,13 @@ void reset_camera(Application& app) {
     if (!camera) {
         throw std::runtime_error(camera.error());
     }
-    if (!app.options.camera_metres && !original_seed(actual_size)) {
+    if (!app.options.camera_meters && !original_seed(actual_size)) {
         aim_at_model(*camera, actual_size);
     }
     auto configuration = camera->settings();
     configuration.fov_degrees = app.settings.general.fov;
-    if (app.options.voxel_metres != 1) {
-        configuration.speed = std::min(side / 20, 2.0 / app.options.voxel_metres);
+    if (app.options.voxel_meters != 1) {
+        configuration.speed = std::min(side / 20, 2.0 / app.options.voxel_meters);
     }
     require(camera->configure(configuration));
     app.camera = std::move(*camera);
@@ -295,7 +295,7 @@ void initialize(Application& app) {
                            ? "Empty world"
                            : "Loaded " + path_to_utf8(app.options.scene.filename());
     app.metrics.status = scene + " | " + stats.device + " | " + app.metrics.chunk_storage;
-    std::cout << app.metrics.status << " | voxel " << app.options.voxel_metres << " m\n"
+    std::cout << app.metrics.status << " | voxel " << app.options.voxel_meters << " m\n"
               << std::flush;
     if (app.options.walk) {
         start_walking(app);
