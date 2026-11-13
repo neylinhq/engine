@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "world.collision"
+role = "adapter"
+owner = "world_collision"
+purpose = "Provide SDK shape queries against the occupied voxels of a committed NAADF world."

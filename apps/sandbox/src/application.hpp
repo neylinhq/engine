@@ -2,6 +2,7 @@
 #define ENGINE_APP_SANDBOX_SRC_APPLICATION_HPP
 #include "options.hpp"
 #include <engine/gui/frontend/frontend.hpp>
+#include <engine/motion/character/motor.hpp>
 #include <engine/rendering/vulkan/renderer.hpp>
 #include <future>
 #include <optional>
@@ -18,6 +19,7 @@ struct Application {
     std::unique_ptr<platform::window::Window> window;
     std::unique_ptr<rendering::vulkan::Renderer> renderer;
     std::optional<motion::camera::Camera> camera;
+    std::optional<motion::character::Motor> character;
     motion::path::Path path;
     interaction::input::Router router;
     std::unique_ptr<gui::frontend::Frontend> ui;
@@ -49,6 +51,7 @@ void handle_requests(Application& app, const std::vector<gui::frontend::Request>
 void poll_import(Application& app);
 void update_navigation(Application& app, const interaction::input::Actions& actions,
                        double seconds);
+void start_walking(Application& app);
 void update_editing(Application& app, const interaction::input::Actions& actions, double seconds);
 void update_entities(Application& app);
 void reset_camera(Application& app);

@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "motion.character"
+role = "core"
+owner = "character_system"
+purpose = "Advance walking, running and jumping with fixed steps and contact queries."

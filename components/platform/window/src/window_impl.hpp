@@ -13,6 +13,7 @@ struct Window::Impl {
     bool initialized = false;
     bool captured = false;
     bool transitioning = false;
+    bool space_pressed = false;
     double wheel = 0;
     window_state::WindowState state;
     window_state::Rectangle normal;

@@ -9,6 +9,8 @@
 namespace engine::world::model {
 
 struct WorldView {
+    using SolidVisitor = bool (*)(void* context, foundation::geometry::Box bounds);
+
     Vec3i size;
     Vec3i actual_size;
     std::span<const std::uint32_t> chunks;
@@ -24,6 +26,18 @@ struct WorldView {
     std::span<const std::uint32_t> changed_voxels;
     std::span<const std::uint32_t> invalidated_chunks;
     bool gpu_authoritative = false;
+
+    // Visit occupied regions that intersect finite, nonempty bounds in voxel coordinates.
+    // The callback receives entire regions synchronously. Its true return ends the query.
+    [[nodiscard]] bool visit_solids(foundation::geometry::Box bounds, SolidVisitor visitor,
+                                    void* context) const;
+};
+
+// Rejects a pending batch if a newly occupied voxel within the bounds is blocked.
+struct PlacementGuard {
+    foundation::geometry::Box bounds{};
+    bool (*blocks)(foundation::geometry::Box voxel, const void* context) noexcept = nullptr;
+    const void* context = nullptr;
 };
 
 class World {
@@ -56,6 +70,9 @@ class World {
     void adopt_chunk_voxels(Vec3i chunk, std::unique_ptr<std::array<std::uint16_t, 4096>> voxels);
     void fill_chunk(Vec3i chunk, std::uint16_t material);
     void commit_edits();
+    // Bounds use voxel coordinates. The callback runs synchronously and must not edit the world.
+    // Invalid bounds or a blocked voxel discard the pending batch without committing it.
+    [[nodiscard]] bool commit_edits(PlacementGuard guard);
     void rebuild_bounds();
     void update_bounds(std::size_t cell_budget = 32768);
     [[nodiscard]] std::span<const Material> materials() const;
@@ -75,6 +92,7 @@ class World {
 
   private:
     struct State;
+    [[nodiscard]] bool blocks_placement(PlacementGuard guard) const;
     std::unique_ptr<State> state_;
     unsigned worker_count_;
 };

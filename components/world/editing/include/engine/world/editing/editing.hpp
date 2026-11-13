@@ -17,9 +17,11 @@ struct Brush {
     bool erase = false;
 };
 
-void apply_brush(model::World& world, const Brush& brush);
+// Returns false if the placement guard rejects the edit.
+bool apply_brush(model::World& world, const Brush& brush, model::PlacementGuard guard = {});
 void flood_fill(model::World& world, model::Vec3i start, std::uint16_t material);
-void stamp_model(model::World& world, const model::Model& source, model::Vec3i origin);
+bool stamp_model(model::World& world, const model::Model& source, model::Vec3i origin,
+                 model::PlacementGuard guard = {});
 
 } // namespace engine::world::editing
 

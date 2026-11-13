@@ -54,7 +54,8 @@ void flood_fill(model::World& world, model::Vec3i start, std::uint16_t material)
     world.commit_edits();
 }
 
-void stamp_model(model::World& world, const model::Model& source, model::Vec3i origin) {
+bool stamp_model(model::World& world, const model::Model& source, model::Vec3i origin,
+                 model::PlacementGuard guard) {
     const auto world_size = world.size();
     const auto origin_vector =
         model::Vec3{static_cast<double>(origin.x), static_cast<double>(origin.y),
@@ -70,7 +71,7 @@ void stamp_model(model::World& world, const model::Model& source, model::Vec3i o
             stamp_row(world, source, {lower.x, y, z}, origin, upper.x);
         }
     }
-    world.commit_edits();
+    return world.commit_edits(guard);
 }
 
 } // namespace engine::world::editing

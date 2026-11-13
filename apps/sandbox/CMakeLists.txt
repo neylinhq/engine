@@ -14,13 +14,14 @@ if(ENGINE_DESKTOP)
         engine::foundation.geometry engine::motion.camera engine::motion.path
         engine::interaction.input engine::platform.window engine::world.model engine::world.editing
         engine::world.storage engine::rendering.settings engine::rendering.vulkan engine::gui.frontend
-        engine::rendering.configuration)
+        engine::rendering.configuration engine::motion.character engine::world.collision)
     add_dependencies(sandbox engine_runtime_shaders)
     install(TARGETS sandbox RUNTIME DESTINATION bin)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/shaders/" DESTINATION bin/shaders)
     install(FILES docs/runtime.md DESTINATION . RENAME README.md)
     install(FILES "${PROJECT_SOURCE_DIR}/LICENSE" DESTINATION .)
     install(DIRECTORY "${PROJECT_SOURCE_DIR}/licenses/" DESTINATION licenses)
+    install(DIRECTORY "${physics_LICENSE_DIR}/" DESTINATION licenses/physics)
     set(notices_source "${PROJECT_SOURCE_DIR}/docs/third_party_notices.md")
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${notices_source}")
     file(READ "${notices_source}" notices)

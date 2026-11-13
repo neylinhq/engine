@@ -43,7 +43,9 @@ void draw_debug(UiState& state, Context& context) {
         frame_metrics(state, context.metrics);
         ImGui::Separator();
         world_metrics(state, context);
-        ImGui::Text("Flight boost: %.2f", context.camera.boost());
+        if (!context.walking) {
+            ImGui::Text("Flight boost: %.2f", context.camera.boost());
+        }
         const auto position = context.camera.pose().position;
         ImGui::Text("Camera: %.2f %.2f %.2f", position.x, position.y, position.z);
     }

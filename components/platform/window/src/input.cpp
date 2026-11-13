@@ -16,6 +16,7 @@ constexpr std::array<int, interaction::input::kKeyCount> kCodes{GLFW_KEY_W,
                                                                 GLFW_KEY_RIGHT_ALT,
                                                                 GLFW_KEY_B,
                                                                 GLFW_KEY_Z,
+                                                                GLFW_KEY_F,
                                                                 GLFW_KEY_F1,
                                                                 GLFW_KEY_F2,
                                                                 GLFW_KEY_F5,
@@ -36,6 +37,7 @@ interaction::input::Snapshot Window::input(interaction::input::Access access) {
     interaction::input::Snapshot result;
     result.access = access;
     result.focused = focused();
+    result.space_pressed = std::exchange(impl_->space_pressed, false);
     for (std::size_t index = 0; index < kCodes.size(); ++index) {
         result.keys[index] = glfwGetKey(impl_->handle, kCodes[index]) == GLFW_PRESS;
     }

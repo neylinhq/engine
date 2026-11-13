@@ -12,6 +12,9 @@ void replace_world(Application& app, const gui::frontend::Request& request,
     app.ui->reset_world();
     reframe_camera(app);
     app.metrics.status = "Loaded " + path_to_utf8(request.path);
+    if (app.character) {
+        start_walking(app);
+    }
 }
 void begin_import(Application& app, const gui::frontend::Request& request) {
     if (app.importing) {

@@ -43,6 +43,15 @@ PreparedBatch prepare_edits(const std::unordered_map<std::size_t, ChunkEdit>& ed
 
 } // namespace
 
+bool World::commit_edits(PlacementGuard guard) {
+    if (guard.blocks && blocks_placement(guard)) {
+        state_->edits.clear();
+        return false;
+    }
+    commit_edits();
+    return true;
+}
+
 void World::commit_edits() {
     if (state_->edits.empty()) {
         return;

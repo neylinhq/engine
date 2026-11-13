@@ -7,8 +7,9 @@ Conan 2.34.0. Установите [archcheck](https://github.com/neylinhq/archc
 Добавьте каталоги инструментов в `PATH`.
 
 Conan устанавливает Boost.JSON 1.92.0. Для настольной сборки он также
-устанавливает GLFW 3.4 и исходники Dear ImGui 1.91.9b
-с официальными backend GLFW и Vulkan. Ревизии рецептов закреплены в
+устанавливает GLFW 3.4, исходники Dear ImGui 1.91.9b
+с официальными backend GLFW и Vulkan, а также Neylin Physics.
+Ревизии рецептов закреплены в
 `conan.lock`. Системный Vulkan SDK предоставляет заголовки, загрузчик и
 `slangc`. Требования к устройству перечислены в
 [документации рендерера](../components/rendering/vulkan/README.md).
@@ -19,6 +20,16 @@ Conan устанавливает Boost.JSON 1.92.0. Для настольной 
 ```sh
 conan export cmake/conan/recipes/boost_json --user=engine --channel=dependencies
 conan export cmake/conan/recipes/imgui_sources --user=engine --channel=dependencies
+```
+
+Для настольной сборки нужны Git 2.49 или новее и доступ по SSH к репозиторию
+[Neylin Physics](https://github.com/neylinhq/physics).
+Скрипт загружает закреплённый коммит SDK в `out/dependencies/` и экспортирует
+его рецепт в кэш Conan. При установке зависимостей Conan использует ревизию
+из `conan.lock` и собирает пакет для выбранного профиля, если его ещё нет в кэше.
+
+```sh
+cmake -P cmake/conan/export_physics.cmake
 ```
 
 ## Windows x64

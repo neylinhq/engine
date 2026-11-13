@@ -25,7 +25,7 @@ void file_menu(UiState& state) {
     }
 }
 } // namespace
-void draw_menu(UiState& state) {
+void draw_menu(UiState& state, bool walking) {
     if (!ImGui::BeginMainMenuBar()) {
         return;
     }
@@ -44,8 +44,9 @@ void draw_menu(UiState& state) {
         ImGui::MenuItem("Path Builder", nullptr, &state.panels.path);
         ImGui::EndMenu();
     }
-    ImGui::TextDisabled(
-        "F1 / Tab: UI   Shift: boost   Space / Ctrl: ascend / descend   F11: borderless");
+    const auto* controls = walking ? "F: fly   Shift: run   Space: jump"
+                                   : "F: walk   Shift: boost   Space / Ctrl: ascend / descend";
+    ImGui::TextDisabled("F1 / Tab: UI   %s   F11: borderless", controls);
     ImGui::EndMainMenuBar();
 }
 } // namespace engine::gui::frontend

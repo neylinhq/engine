@@ -18,6 +18,7 @@
 | ProggyClean | Шрифт ImGui по умолчанию | [Уведомление о шрифте](../licenses/imgui_default_font.txt) |
 | Vulkan Headers / Vulkan-Hpp | Объявления API Vulkan | [Уведомление репозитория](../licenses/vulkan_headers.txt), [Apache 2.0](../licenses/apache_2.txt), [MIT](../licenses/vulkan_mit.txt) |
 | Slang | Компиляция шейдеров при сборке | [Apache 2.0 с исключением LLVM](../licenses/slang.txt), [Текст Apache](../licenses/apache_2.txt) |
+| Neylin Physics | Коллизии персонажа с воксельной геометрией | Уведомления SDK в `licenses/physics` установленного пакета |
 
 Загрузчик Vulkan и библиотеки операционной системы предоставляет целевое
 окружение. Slang не требуется при запуске приложения. Дополнительные кириллические

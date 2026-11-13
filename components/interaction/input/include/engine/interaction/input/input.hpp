@@ -20,6 +20,7 @@ enum class Key {
     right_alt,
     b,
     z,
+    f,
     f1,
     f2,
     f5,
@@ -43,6 +44,7 @@ enum class Command {
     toggle_sampling,
     toggle_window,
     toggle_path,
+    toggle_navigation,
     count
 };
 inline constexpr auto kCommandCount = static_cast<std::size_t>(Command::count);
@@ -67,6 +69,7 @@ struct Snapshot {
     Pointer pointer;
     Access access;
     bool focused = true;
+    bool space_pressed = false;
     [[nodiscard]] bool down(Key key) const;
 };
 struct RoutingState {
@@ -89,6 +92,7 @@ struct Actions {
     double sun_delta = 0;
     bool pause_sampling = false;
     bool boost = false;
+    bool jump_pressed = false;
     bool alt = false;
     bool release_guides = false;
     bool erase = false;
@@ -113,7 +117,7 @@ class Router {
     void commands(const Snapshot& snapshot, Actions& actions);
     void buttons(const Snapshot& snapshot, RepeatPolicy repeat, Actions& actions);
     void pointer(const Snapshot& snapshot, RepeatPolicy repeat, Actions& actions);
-    void navigation(const Snapshot& snapshot, Actions& actions) const;
+    void navigation(const Snapshot& snapshot, Actions& actions);
     RoutingState state_;
     std::array<bool, kKeyCount> previous_{};
     bool previous_left_ = false;

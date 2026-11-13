@@ -43,6 +43,16 @@ std::expected<Window, std::string> Window::create(Configuration configuration) {
         return std::unexpected(last_error("Create window"));
     }
     glfwSetWindowUserPointer(impl->handle, impl.get());
+    glfwSetKeyCallback(impl->handle, [](GLFWwindow* native, int key, int, int action, int) {
+        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+            static_cast<Impl*>(glfwGetWindowUserPointer(native))->space_pressed = true;
+        }
+    });
+    glfwSetWindowFocusCallback(impl->handle, [](GLFWwindow* native, int focused) {
+        if (!focused) {
+            static_cast<Impl*>(glfwGetWindowUserPointer(native))->space_pressed = false;
+        }
+    });
     glfwSetScrollCallback(impl->handle, [](GLFWwindow* native, double, double vertical) {
         auto* owner = static_cast<Impl*>(glfwGetWindowUserPointer(native));
         owner->wheel += vertical;

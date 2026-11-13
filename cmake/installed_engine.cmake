@@ -4,6 +4,12 @@ set(prefix "${BUILD_DIR}/installed-test/${token}")
 execute_process(COMMAND "${CMAKE_COMMAND}" --install "${BUILD_DIR}" --prefix "${prefix}"
     COMMAND_ERROR_IS_FATAL ANY)
 
+foreach(notice IN ITEMS LICENSE box3d.txt qsort.txt)
+    if(NOT EXISTS "${prefix}/licenses/physics/${notice}")
+        message(FATAL_ERROR "Missing installed Physics SDK notice: ${notice}")
+    endif()
+endforeach()
+
 file(READ "${prefix}/bin/shaders/programs.json" manifest)
 string(JSON program_count LENGTH "${manifest}" programs)
 if(program_count EQUAL 0)

@@ -25,4 +25,8 @@ if(ENGINE_DESKTOP)
         "${Vulkan_INCLUDE_DIR}/vulkan" "${Vulkan_INCLUDE_DIR}/vk_video")
     find_package(glfw3 3.4 CONFIG REQUIRED)
     engine_external_headers(glfw external.glfw "${glfw3_VERSION}" "${glfw3_INCLUDE_DIRS}" GLFW)
+    find_package(physics 0.1.0 EXACT CONFIG REQUIRED)
+    get_target_property(physics_include_dirs physics::collision.geometry INTERFACE_INCLUDE_DIRECTORIES)
+    engine_external_headers(physics::collision.geometry external.physics "${physics_VERSION}"
+        "${physics_include_dirs}" physics)
 endif()

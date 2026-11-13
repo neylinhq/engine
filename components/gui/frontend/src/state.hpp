@@ -54,7 +54,7 @@ struct Frontend::State {
 // Uses the current ImGui context. Reports a transfer of input ownership.
 [[nodiscard]] bool configure_input(bool enabled);
 void apply_style();
-void draw_menu(UiState& state);
+void draw_menu(UiState& state, bool walking);
 void draw_files(UiState& state);
 void draw_settings(UiState& state, Context& context);
 void draw_sky(UiState& state, Context& context);

@@ -135,13 +135,13 @@ int upper_bound(double center, double radius, int size) {
 
 } // namespace
 
-void apply_brush(model::World& world, const Brush& brush) {
+bool apply_brush(model::World& world, const Brush& brush, model::PlacementGuard guard) {
     if (!foundation::geometry::finite(brush.center) || !std::isfinite(brush.radius) ||
         brush.radius <= 0 || brush.radius > kMaximumBrushRadius) {
         throw std::runtime_error("Brush radius must be finite and in (0,400]");
     }
     if (brush.tool == Tool::none) {
-        return;
+        return true;
     }
     const auto size = world.size();
     const model::Vec3i lower{lower_bound(brush.center.x, brush.radius, size.x),
@@ -151,7 +151,7 @@ void apply_brush(model::World& world, const Brush& brush) {
                              upper_bound(brush.center.y, brush.radius, size.y),
                              upper_bound(brush.center.z, brush.radius, size.z)};
     if (lower.x > upper.x || lower.y > upper.y || lower.z > upper.z) {
-        return;
+        return true;
     }
     std::vector<ChunkResult> chunks;
     for (auto z = lower.z / 16; z <= upper.z / 16; ++z) {
@@ -165,7 +165,7 @@ void apply_brush(model::World& world, const Brush& brush) {
         chunks.size(), world.worker_count(),
         [&](std::size_t index) { prepare_chunk(world, brush, chunks[index]); });
     apply_chunks(world, brush, chunks);
-    world.commit_edits();
+    return world.commit_edits(guard);
 }
 
 } // namespace engine::world::editing

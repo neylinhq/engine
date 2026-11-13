@@ -110,6 +110,8 @@ void value_option(Options& result, std::string_view option, std::string_view val
 bool flag_option(Options& result, std::string_view option) {
     if (option == "--hidden") {
         result.hidden = true;
+    } else if (option == "--walk") {
+        result.walk = true;
     } else if (option == "--no-ui") {
         result.no_ui = true;
     } else if (option == "--validation") {
@@ -157,8 +159,9 @@ void print_usage() {
                  "  --chunk-layout automatic|packed|split (default: automatic)\n"
                  "  --frame-wait deferred|early (default: deferred)\n"
                  "  --output-path automatic|offscreen (default: automatic)\n"
-                 "  --voxel-size METRES  --camera X,Y,Z,YAW,PITCH (metres/radians)\n"
+                 "  --voxel-size METRES  --camera X,Y,Z,YAW,PITCH (metres/radians)  --walk\n"
                  "WASD fly, mouse look, Shift boost, Space ascend, Ctrl descend.\n"
+                 "F toggles walk/flight. In walk mode Shift runs and Space jumps.\n"
                  "Tab or F1 UI/capture, Esc release, F2 path, F11 borderless.\n";
 }
 } // namespace engine::app::sandbox

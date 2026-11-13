@@ -1,5 +1,6 @@
 add_library(world_model STATIC
     src/model.cpp
+    src/solid_regions.cpp
     src/packing.cpp
     src/bounds.cpp
     src/bound_queue.cpp

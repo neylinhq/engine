@@ -72,6 +72,7 @@ struct Context {
     motion::path::Path& path;
     rendering::settings::Settings& settings;
     Metrics metrics;
+    bool walking = false;
 };
 class Frontend {
   public:

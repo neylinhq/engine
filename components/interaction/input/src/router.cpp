@@ -64,12 +64,15 @@ void Router::pointer(const Snapshot& snapshot, RepeatPolicy repeat, Actions& act
         actions.wheel = mouse.wheel;
     }
 }
-void Router::navigation(const Snapshot& snapshot, Actions& actions) const {
+void Router::navigation(const Snapshot& snapshot, Actions& actions) {
     actions.alt = snapshot.down(Key::left_alt) || snapshot.down(Key::right_alt);
     actions.release_guides = snapshot.down(Key::v);
+    const auto space_edge = edge(Key::space, snapshot.down(Key::space));
+    const auto jump_pressed = snapshot.space_pressed || space_edge;
     if (snapshot.access.keyboard_owned) {
         return;
     }
+    actions.jump_pressed = !snapshot.access.text_editing && jump_pressed;
     actions.sun_delta =
         static_cast<int>(snapshot.down(Key::right)) - static_cast<int>(snapshot.down(Key::left));
     actions.pause_sampling = snapshot.down(Key::p);

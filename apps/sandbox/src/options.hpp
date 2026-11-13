@@ -21,6 +21,7 @@ struct Options {
     bool hidden = false;
     bool no_ui = false;
     bool validation = false;
+    bool walk = false;
     bool defer_frame_wait = true;
     bool offscreen_output = false;
     bool mode_set = false;

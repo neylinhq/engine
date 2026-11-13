@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <engine/world/collision/placement.hpp>
 #include <exception>
 namespace engine::app::sandbox {
 namespace {
@@ -9,11 +10,12 @@ world::model::Vec3i integer(foundation::geometry::Vec3 position) {
     return {static_cast<int>(std::floor(position.x)), static_cast<int>(std::floor(position.y)),
             static_cast<int>(std::floor(position.z))};
 }
-void model_stamp(Application& app, const world::model::Hit& hit) {
+bool model_stamp(Application& app, const world::model::Hit& hit,
+                 world::model::PlacementGuard guard) {
     const auto& editing = app.ui->editing();
     if (editing.stamp_model < 0 ||
         static_cast<std::size_t>(editing.stamp_model) >= app.world.models().size()) {
-        return;
+        return true;
     }
     auto position = app.camera->pose().position + app.pointer_ray * hit.distance + hit.normal * 0.5;
     if (editing.place_camera) {
@@ -21,11 +23,12 @@ void model_stamp(Application& app, const world::model::Hit& hit) {
         position = {std::floor(camera.x / 4) * 4, std::floor(camera.y / 4) * 4,
                     std::floor(camera.z / 4) * 4};
     }
-    world::editing::stamp_model(app.world,
-                                app.world.models()[static_cast<std::size_t>(editing.stamp_model)],
-                                integer(position));
+    return world::editing::stamp_model(
+        app.world, app.world.models()[static_cast<std::size_t>(editing.stamp_model)],
+        integer(position), guard);
 }
-void brush(Application& app, const world::model::Hit& hit, bool erase, double seconds) {
+bool brush(Application& app, const world::model::Hit& hit, bool erase, double seconds,
+           world::model::PlacementGuard guard) {
     const auto& editing = app.ui->editing();
     const auto target = app.camera->pose().position + app.pointer_ray * hit.distance;
     if (!app.brush_active) {
@@ -34,25 +37,27 @@ void brush(Application& app, const world::model::Hit& hit, bool erase, double se
         const auto alpha = 1.0 - 1.0 / (1.0 + seconds * 150.0 / editing.radius);
         app.brush_position = foundation::geometry::interpolate(app.brush_position, target, alpha);
     }
-    world::editing::apply_brush(
-        app.world, {editing.tool, app.brush_position, editing.radius, editing.material, erase});
+    return world::editing::apply_brush(
+        app.world, {editing.tool, app.brush_position, editing.radius, editing.material, erase},
+        guard);
 }
-void apply_tool(Application& app, const world::model::Hit& hit, double seconds) {
+bool apply_tool(Application& app, const world::model::Hit& hit, double seconds,
+                world::model::PlacementGuard guard) {
     const auto& editing = app.ui->editing();
     const auto shape =
         editing.tool == world::editing::Tool::sphere || editing.tool == world::editing::Tool::cube;
     const auto erase = shape && editing.erase;
     if (shape && !erase && editing.material == 0) {
-        return;
+        return true;
     }
     if (editing.tool == world::editing::Tool::model) {
-        model_stamp(app, hit);
-    } else if (editing.tool == world::editing::Tool::flood_fill) {
-        world::editing::flood_fill(app.world, hit.voxel, editing.material);
-    } else {
-        brush(app, hit, erase, seconds);
+        return model_stamp(app, hit, guard);
     }
-    app.world.commit_edits();
+    if (editing.tool == world::editing::Tool::flood_fill) {
+        world::editing::flood_fill(app.world, hit.voxel, editing.material);
+        return true;
+    }
+    return brush(app, hit, erase, seconds, guard);
 }
 void pick_material(Application& app) {
     if (!app.left_released || !app.pointer_available) {
@@ -93,8 +98,16 @@ void update_editing(Application& app, const interaction::input::Actions& actions
     }
     const auto start = std::chrono::steady_clock::now();
     try {
-        apply_tool(app, hit, seconds);
-        app.brush_active = true;
+        world::model::PlacementGuard guard{};
+        world::collision::CapsulePlacement placement{};
+        if (app.character) {
+            placement = {app.character->capsule(), app.options.voxel_metres};
+            guard = placement.guard();
+        }
+        app.brush_active = apply_tool(app, hit, seconds, guard);
+        if (!app.brush_active) {
+            app.metrics.status = "Placement blocked by the character";
+        }
     } catch (const std::exception& error) {
         app.metrics.status = error.what();
     }

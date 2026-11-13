@@ -297,6 +297,9 @@ void initialize(Application& app) {
     app.metrics.status = scene + " | " + stats.device + " | " + app.metrics.chunk_storage;
     std::cout << app.metrics.status << " | voxel " << app.options.voxel_metres << " m\n"
               << std::flush;
+    if (app.options.walk) {
+        start_walking(app);
+    }
 }
 void frame(Application& app, double seconds) {
     synchronize_capture(app);
@@ -322,8 +325,12 @@ void frame(Application& app, double seconds) {
         app.camera->clear_changed();
     }
     const auto previous_path = app.settings.render.path_tracer;
-    const auto requests =
-        app.ui->draw({app.world, *app.camera, app.path, app.settings, app.metrics});
+    const auto previous_position = app.camera->pose().position;
+    const auto requests = app.ui->draw(
+        {app.world, *app.camera, app.path, app.settings, app.metrics, app.character.has_value()});
+    if (app.character && app.camera->pose().position != previous_position) {
+        start_walking(app);
+    }
     handle_requests(app, requests);
     update_camera_settings(app, previous_path);
     auto snapshot = app.window->input();

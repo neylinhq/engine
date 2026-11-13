@@ -118,6 +118,55 @@ void blocked_edges() {
     require(finite.has_value() && !finite->wants(Command::undo) && finite->forward == 0,
             "Physical input changed finite scenario");
 }
+void walk_controls() {
+    Router router;
+    Snapshot snapshot;
+    set(snapshot, Key::f, true);
+    set(snapshot, Key::space, true);
+    const auto first = router.poll(snapshot).value();
+    require(first.wants(Command::toggle_navigation) && first.jump_pressed && first.vertical == 1,
+            "Walking controls changed the flight ascent action");
+    const auto held = router.poll(snapshot).value();
+    require(!held.wants(Command::toggle_navigation) && !held.jump_pressed && held.vertical == 1,
+            "Held movement controls produced a second press");
+    set(snapshot, Key::f, false);
+    set(snapshot, Key::space, false);
+    static_cast<void>(router.poll(snapshot));
+    snapshot.access.keyboard_owned = true;
+    set(snapshot, Key::f, true);
+    set(snapshot, Key::space, true);
+    const auto blocked = router.poll(snapshot).value();
+    snapshot.access.keyboard_owned = false;
+    const auto released = router.poll(snapshot).value();
+    require(!blocked.wants(Command::toggle_navigation) && !blocked.jump_pressed &&
+                !released.wants(Command::toggle_navigation) && !released.jump_pressed,
+            "Leaving an editor replayed a held walk control");
+}
+void short_jump_presses() {
+    Router router;
+    Snapshot snapshot;
+    snapshot.space_pressed = true;
+    const auto tap = router.poll(snapshot).value();
+    require(tap.jump_pressed && tap.vertical == 0,
+            "Space pressed and released between snapshots did not request a jump");
+    snapshot.space_pressed = false;
+    require(!router.poll(snapshot)->jump_pressed, "A short Space press was replayed");
+
+    set(snapshot, Key::space, true);
+    static_cast<void>(router.poll(snapshot));
+    snapshot.space_pressed = true;
+    require(router.poll(snapshot)->jump_pressed,
+            "Space released and pressed again between snapshots did not request a jump");
+
+    snapshot.access.keyboard_owned = true;
+    require(!router.poll(snapshot)->jump_pressed, "Space in the UI requested a jump");
+    snapshot.access.keyboard_owned = false;
+    snapshot.focused = false;
+    require(!router.poll(snapshot)->jump_pressed, "An unfocused window requested a jump");
+    snapshot.focused = true;
+    snapshot.space_pressed = false;
+    require(!router.poll(snapshot)->jump_pressed, "Refocus replayed the earlier Space press");
+}
 void flight_bindings() {
     Router router;
     Snapshot snapshot;
@@ -182,6 +231,8 @@ int main() {
         pointer_ownership();
         focus_and_capture_commands();
         blocked_edges();
+        walk_controls();
+        short_jump_presses();
         modifiers_and_window();
         flight_bindings();
         original_tool_repeat();

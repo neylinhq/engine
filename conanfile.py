@@ -16,6 +16,7 @@ class EngineDependencies(ConanFile):
         if self.options.desktop:
             self.requires("glfw/3.4")
             self.requires("imgui-sources/1.91.9b@engine/dependencies")
+            self.requires("physics/0.1.0@neylinhq/sdk")
 
     def generate(self):
         CMakeDeps(self).generate()

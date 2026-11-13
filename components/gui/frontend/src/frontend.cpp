@@ -44,7 +44,7 @@ std::vector<Request> Frontend::draw(Context context) {
     auto& state = state_->ui;
     state.requests.clear();
     if (state.panels.visible) {
-        draw_menu(state);
+        draw_menu(state, context.walking);
         draw_settings(state, context);
         draw_debug(state, context);
         draw_sky(state, context);

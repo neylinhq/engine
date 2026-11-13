@@ -9,13 +9,14 @@ std::string_view command_id(Command command) {
         "command.rendering.shaders.reload",
         "command.rendering.sampling.compare",
         "command.platform.window.toggle_borderless",
-        "command.camera.path.toggle"};
+        "command.camera.path.toggle",
+        "command.camera.navigation.toggle"};
     const auto index = static_cast<std::size_t>(command);
     return index < kIds.size() ? kIds[index] : std::string_view{};
 }
 std::string_view command_key(Command command) {
-    constexpr std::array<std::string_view, kCommandCount> kKeys{"Tab", "Esc", "",    "Z",
-                                                                "F5",  "F7",  "F11", "F2"};
+    constexpr std::array<std::string_view, kCommandCount> kKeys{"Tab", "Esc", "",   "Z", "F5",
+                                                                "F7",  "F11", "F2", "F"};
     const auto index = static_cast<std::size_t>(command);
     return index < kKeys.size() ? kKeys[index] : std::string_view{};
 }
@@ -64,6 +65,9 @@ void Router::commands(const Snapshot& snapshot, Actions& actions) {
         actions.requested[static_cast<std::size_t>(Command::reload_shaders)] =
             edge(Key::f5, snapshot.down(Key::f5));
     }
+    const auto toggle_navigation = edge(Key::f, snapshot.down(Key::f));
+    actions.requested[static_cast<std::size_t>(Command::toggle_navigation)] =
+        !snapshot.access.keyboard_owned && !snapshot.access.text_editing && toggle_navigation;
     actions.requested[static_cast<std::size_t>(Command::toggle_path)] =
         edge(Key::f2, !snapshot.access.text_editing && snapshot.down(Key::f2));
     actions.requested[static_cast<std::size_t>(Command::toggle_sampling)] =
