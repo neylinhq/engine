@@ -128,7 +128,7 @@ struct Renderer::Impl {
     void initialize_ui();
     void shutdown_ui_renderer();
     bool begin_frame();
-    void draw(const FrameInput& input);
+    void draw(const FrameInput& input, FrameSampling* sampling);
     void submit();
     void collect();
     [[nodiscard]] std::uint32_t timestamp_capacity() const;
@@ -153,7 +153,7 @@ struct Renderer::Impl {
     void upload_buffer(std::string_view name, std::span<const std::byte> data);
     void copy_to_buffer(Buffer& target, std::span<const std::byte> data, vk::DeviceSize offset = 0);
     void update_history(const FrameInput& input);
-    [[nodiscard]] const UniformValues& parameters(const FrameInput& input);
+    [[nodiscard]] const UniformValues& parameters(const FrameInput& input, FrameSampling* sampling);
     [[nodiscard]] Program& program(const std::string& name);
     void update_descriptors(Program& program);
     void write_uniforms(Program& program, const UniformValues& values);

@@ -1,6 +1,6 @@
 set(app_sources
     src/main.cpp src/options.hpp src/options.cpp src/application.hpp src/application.cpp
-    src/navigation.cpp src/editing.cpp src/entities.cpp src/requests.cpp
+    src/navigation.cpp src/editing.cpp src/entities.cpp src/requests.cpp src/frame_context.cpp
     src/io/settings.cpp
     src/io/path.hpp src/io/executable.hpp src/io/executable.cpp)
 set(app_test_sources tests/unit/options_test.cpp)
@@ -14,7 +14,12 @@ if(ENGINE_DESKTOP)
         engine::foundation.geometry engine::motion.camera engine::motion.path
         engine::interaction.input engine::platform.window engine::world.model engine::world.editing
         engine::world.storage engine::rendering.settings engine::rendering.vulkan engine::gui.frontend
-        engine::rendering.configuration engine::motion.character engine::world.collision)
+        engine::rendering.configuration engine::motion.character engine::world.collision
+        engine::platform.process Boost::json)
+    target_compile_definitions(sandbox PRIVATE
+        ENGINE_APP_SANDBOX_COMPILER="${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+        ENGINE_APP_SANDBOX_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+        ENGINE_APP_SANDBOX_VERSION="${PROJECT_VERSION}")
     add_dependencies(sandbox engine_runtime_shaders)
     install(TARGETS sandbox RUNTIME DESTINATION bin)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/shaders/" DESTINATION bin/shaders)

@@ -93,6 +93,15 @@ function_like = false
 match = { path_pattern = 'apps/benchmark/src/.*', name_pattern = 'ENGINE_APP_BENCHMARK_(COMPILER|BUILD_TYPE|VERSION)' }
 
 [[registrations]]
+id = "sandbox_build_identity"
+kind = "conditional_macro"
+purpose = "Identify the Sandbox build in copied frame context"
+configurations = ["*"]
+value_pattern = '"[^"]*"'
+function_like = false
+match = { path_pattern = 'apps/sandbox/src/.*', name_pattern = 'ENGINE_APP_SANDBOX_(COMPILER|BUILD_TYPE|VERSION)' }
+
+[[registrations]]
 id = "vulkan_test_build_identity"
 kind = "conditional_macro"
 purpose = "Identify the configuration in the Vulkan performance test output"

@@ -88,7 +88,7 @@ void Renderer::Impl::record_final(const UniformValues& values, const FrameInput&
     profile_pass(selected.name);
 }
 
-void Renderer::Impl::draw(const FrameInput& input) {
+void Renderer::Impl::draw(const FrameInput& input, FrameSampling* sampling) {
     if (!acquired || !input.camera || !input.settings) {
         throw std::runtime_error("Renderer draw requires an acquired frame, camera and settings");
     }
@@ -114,7 +114,8 @@ void Renderer::Impl::draw(const FrameInput& input) {
     prepare_resources(input);
     prepared_timestamp();
     update_history(input);
-    const auto& values = parameters(input);
+    FrameSampling recorded_sampling;
+    const auto& values = parameters(input, sampling ? &recorded_sampling : nullptr);
     record_original(input, values);
     record_final(values, input);
     end_timing();
@@ -128,6 +129,9 @@ void Renderer::Impl::draw(const FrameInput& input) {
     status.cpu_submit_milliseconds = Milliseconds(submit_end - submit_start).count();
     force_path_reset = false;
     restart_requested = false;
+    if (sampling) {
+        *sampling = recorded_sampling;
+    }
 }
 
 } // namespace engine::rendering::vulkan

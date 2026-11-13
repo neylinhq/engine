@@ -31,7 +31,7 @@ void camera_parameters(UniformValues& values, const FrameInput& input, const His
 }
 } // namespace
 
-const UniformValues& Renderer::Impl::parameters(const FrameInput& input) {
+const UniformValues& Renderer::Impl::parameters(const FrameInput& input, FrameSampling* sampling) {
     // Every frame populates the same keys and value types. Keep their storage stable
     // so program reflection can bind source vectors once, without per-frame allocation.
     auto& values = uniform_values;
@@ -41,15 +41,19 @@ const UniformValues& Renderer::Impl::parameters(const FrameInput& input) {
     const auto frame = static_cast<std::uint32_t>(serial);
     const auto history_count =
         std::clamp(input.settings->render.base.global_illumination_max_accumulation, 1, 128);
+    const auto taa_index = 127u - (frame % 128u);
+    const auto accumulation_index =
+        std::uint32_t(history_count) - (frame % std::uint32_t(history_count)) - 1u;
+    const auto random_counter = random_value(frame);
+    const auto random_counter_secondary = random_value(frame ^ 0x9e3779b9u);
     set_value(values, "frameCount", frame);
     set_value(values, "frameIndex", frame);
-    set_value(values, "taaIndex", 127u - (frame % 128u));
+    set_value(values, "taaIndex", taa_index);
     set_value(values, "taaFinalIndex", 0u);
     set_value(values, "taaFinalIndexTest", 0u);
-    set_value(values, "accumIndex",
-              std::uint32_t(history_count) - (frame % std::uint32_t(history_count)) - 1u);
-    set_value(values, "randCounter", random_value(frame));
-    set_value(values, "randCounter2", random_value(frame ^ 0x9e3779b9u));
+    set_value(values, "accumIndex", accumulation_index);
+    set_value(values, "randCounter", random_counter);
+    set_value(values, "randCounter2", random_counter_secondary);
     set_value(values, "screenWidth", render_extent.width);
     set_value(values, "screenHeight", render_extent.height);
     set_value(values, "outputWidth", surface_extent.width);
@@ -61,8 +65,14 @@ const UniformValues& Renderer::Impl::parameters(const FrameInput& input) {
     set_value(values, "atmosphereTexSizeX", 1024);
     set_value(values, "atmosphereTexSizeY", 1024);
     const bool restart = input.camera->changed() || input.reset_accumulation || force_path_reset;
-    set_value(values, "maxSamples",
-              restart ? 1 : std::clamp(input.settings->render.path_tracer.max_samples, 1, 8192));
+    const auto path_sample_limit =
+        restart ? 1 : std::clamp(input.settings->render.path_tracer.max_samples, 1, 8192);
+    set_value(values, "maxSamples", path_sample_limit);
+    if (sampling) {
+        *sampling = {history.jitter,     frame,          taa_index,
+                     accumulation_index, random_counter, random_counter_secondary,
+                     path_sample_limit};
+    }
     return values;
 }
 

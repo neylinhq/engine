@@ -9,6 +9,7 @@ void replace_world(Application& app, const gui::frontend::Request& request,
     const auto fixed = request.operation == gui::frontend::Operation::open_fixed;
     generate_world(app, std::move(model), fixed ? request.requested_size : world::model::Vec3i{},
                    request.segment_groups);
+    app.scene_source = {request.path, {}};
     app.ui->reset_world();
     reframe_camera(app);
     app.metrics.status = "Loaded " + path_to_utf8(request.path);
@@ -52,6 +53,9 @@ void handle_request(Application& app, const gui::frontend::Request& request) {
         break;
     case Operation::screenshot:
         app.screenshot_requested = true;
+        break;
+    case Operation::copy_frame_context:
+        app.frame_context_requested = true;
         break;
     default:
         begin_import(app, request);

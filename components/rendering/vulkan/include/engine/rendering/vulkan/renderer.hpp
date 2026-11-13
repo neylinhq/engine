@@ -1,6 +1,7 @@
 #ifndef ENGINE_RENDERING_VULKAN_RENDERER_HPP
 #define ENGINE_RENDERING_VULKAN_RENDERER_HPP
 
+#include <array>
 #include <cstdint>
 #include <engine/motion/camera/camera.hpp>
 #include <engine/platform/window/window.hpp>
@@ -48,6 +49,16 @@ struct FrameInput {
     // Preserve this frame including UI for a subsequent screenshot() call.
     bool capture_output = false;
     unsigned bounds_budget = 32768;
+};
+
+struct FrameSampling {
+    std::array<float, 2> jitter_pixels{};
+    std::uint32_t shader_frame = 0;
+    std::uint32_t taa_index = 0;
+    std::uint32_t accumulation_index = 0;
+    std::uint32_t random_counter = 0;
+    std::uint32_t random_counter_secondary = 0;
+    int path_sample_limit = 0;
 };
 
 struct ComputeExecution {
@@ -98,6 +109,8 @@ struct Statistics {
     std::uint64_t validation_errors = 0;
     std::uint32_t width = 0;
     std::uint32_t height = 0;
+    std::uint32_t output_width = 0;
+    std::uint32_t output_height = 0;
     double gpu_milliseconds = 0;
     double gpu_prepare_milliseconds = 0;
     double gpu_render_milliseconds = 0;
@@ -127,8 +140,9 @@ class Renderer {
     ~Renderer();
     // Acquires a drawable and starts ImGui. False means minimized/out-of-date.
     [[nodiscard]] std::expected<bool, std::string> begin_frame();
-    // Ends ImGui, records original NAADF passes, submits and presents.
-    [[nodiscard]] std::expected<void, std::string> draw(const FrameInput& input);
+    // On success, sampling receives the submitted frame's shader parameters if requested.
+    [[nodiscard]] std::expected<void, std::string> draw(const FrameInput& input,
+                                                        FrameSampling* sampling = nullptr);
     [[nodiscard]] std::expected<world::model::GeneratedWorld, std::string>
     generate_world(const world::model::Model& source, world::model::Vec3i requested = {},
                    int segment_groups = 4);

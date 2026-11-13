@@ -12,8 +12,13 @@ struct PendingImport {
     gui::frontend::Request request;
     std::future<world::model::Model> task;
 };
+struct SceneSource {
+    std::filesystem::path world;
+    std::filesystem::path materials;
+};
 struct Application {
     Options options;
+    SceneSource scene_source;
     world::model::World world{std::thread::hardware_concurrency()};
     rendering::settings::Settings settings;
     std::unique_ptr<platform::window::Window> window;
@@ -38,6 +43,7 @@ struct Application {
     bool paused = false;
     bool active = true;
     bool screenshot_requested = false;
+    bool frame_context_requested = false;
     bool reset = true;
     bool rebase_clock = false;
     unsigned frame = 0;
@@ -47,6 +53,8 @@ void initialize(Application& app);
 void generate_world(Application& app, world::model::Model source, world::model::Vec3i requested,
                     int segment_groups);
 void frame(Application& app, double seconds);
+void copy_frame_context(Application& app, const rendering::vulkan::FrameInput& input,
+                        const rendering::vulkan::FrameSampling& sampling);
 void handle_requests(Application& app, const std::vector<gui::frontend::Request>& requests);
 void poll_import(Application& app);
 void update_navigation(Application& app, const interaction::input::Actions& actions,

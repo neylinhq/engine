@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <thread>
+#include <utility>
 namespace engine::app::sandbox {
 namespace {
 bool original_seed(world::model::Vec3i size) {
@@ -77,7 +78,12 @@ void render(Application& app, double seconds) {
     input.capture_output = final && !app.options.screenshot.empty();
     input.reset_accumulation = app.reset;
     input.bounds_budget = static_cast<unsigned>(app.ui->bounds_speedup()) * 512U;
-    require(app.renderer->draw(input));
+    const auto copy_context = std::exchange(app.frame_context_requested, false);
+    rendering::vulkan::FrameSampling sampling;
+    require(app.renderer->draw(input, copy_context ? &sampling : nullptr));
+    if (copy_context) {
+        copy_frame_context(app, input, sampling);
+    }
     if (app.active) {
         app.world.acknowledge_changes();
         app.reset = false;
@@ -284,6 +290,7 @@ void initialize(Application& app) {
     }
     app.renderer = std::make_unique<rendering::vulkan::Renderer>(std::move(*renderer));
     generate_world(app, std::move(source), {}, 4);
+    app.scene_source = {app.options.scene, app.options.materials};
     reset_camera(app);
     app.ui = std::make_unique<gui::frontend::Frontend>(*app.window);
     update_metrics(app);

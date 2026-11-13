@@ -41,6 +41,9 @@ void draw_debug(UiState& state, Context& context) {
     ImGui::SetNextWindowPos({5, 23}, ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Debug", &state.panels.debug)) {
         frame_metrics(state, context.metrics);
+        if (ImGui::Button("Copy Frame Context")) {
+            enqueue(state, Operation::copy_frame_context);
+        }
         ImGui::Separator();
         world_metrics(state, context);
         if (!context.walking) {

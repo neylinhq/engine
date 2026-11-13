@@ -34,9 +34,9 @@ std::expected<bool, std::string> Renderer::begin_frame() {
     }
 }
 
-std::expected<void, std::string> Renderer::draw(const FrameInput& input) {
+std::expected<void, std::string> Renderer::draw(const FrameInput& input, FrameSampling* sampling) {
     try {
-        impl_->draw(input);
+        impl_->draw(input, sampling);
         return {};
     } catch (const std::exception& error) {
         return std::unexpected(error.what());

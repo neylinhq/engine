@@ -25,7 +25,8 @@ enum class Operation {
     restart_render,
     load_path,
     save_path,
-    screenshot
+    screenshot,
+    copy_frame_context
 };
 struct Request {
     Operation operation = Operation::open_world;

@@ -39,6 +39,8 @@ class Window {
     // Borrowed GLFWwindow pointer for a native UI adapter; valid for the window lifetime.
     [[nodiscard]] void* native_handle() const;
     void title(const std::string& title);
+    // Copies UTF-8 text to the system clipboard on the window thread.
+    [[nodiscard]] std::expected<void, std::string> set_clipboard(const std::string& text);
     [[nodiscard]] std::expected<void, std::string> toggle_borderless();
     [[nodiscard]] bool borderless() const;
     [[nodiscard]] std::expected<std::vector<const char*>, std::string> instance_extensions() const;

@@ -113,6 +113,19 @@ void* Window::native_handle() const {
 void Window::title(const std::string& title) {
     glfwSetWindowTitle(impl_->handle, title.c_str());
 }
+std::expected<void, std::string> Window::set_clipboard(const std::string& text) {
+    if (text.find('\0') != std::string::npos) {
+        return std::unexpected("Clipboard text cannot contain embedded NUL characters");
+    }
+    static_cast<void>(glfwGetError(nullptr));
+    glfwSetClipboardString(impl_->handle, text.c_str());
+    const char* description = nullptr;
+    if (glfwGetError(&description) != GLFW_NO_ERROR) {
+        return std::unexpected(std::string("Clipboard write failed: ") +
+                               (description ? description : "unknown GLFW error"));
+    }
+    return {};
+}
 bool Window::borderless() const {
     return impl_->state.borderless();
 }

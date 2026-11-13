@@ -106,7 +106,7 @@ struct Harness {
                               renderer.history_index(settings.render.version, paused));
     }
 
-    void draw(unsigned frame, bool active, bool paused) {
+    rendering::vulkan::FrameSampling draw(unsigned frame, bool active, bool paused) {
         rendering::vulkan::FrameInput input;
         input.world = world.view();
         input.entities = &world.entity_gpu();
@@ -116,13 +116,16 @@ struct Harness {
         input.paused = paused;
         input.bounds_budget = 64;
         input.capture_scene = frame == 11;
-        require(renderer.draw(input));
+        rendering::vulkan::FrameSampling sampling;
+        require(renderer.draw(input, &sampling));
         if (active) {
             world.acknowledge_changes();
         }
+        return sampling;
     }
 
     void frames() {
+        rendering::vulkan::FrameSampling previous;
         for (unsigned frame = 0; frame < 12; ++frame) {
             const auto before = renderer.statistics();
             begin(before);
@@ -130,7 +133,7 @@ struct Harness {
             const auto paused = frame == 7;
             cpu_preparation(frame, active, paused);
             const auto history = renderer.history_index(settings.render.version, paused || !active);
-            draw(frame, active, paused);
+            const auto sampling = draw(frame, active, paused);
             const auto after = renderer.statistics();
             check(after.frame_count == before.frame_count + 1, "Draw did not submit one frame");
             if (after.gpu_timestamps_supported) {
@@ -139,6 +142,16 @@ struct Harness {
             }
             check(renderer.history_index(settings.render.version, true) == history,
                   "Deferred completion changed sampling or entity history order");
+            check(sampling.taa_index == history, "Captured sampling came from another frame");
+            const auto advance = static_cast<unsigned>(active && !paused);
+            check(sampling.shader_frame == previous.shader_frame + advance,
+                  "Captured shader frame did not follow the sampling clock");
+            if (advance == 0) {
+                check(sampling.random_counter == previous.random_counter &&
+                          sampling.random_counter_secondary == previous.random_counter_secondary,
+                      "Paused sampling changed the captured random counters");
+            }
+            previous = sampling;
             check(after.validation_errors == 0, "Validation error during deferred resource reuse");
         }
     }

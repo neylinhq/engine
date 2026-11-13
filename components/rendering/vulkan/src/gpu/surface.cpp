@@ -156,6 +156,8 @@ void Renderer::Impl::resize_output() {
     reset = true;
     status.width = render_extent.width;
     status.height = render_extent.height;
+    status.output_width = surface_extent.width;
+    status.output_height = surface_extent.height;
 }
 
 void Renderer::Impl::rebuild_surface() {
