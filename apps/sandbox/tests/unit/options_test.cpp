@@ -18,14 +18,26 @@ void unicode_arguments() {
     const std::filesystem::path scene =
         u8"\u043c\u043e\u0434\u0435\u043b\u0438/\u043e\u0430\u0437\u0438\u0441.cvox";
     const std::filesystem::path capture = u8"\u0441\u043d\u0438\u043c\u043e\u043a.png";
-    std::array<std::string, 5> values{"engine", "--scene", path_to_utf8(scene), "--screenshot",
+    const std::filesystem::path materials =
+        u8"\u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b.materials.json";
+    const std::filesystem::path settings = u8"\u0441\u0432\u0435\u0442.settings.json";
+    std::array<std::string, 9> values{"engine",
+                                      "--scene",
+                                      path_to_utf8(scene),
+                                      "--materials",
+                                      path_to_utf8(materials),
+                                      "--settings",
+                                      path_to_utf8(settings),
+                                      "--screenshot",
                                       path_to_utf8(capture)};
-    std::array<char*, 5> arguments{};
+    std::array<char*, values.size()> arguments{};
     for (std::size_t index = 0; index < values.size(); ++index) {
         arguments[index] = values[index].data();
     }
     const auto options = parse_options(static_cast<int>(arguments.size()), arguments.data());
     require(options.scene == scene, "CLI scene lost Unicode path");
+    require(options.materials == materials && options.settings == settings,
+            "External palette or settings lost its Unicode path");
     require(options.screenshot == capture && options.frames == 1,
             "CLI screenshot lost Unicode path or implicit frame count");
     require(path_from_utf8(path_to_utf8(scene)) == scene,
@@ -86,8 +98,9 @@ engine::app::sandbox::Options parse(std::array<std::string, count> values) {
     return engine::app::sandbox::parse_options(static_cast<int>(count), arguments.data());
 }
 void scene_units() {
-    require(parse(std::array<std::string, 1>{"engine"}).scene.empty(),
-            "Startup without --scene must not require a bundled map");
+    const auto defaults = parse(std::array<std::string, 1>{"engine"});
+    require(defaults.scene.empty() && defaults.materials.empty() && defaults.settings.empty(),
+            "Startup must not select implicit input files");
     require(!parse(std::array<std::string, 1>{"engine"}).walk &&
                 parse(std::array<std::string, 2>{"engine", "--walk"}).walk,
             "Walking must be selected explicitly at startup");

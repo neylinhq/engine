@@ -8,10 +8,11 @@
 namespace engine::app::sandbox {
 struct Options {
     std::filesystem::path scene;
+    std::filesystem::path materials;
     std::filesystem::path shaders;
-    std::filesystem::path settings = "out/user/settings.json";
+    std::filesystem::path settings;
     std::filesystem::path screenshot;
-    rendering::settings::RenderVersion mode = rendering::settings::RenderVersion::base;
+    std::optional<rendering::settings::RenderVersion> mode;
     rendering::vulkan::ChunkLayout chunk_layout = rendering::vulkan::ChunkLayout::automatic;
     int width = 1600;
     int height = 900;
@@ -24,7 +25,6 @@ struct Options {
     bool walk = false;
     bool defer_frame_wait = true;
     bool offscreen_output = false;
-    bool mode_set = false;
     bool help = false;
 };
 [[nodiscard]] Options parse_options(int count, char** arguments);

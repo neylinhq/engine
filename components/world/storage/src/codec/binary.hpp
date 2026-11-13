@@ -11,6 +11,8 @@
 
 namespace engine::world::storage {
 
+inline constexpr std::size_t kMaxTerminatedStringBytes = 1024 * 1024;
+
 class Reader {
   public:
     explicit Reader(std::span<const std::byte> data);
@@ -51,7 +53,6 @@ class Writer {
 };
 
 [[nodiscard]] std::vector<std::byte> read_file(const std::filesystem::path& path);
-void write_file(const std::filesystem::path& path, std::span<const std::byte> bytes);
 [[nodiscard]] std::filesystem::path utf8_path(std::string_view text);
 [[nodiscard]] std::string path_text(const std::filesystem::path& path);
 [[nodiscard]] std::string extension_text(const std::filesystem::path& path);

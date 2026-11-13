@@ -10,7 +10,8 @@ void set_path(FileDialog& dialog, const std::filesystem::path& path) {
     std::snprintf(dialog.path.data(), dialog.path.size(), "%s", text.c_str());
 }
 bool writing(Operation operation) {
-    return operation == Operation::save_world || operation == Operation::save_path;
+    return operation == Operation::save_world || operation == Operation::save_path ||
+           operation == Operation::save_settings;
 }
 const char* file_description(Operation operation) {
     switch (operation) {
@@ -20,6 +21,8 @@ const char* file_description(Operation operation) {
         return "Voxel records (*.vl32)";
     case Operation::import_mesh:
         return "Triangle mesh (*.obj, *.stl)";
+    case Operation::save_settings:
+        return "Engine settings (*.settings.json)";
     case Operation::load_path:
     case Operation::save_path:
         return "NAADF camera path (*.pnb)";
@@ -96,13 +99,17 @@ void queue_file(UiState& state, const std::filesystem::path& path) {
 void submit(UiState& state) {
     auto& dialog = state.file;
     auto path = path_from_utf8(dialog.path.data());
-    if (*dialog.operation == Operation::save_world && path.extension().empty()) {
-        path += ".cvox";
-    }
     std::error_code error;
     if (std::filesystem::is_directory(path, error)) {
         dialog.directory = path;
         return;
+    }
+    if (!path.empty() && path.extension().empty()) {
+        if (*dialog.operation == Operation::save_world) {
+            path += ".cvox";
+        } else if (*dialog.operation == Operation::save_settings) {
+            path += ".settings.json";
+        }
     }
     const auto readable = std::filesystem::is_regular_file(path, error);
     if (path.empty() || (!writing(*dialog.operation) && !readable)) {
@@ -185,7 +192,11 @@ void open_file(UiState& state, Operation operation) {
     if (dialog.directory.empty()) {
         dialog.directory = std::filesystem::current_path();
     }
-    set_path(dialog, dialog.directory / (writing(operation) ? "world.cvox" : ""));
+    if (operation == Operation::save_settings) {
+        set_path(dialog, dialog.directory / "engine.settings.json");
+    } else {
+        set_path(dialog, dialog.directory / (writing(operation) ? "world.cvox" : ""));
+    }
 }
 void draw_files(UiState& state) {
     auto& dialog = state.file;

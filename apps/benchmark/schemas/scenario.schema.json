@@ -18,6 +18,11 @@
               "type": "string",
               "minLength": 1,
               "pattern": "^[^\\u0000]+$"
+            },
+            "materials": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^\\u0000]+$"
             }
           },
           "required": [
@@ -106,6 +111,11 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 10
+        },
+        "settings_file": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\u0000]+$"
         },
         "settings": {
           "type": "object",
@@ -365,6 +375,9 @@
         "width",
         "height"
       ],
+      "not": {
+        "required": ["settings", "settings_file"]
+      },
       "additionalProperties": false
     },
     "camera": {

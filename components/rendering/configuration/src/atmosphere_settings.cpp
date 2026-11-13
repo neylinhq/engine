@@ -1,4 +1,7 @@
 #include "settings.hpp"
+#include <algorithm>
+#include <array>
+#include <cmath>
 namespace engine::rendering::configuration {
 namespace {
 void read_array(const json::object& object, std::string_view key, std::array<float, 3>& values) {
@@ -12,9 +15,6 @@ void read_array(const json::object& object, std::string_view key, std::array<flo
     }
     for (std::size_t index = 0; index < values.size(); ++index) {
         values[index] = array[index].to_number<float>();
-        if (!std::isfinite(values[index])) {
-            throw std::runtime_error("Sky vector must be finite");
-        }
     }
 }
 json::array write_array(const std::array<float, 3>& values) {
@@ -38,6 +38,18 @@ void read_atmosphere(const json::object& object, settings::Atmosphere& sky) {
     read_setting(object, "mieFactor", sky.mie_factor);
     read_setting(object, "mainRaySteps", sky.main_ray_steps);
     read_setting(object, "subScatterSteps", sky.sub_scatter_steps);
+}
+void validate_atmosphere(const settings::Atmosphere& sky) {
+    const std::array scalars{sky.sun_angle,         sky.sun_azimuth,   sky.sun_intensity,
+                             sky.mie_scatter,       sky.sphere_radius, sky.thickness,
+                             sky.average_point,     sky.density,       sky.absorb_intensity,
+                             sky.scatter_intensity, sky.mie_factor};
+    const auto finite = [](float value) { return std::isfinite(value); };
+    if (!std::ranges::all_of(scalars, finite) || !std::ranges::all_of(sky.sun_color, finite) ||
+        !std::ranges::all_of(sky.rayleigh_scatter, finite) ||
+        !std::ranges::all_of(sky.ozone_absorb, finite)) {
+        throw std::runtime_error("Atmosphere settings must be finite");
+    }
     if (sky.sphere_radius <= 0 || sky.thickness <= 0 || sky.average_point <= 0 ||
         sky.main_ray_steps < 1 || sky.main_ray_steps > 100 || sky.sub_scatter_steps < 1 ||
         sky.sub_scatter_steps > 100 || sky.mie_factor < -1 || sky.mie_factor >= 1) {

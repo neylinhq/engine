@@ -1,0 +1,5 @@
+schema = "archcheck.component.v1"
+id = "platform.filesystem"
+role = "adapter"
+owner = "engine_maintainers"
+purpose = "Bounded file reads and replacement of complete file contents."

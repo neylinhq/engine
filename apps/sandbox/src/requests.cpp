@@ -37,8 +37,8 @@ void handle_request(Application& app, const gui::frontend::Request& request) {
         begin_import(app, request);
         break;
     case Operation::save_settings:
-        save_settings(app);
-        app.metrics.status = "Settings saved";
+        save_settings(app, request.path);
+        app.metrics.status = "Saved settings " + path_to_utf8(request.path);
         break;
     case Operation::restart_render:
         app.renderer->restart();

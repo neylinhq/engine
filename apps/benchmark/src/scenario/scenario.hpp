@@ -33,6 +33,8 @@ struct Probe {
 struct Scenario {
     std::string name;
     std::filesystem::path scene;
+    std::filesystem::path materials;
+    std::filesystem::path settings_file;
     world::model::Vec3i empty_size{256, 256, 256};
     double voxel_size = 1;
     unsigned frames = 600;
@@ -52,7 +54,8 @@ struct Scenario {
 };
 [[nodiscard]] Scenario load_scenario(const Options& options);
 [[nodiscard]] Scenario parse_scenario(const json::object& root,
-                                      const std::filesystem::path& directory);
+                                      const std::filesystem::path& directory,
+                                      const std::filesystem::path& settings_override = {});
 [[nodiscard]] std::vector<Event>
 parse_events(const json::array& values, const std::filesystem::path& directory, unsigned frames);
 [[nodiscard]] std::vector<Keyframe> parse_camera(const json::array& values, unsigned frames);

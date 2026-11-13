@@ -1,9 +1,13 @@
-#include <engine/world/storage/storage.hpp>
-
+#include "codec/cvox.hpp"
 #include "codec/zip.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <engine/platform/filesystem/filesystem.hpp>
+#include <engine/world/storage/storage.hpp>
+#include <span>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace engine::world::storage {
 namespace {
@@ -42,8 +46,13 @@ void write_vector(Writer& writer, model::Vec3 value) {
 }
 
 void write_material(Writer& writer, const model::Material& material) {
-    writer.terminated(material.name.empty() || material.name.starts_with('_') ? "_"
-                                                                              : material.name);
+    auto name = std::string_view(material.name);
+    if (name.empty() || name.starts_with('_')) {
+        name = "_";
+    }
+    validate_cvox_material_name(name);
+    writer.append(std::as_bytes(std::span(name)));
+    writer.u8(0);
     write_vector(writer, material.color_base);
     write_vector(writer, material.color_layer);
     writer.u32(static_cast<std::uint32_t>(material.base));
@@ -112,6 +121,15 @@ model::Model decode_cvox(Reader& reader) {
 
 } // namespace
 
+void validate_cvox_material_name(std::string_view name) {
+    if (name.size() > kMaxTerminatedStringBytes) {
+        throw std::invalid_argument("CVox material name exceeds 1 MiB");
+    }
+    if (!std::ranges::all_of(name, [](unsigned char byte) { return byte != 0 && byte < 0x80; })) {
+        throw std::invalid_argument("CVox material names must use ASCII without NUL");
+    }
+}
+
 model::Model load_cvox(const std::filesystem::path& path) {
     const auto archive = read_file(path);
     const auto payload = zip_extract(archive, "data");
@@ -136,13 +154,18 @@ void save_cvox(const std::filesystem::path& path, const model::Model& model) {
     writer.u32(static_cast<std::uint32_t>(model.chunks.size()));
     writer.u32(static_cast<std::uint32_t>(model.blocks.size()));
     writer.u32(static_cast<std::uint32_t>(model.voxels.size() * 2));
+    std::unordered_set<std::string_view> names;
     for (const auto& material : model.materials) {
+        if (!material.name.empty() && !material.name.starts_with('_') &&
+            !names.insert(material.name).second) {
+            throw std::invalid_argument("Duplicate CVox material name: " + material.name);
+        }
         write_material(writer, material);
     }
     write_words(writer, model.chunks, false);
     write_words(writer, model.blocks, false);
     write_words(writer, model.voxels, true);
-    write_file(path, zip_compress(writer.bytes(), "data"));
+    platform::filesystem::write(path, zip_compress(writer.bytes(), "data"));
 }
 
 model::Model load(const std::filesystem::path& path, const ImportOptions& options) {

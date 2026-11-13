@@ -8,6 +8,8 @@ struct Options {
     std::string command;
     std::filesystem::path scenario;
     std::filesystem::path scene;
+    std::filesystem::path materials;
+    std::filesystem::path settings;
     std::filesystem::path shaders;
     std::filesystem::path output;
     std::filesystem::path baseline;

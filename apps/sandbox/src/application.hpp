@@ -57,7 +57,7 @@ void update_entities(Application& app);
 void reset_camera(Application& app);
 void reframe_camera(Application& app);
 void load_settings(Application& app);
-void save_settings(const Application& app);
+void save_settings(const Application& app, const std::filesystem::path& path);
 void load_path(Application& app, const std::filesystem::path& path);
 void save_path(const Application& app, const std::filesystem::path& path);
 } // namespace engine::app::sandbox

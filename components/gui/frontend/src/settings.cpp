@@ -94,8 +94,8 @@ void draw_settings(UiState& state, Context& context) {
     ImGui::SetNextWindowSize({400, 500}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos({5, 278}, ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Settings", &state.panels.settings)) {
-        if (ImGui::Button("Save")) {
-            enqueue(state, Operation::save_settings);
+        if (ImGui::Button("Save As")) {
+            open_file(state, Operation::save_settings);
         }
         ImGui::Spacing();
         ImGui::Separator();

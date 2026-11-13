@@ -1,9 +1,9 @@
 #include "json.hpp"
 #include <algorithm>
 #include <cmath>
+#include <engine/platform/filesystem/filesystem.hpp>
 #include <engine/platform/process/process.hpp>
 #include <fstream>
-#include <iterator>
 #include <stdexcept>
 namespace engine::app::benchmark {
 void keys(const json::object& object, std::initializer_list<std::string_view> allowed) {
@@ -50,18 +50,12 @@ world::model::Vec3i voxel(const json::value& value) {
     return {static_cast<int>(v.x), static_cast<int>(v.y), static_cast<int>(v.z)};
 }
 std::string read_text(const std::filesystem::path& path) {
-    if (std::filesystem::file_size(path) > 16 * 1024 * 1024) {
-        throw std::invalid_argument("JSON input exceeds 16 MiB");
+    constexpr std::size_t kMaxJsonBytes = 16 * 1024 * 1024;
+    const auto bytes = platform::filesystem::read(path, kMaxJsonBytes);
+    if (bytes.empty()) {
+        return {};
     }
-    std::ifstream file(path, std::ios::binary);
-    if (!file) {
-        throw std::invalid_argument("Cannot open JSON: " + platform::process::path_text(path));
-    }
-    std::string result{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-    if (file.bad()) {
-        throw std::runtime_error("Cannot read JSON");
-    }
-    return result;
+    return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
 }
 std::filesystem::path relative_file(const json::value& value,
                                     const std::filesystem::path& directory) {

@@ -7,7 +7,8 @@ set(benchmark_sources src/main.cpp src/command.hpp src/command.cpp src/repeat.cp
     src/report/report.hpp src/report/statistics.cpp src/report/summary.cpp
     src/report/samples.cpp src/report/comparison.cpp)
 set(benchmark_dependencies engine::foundation.geometry engine::motion.camera
-    engine::platform.process engine::platform.window engine::world.model engine::world.editing
+    engine::platform.process engine::platform.filesystem engine::platform.window
+    engine::world.model engine::world.editing
     engine::world.storage engine::rendering.settings engine::rendering.configuration
     engine::rendering.vulkan Boost::json)
 if(ENGINE_DESKTOP)

@@ -38,6 +38,7 @@ void read_render(const json::object& object, settings::Render& render);
 void read_atmosphere(const json::object& object, settings::Atmosphere& sky);
 [[nodiscard]] json::object write_render(const settings::Render& render);
 [[nodiscard]] json::object write_atmosphere(const settings::Atmosphere& sky);
-void validate_settings(settings::Settings& settings);
+[[nodiscard]] settings::Settings checked_settings(const settings::Settings& settings, bool strict);
+void validate_atmosphere(const settings::Atmosphere& sky);
 } // namespace engine::rendering::configuration
 #endif

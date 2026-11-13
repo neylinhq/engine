@@ -16,6 +16,9 @@ struct ImportOptions {
 
 [[nodiscard]] model::Model load(const std::filesystem::path& path,
                                 const ImportOptions& options = {});
+// Apply an optional palette to the scene's local material IDs before registration.
+[[nodiscard]] model::Model load_scene(const std::filesystem::path& path,
+                                      const std::filesystem::path& materials);
 [[nodiscard]] model::Model load_cvox(const std::filesystem::path& path);
 void save_cvox(const std::filesystem::path& path, const model::Model& model);
 [[nodiscard]] model::Model import_vox(const std::filesystem::path& path);

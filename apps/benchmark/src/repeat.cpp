@@ -14,10 +14,15 @@ platform::process::Command worker(const Options& options, const std::filesystem:
         {"measure", "--scenario", path_text(std::filesystem::absolute(options.scenario)),
          "--shaders", path_text(std::filesystem::absolute(options.shaders)), "--output",
          path_text(std::filesystem::absolute(output)), "--run-index", std::to_string(index)}};
-    if (!options.scene.empty()) {
-        command.arguments.insert(command.arguments.end(),
-                                 {"--scene", path_text(std::filesystem::absolute(options.scene))});
-    }
+    const auto add_path = [&](const char* option, const std::filesystem::path& path) {
+        if (!path.empty()) {
+            command.arguments.insert(command.arguments.end(),
+                                     {option, path_text(std::filesystem::absolute(path))});
+        }
+    };
+    add_path("--scene", options.scene);
+    add_path("--materials", options.materials);
+    add_path("--settings", options.settings);
     if (!options.label.empty()) {
         command.arguments.insert(command.arguments.end(), {"--label", options.label});
     }

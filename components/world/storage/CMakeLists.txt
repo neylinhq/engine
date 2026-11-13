@@ -1,5 +1,6 @@
 add_library(world_storage STATIC
     src/cvox.cpp
+    src/materials.cpp
     src/path.cpp
     src/palette.cpp
     src/vl32.cpp
@@ -32,13 +33,15 @@ add_library(world_storage STATIC
     src/import.hpp
     src/vox.hpp
     src/codec/binary.hpp
+    src/codec/cvox.hpp
     src/codec/zip.hpp
     src/image/image.hpp
     include/engine/world/storage/storage.hpp
 )
 ac_component(world_storage world.storage)
 target_include_directories(world_storage PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(world_storage PUBLIC engine::world.model engine::foundation.geometry)
+target_link_libraries(world_storage PUBLIC engine::world.model engine::foundation.geometry
+    PRIVATE engine::platform.filesystem Boost::json)
 add_executable(world_storage_test tests/unit/storage_test.cpp)
 ac_test(world_storage_test world_storage)
 target_link_libraries(world_storage_test PRIVATE engine::world.storage engine::world.model engine::foundation.geometry)

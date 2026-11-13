@@ -75,13 +75,21 @@ bool choice(std::string_view value, std::string_view enabled, std::string_view d
     throw std::invalid_argument("Expected " + std::string(enabled) + " or " +
                                 std::string(disabled));
 }
+std::filesystem::path input_path(std::string_view option, std::string_view value) {
+    if (value.empty()) {
+        throw std::invalid_argument("Missing path for " + std::string(option));
+    }
+    return path_from_utf8(value);
+}
 void value_option(Options& result, std::string_view option, std::string_view value) {
     if (option == "--scene") {
-        result.scene = path_from_utf8(value);
+        result.scene = input_path(option, value);
+    } else if (option == "--materials") {
+        result.materials = input_path(option, value);
     } else if (option == "--shaders") {
         result.shaders = path_from_utf8(value);
     } else if (option == "--settings") {
-        result.settings = path_from_utf8(value);
+        result.settings = input_path(option, value);
     } else if (option == "--screenshot") {
         result.screenshot = path_from_utf8(value);
     } else if (option == "--frames") {
@@ -92,7 +100,6 @@ void value_option(Options& result, std::string_view option, std::string_view val
         result.height = static_cast<int>(number(value));
     } else if (option == "--mode") {
         result.mode = mode(value);
-        result.mode_set = true;
     } else if (option == "--chunk-layout") {
         result.chunk_layout = chunk_layout(value);
     } else if (option == "--frame-wait") {
@@ -144,6 +151,9 @@ Options parse_options(int count, char** arguments) {
     if (result.voxel_meters < 1.0 / 1024 || result.voxel_meters > 1) {
         throw std::invalid_argument("Voxel size must be in [1/1024, 1] meters");
     }
+    if (!result.materials.empty() && result.scene.empty()) {
+        throw std::invalid_argument("--materials requires --scene");
+    }
     if (!result.screenshot.empty() && result.frames == 0) {
         result.frames = 1;
     }
@@ -155,7 +165,8 @@ void print_usage() {
                  "  Without --scene, start an empty world and open a file from the menu.\n"
                  "  --mode albedo|base|path  --width N --height N --frames N\n"
                  "  --screenshot FILE.png  --hidden  --no-ui  --validation\n"
-                 "  --settings FILE.json\n"
+                 "  --materials FILE.materials.json (requires --scene)\n"
+                 "  --settings FILE.settings.json\n"
                  "  --chunk-layout automatic|packed|split (default: automatic)\n"
                  "  --frame-wait deferred|early (default: deferred)\n"
                  "  --output-path automatic|offscreen (default: automatic)\n"

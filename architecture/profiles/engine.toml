@@ -26,7 +26,7 @@ purpose = "Distinguish temporary output paths allocated within one process"
 initialization = "Constant initialization to zero"
 destruction = "The atomic counter has no external resources"
 synchronization = "Temporary path allocation increments the sequence with atomic fetch_add"
-match = { path_pattern = 'components/world/storage/src/codec/binary[.]cpp', name_pattern = 'sequence', kinds = ["VarDecl"] }
+match = { path_pattern = 'components/platform/filesystem/src/filesystem[.]cpp', name_pattern = 'sequence', kinds = ["VarDecl"] }
 
 [[registrations]]
 id = "compiler_parameters"

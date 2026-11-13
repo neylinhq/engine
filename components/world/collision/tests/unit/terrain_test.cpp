@@ -319,10 +319,10 @@ void guarded_placement() {
                 world.at({16, 1, 16}) == 0 && world.at({8, 2, 16}) == 0,
             "Rejected placement left changes in the world or the pending batch");
 
-    constexpr model::Vec3i corner{11, 8, 11};
+    constexpr model::Vec3i kCornerVoxel{11, 8, 11};
     require(
         editing::apply_brush(world, {editing::Tool::cube, {11.5, 8.5, 11.5}, 0.5, paint}, guard) &&
-            world.at(corner) == paint,
+            world.at(kCornerVoxel) == paint,
         "A voxel in the corner of the capsule bounds blocked placement");
     require(
         editing::apply_brush(world, {editing::Tool::paint, {16.5, 0.5, 16.5}, 0.5, paint}, guard) &&

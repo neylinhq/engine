@@ -10,15 +10,16 @@
 
 ```powershell
 .\out\windows-release\bin\sandbox.exe
-.\out\windows-release\bin\sandbox.exe --scene C:\Scenes\world.cvox --voxel-size 1
+.\out\windows-release\bin\sandbox.exe --scene C:\Scenes\world.cvox --materials C:\Scenes\world.materials.json --settings C:\Scenes\day.settings.json --voxel-size 1
 .\out\windows-release\bin\sandbox.exe --help
 ```
 
 В Linux исполняемый файл находится в `out/linux-release/bin/sandbox`.
-Карты хранятся вне проекта. `--scene` принимает CVox, VOX, VL32, OBJ и STL
-и создаёт мир по размеру импортированной модели. В интерфейсе `File > Open`
-открывает CVox, а отдельные команды импорта — VOX, VL32 и сетки OBJ/STL.
-`Save As` сохраняет текущий мир в CVox с подтверждением перезаписи.
+Карты, палитры и настройки хранятся вне проекта. `--scene` принимает CVox, VOX,
+VL32, OBJ и STL. `--materials FILE.materials.json` заменяет палитру указанной карты
+при запуске. Без этого параметра используется палитра карты. В меню `File > Open`
+открывается CVox, для остальных форматов есть отдельные команды импорта.
+`File > Save As` сохраняет мир в CVox вместе с действующей палитрой.
 
 `--voxel-size` задаёт размер вокселя в метрах. `--camera X,Y,Z,YAW,PITCH`
 принимает позицию в метрах и углы в радианах. Например:
@@ -27,9 +28,11 @@
 .\out\windows-release\bin\sandbox.exe --scene C:\Scenes\strata-03125.cvox --voxel-size 0.03125 --camera "256,104,112,0,-0.08"
 ```
 
-`--settings FILE.json` выбирает файл настроек; по умолчанию используется
-`out/user/settings.json` относительно каталога запуска. Кнопка Save в Settings
-записывает настройки в этот файл. Формат сохраняет имена полей NAADF.
+`--settings FILE.settings.json` загружает настройки рендера и атмосферы.
+Без этого параметра действуют встроенные значения. Явный `--mode` задаёт
+режим рендера поверх файла. `Save As` в панели Settings записывает действующие
+настройки в выбранный файл. Ошибка загрузки указанной карты, палитры или
+настроек останавливает запуск.
 
 ## Управление
 

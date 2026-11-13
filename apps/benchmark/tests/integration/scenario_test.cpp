@@ -29,9 +29,11 @@ void write(const std::filesystem::path& path, const std::string& content) {
 }
 json::object scenario() {
     return json::parse(R"({"schema":"engine.benchmark.scenario.v1","name":"integration",
-      "scene":{"file":"world.cvox"},"voxel_size":1,"frames":16,"warmup_frames":2,
+      "scene":{"file":"world.cvox","materials":"world.materials.json"},
+      "voxel_size":1,"frames":16,"warmup_frames":2,
       "step_seconds":0.016666666666666666,"memory_interval":4,
-      "render":{"width":256,"height":256,"mode":"base","fov":70,"bounces":3,"profile":"passes"},
+      "render":{"width":256,"height":256,"mode":"base","fov":70,"bounces":3,"profile":"passes",
+                "settings_file":"day.settings.json"},
       "camera":[{"frame":0,"position":[16,16,-32],"yaw":0,"pitch":0},
                 {"frame":15,"position":[18,16,-32],"yaw":0,"pitch":0}],
       "events":[
@@ -59,6 +61,16 @@ void assets(const std::filesystem::path& root) {
         model::build_model({32, 32, 32}, palette, {{{1, 1, 1}, 1}, {{2, 1, 1}, 2}}));
     engine::world::storage::save_cvox(root / "model.cvox",
                                       model::build_model({16, 16, 16}, palette, {{{0, 0, 0}, 2}}));
+    write(root / "world.materials.json",
+          R"({"schema":"engine.materials.v1","materials":[
+            {"id":2,"name":"green","color_base":[0.1,0.8,0.2],"color_layer":[0,0,0],
+             "base":"diffuse","layer":"none","roughness":0},
+            {"id":0,"name":"","color_base":[0,0,0],"color_layer":[0,0,0],
+             "base":"diffuse","layer":"none","roughness":0},
+            {"id":1,"name":"red","color_base":[0,0,1],"color_layer":[0,0,0],
+             "base":"diffuse","layer":"none","roughness":0}
+          ]})");
+    write(root / "day.settings.json", R"({"general":{"fov":60,"exposure":2}})");
     write(root / "case.json", json::serialize(scenario()));
 }
 void check_result(const std::filesystem::path& directory, std::set<std::uint64_t>& processes) {
@@ -72,6 +84,15 @@ void check_result(const std::filesystem::path& directory, std::set<std::uint64_t
             "Repeated instances duplicated their entity type");
     require(coverage.at("validated_probes").to_number<unsigned>() == 2, "Voxel probes not checked");
     require(report.at("validation_errors").to_number<unsigned>() == 0, "Vulkan validation errors");
+    const auto& workload = report.at("workload").as_object();
+    const auto& red = workload.at("world_palette").as_array().at(2).as_object();
+    require(red.at("name") == "red" &&
+                red.at("color_base").as_array() == json::array{0.0, 0.0, 1.0},
+            "External palette did not replace the source material");
+    const auto& settings = workload.at("settings").as_object().at("general").as_object();
+    require(settings.at("exposure").to_number<double>() == 2 &&
+                settings.at("fov").to_number<double>() == 70,
+            "External settings or explicit scenario override did not apply");
     processes.insert(report.at("process_id").to_number<std::uint64_t>());
     const auto memory = json::parse(read(directory / "memory.json")).as_array();
     require(memory.size() == 7, "Memory samples missing");
@@ -145,6 +166,7 @@ void path_accumulation(const std::filesystem::path& executable, const std::files
     value.erase("probes");
     auto& render = value["render"].as_object();
     render["mode"] = "path_tracer";
+    render.erase("settings_file");
     std::vector<std::string> images;
     for (const auto samples : {1, 16}) {
         const auto name = "path_samples_" + std::to_string(samples);
@@ -171,6 +193,19 @@ void run(const std::vector<std::string>& arguments) {
         process::text_path("case Юникод " + std::to_string(process::identity().process_id));
     require(std::filesystem::create_directories(root), "Scratch directory already exists");
     assets(root);
+    const auto input = process::path_text(root / "case.json");
+    require(process::run({executable, {"validate", "--scenario", input}}) == 0,
+            "Scenario with external inputs did not validate");
+    const auto invalid = root / "duplicate.materials.json";
+    write(invalid, R"({"schema":"engine.materials.v1","materials":[
+      {"id":0,"name":"","color_base":[0,0,0],"color_layer":[0,0,0],
+       "base":"diffuse","layer":"none","roughness":0},
+      {"id":0}, {"id":2}
+    ]})");
+    require(process::run({executable,
+                          {"validate", "--scenario", input, "--materials",
+                           process::path_text(invalid)}}) == 2,
+            "Duplicate local material ID was accepted");
     const auto output = root / "results";
     const auto command =
         process::Command{executable,

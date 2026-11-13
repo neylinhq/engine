@@ -39,9 +39,6 @@ void read_render(const json::object& object, settings::Render& render) {
     read_setting(object, "showSteps", render.show_steps);
     auto version = static_cast<int>(render.version);
     read_setting(object, "version", version);
-    if (version < 0 || version > 2) {
-        throw std::runtime_error("Unknown render version");
-    }
     render.version = static_cast<settings::RenderVersion>(version);
     if (const auto* group = object.if_contains("renderAlbedo")) {
         const auto& albedo = group->as_object();

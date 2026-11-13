@@ -2,6 +2,7 @@
 #include "scenario/json.hpp"
 #include <charconv>
 #include <engine/platform/process/process.hpp>
+#include <engine/world/storage/storage.hpp>
 #include <iostream>
 #include <set>
 #include <stdexcept>
@@ -21,6 +22,10 @@ void option(Options& options, const std::string& name, const std::string& value)
         options.scenario = text_path(value);
     } else if (name == "--scene") {
         options.scene = text_path(value);
+    } else if (name == "--materials") {
+        options.materials = text_path(value);
+    } else if (name == "--settings") {
+        options.settings = text_path(value);
     } else if (name == "--shaders") {
         options.shaders = text_path(value);
     } else if (name == "--output") {
@@ -43,11 +48,12 @@ std::set<std::string> allowed_options(std::string_view command) {
     if (command == "compare") {
         return {"--baseline", "--candidate", "--output"};
     }
+    std::set<std::string> allowed{"--scenario", "--scene", "--materials", "--settings",
+                                  "--shaders"};
     if (command == "validate") {
-        return {"--scenario", "--scene", "--shaders"};
+        return allowed;
     }
-    std::set<std::string> allowed{"--scenario", "--scene",  "--shaders",    "--output",
-                                  "--label",    "--hidden", "--validation", "--capture"};
+    allowed.insert({"--output", "--label", "--hidden", "--validation", "--capture"});
     if (command == "run") {
         allowed.insert("--repetitions");
     } else if (command == "measure") {
@@ -101,6 +107,9 @@ Options parse_options(const std::vector<std::string>& arguments) {
             if (++index == arguments.size()) {
                 throw std::invalid_argument("Missing option value: " + name);
             }
+            if (arguments[index].empty() && name != "--label") {
+                throw std::invalid_argument("Empty option value: " + name);
+            }
             option(options, name, arguments[index]);
         }
     }
@@ -114,8 +123,9 @@ void print_usage() {
                  "  benchmark measure --scenario case.json --output new-directory\n"
                  "  benchmark compare --baseline old-directory --candidate new-directory [--output "
                  "comparison.json]\n"
-                 "Run/measure options: --scene FILE --shaders DIR --label TEXT --hidden "
-                 "--validation --capture\n"
+                 "Scenario inputs: --scene FILE --materials FILE.materials.json "
+                 "--settings FILE.settings.json\n"
+                 "Run/measure options: --shaders DIR --label TEXT --hidden --validation --capture\n"
                  "Visible Vulkan surface, immediate presentation and no UI by default.\n"
                  "Validation and hidden surfaces are recorded explicitly. Existing results are "
                  "never overwritten.\n";
@@ -128,14 +138,21 @@ int dispatch(const Options& options) {
     if (options.command == "compare") {
         return compare(options);
     }
-    const auto scenario = load_scenario(options);
     if (options.command == "validate") {
+        const auto scenario = load_scenario(options);
+        if (!scenario.materials.empty()) {
+            static_cast<void>(world::storage::load_scene(scenario.scene, scenario.materials));
+        }
         std::cout << json::serialize(json::object{{"schema", "engine.benchmark.validation.v1"},
                                                   {"name", scenario.name},
                                                   {"valid", true}})
                   << '\n';
         return 0;
     }
-    return options.command == "run" ? repeat(options) : measure(options);
+    if (options.command == "run") {
+        static_cast<void>(load_scenario(options));
+        return repeat(options);
+    }
+    return measure(options);
 }
 } // namespace engine::app::benchmark

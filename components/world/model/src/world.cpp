@@ -307,6 +307,13 @@ void World::set_material(std::uint16_t index, Material material) {
     if (index == 0 || index >= materials().size()) {
         throw std::runtime_error("Invalid material index");
     }
+    if (material.name != materials()[index].name && !material.name.empty() &&
+        !material.name.starts_with('_')) {
+        const auto palette = materials();
+        if (std::ranges::find(palette, material.name, &Material::name) != palette.end()) {
+            throw std::invalid_argument("Duplicate material name: " + material.name);
+        }
+    }
     state_->packed_materials[index] = pack_material(material);
     state_->model.materials[index] = std::move(material);
     ++state_->revision;

@@ -2,6 +2,8 @@
 
 #include "codec/binary.hpp"
 
+#include <engine/platform/filesystem/filesystem.hpp>
+
 #include <cmath>
 #include <stdexcept>
 
@@ -72,7 +74,7 @@ void save_path(const std::filesystem::path& path, std::span<const PathNode> node
     for (const auto& node : nodes) {
         write_node(writer, node);
     }
-    write_file(path, writer.bytes());
+    platform::filesystem::write(path, writer.bytes());
 }
 
 } // namespace engine::world::storage

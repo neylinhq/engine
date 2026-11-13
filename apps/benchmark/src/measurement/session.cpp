@@ -7,7 +7,7 @@ namespace engine::app::benchmark {
 namespace {
 world::model::Model source_model(const Scenario& scenario) {
     if (!scenario.scene.empty()) {
-        return world::storage::load(scenario.scene);
+        return world::storage::load_scene(scenario.scene, scenario.materials);
     }
     std::vector<world::model::Material> materials{{},
                                                   {.name = "red", .color_base = {0.8, 0.2, 0.1}},
@@ -19,15 +19,20 @@ json::object file_identity(const std::filesystem::path& path) {
             {"sha256", platform::process::file_sha256(path)},
             {"bytes", std::filesystem::file_size(path)}};
 }
-void load_world(Session& session) {
-    const auto begin = Clock::now();
-    auto source = source_model(session.scenario);
-    session.results.scene_load_ms = elapsed(begin);
+void generate_world(Session& session, world::model::Model source) {
     auto identity = model_identity(source);
     if (!session.scenario.scene.empty()) {
         identity["file"] = file_identity(session.scenario.scene);
     }
-    session.results.assets["scene"] = std::move(identity);
+    auto& assets = session.results.assets;
+    assets["scene"] = std::move(identity);
+    if (!session.scenario.materials.empty()) {
+        assets["materials"] = {{"path", platform::process::path_text(session.scenario.materials)}};
+    }
+    if (!session.scenario.settings_file.empty()) {
+        assets["settings"] = {
+            {"path", platform::process::path_text(session.scenario.settings_file)}};
+    }
     const auto generation = Clock::now();
     auto mapped = session.world.prepare_generation(std::move(source));
     take(session.renderer->generate_world(session.world, mapped, mapped.size, 4));
@@ -88,6 +93,8 @@ void validate_materials(const Session& session) {
 void initialize(Session& session) {
     const auto begin = Clock::now();
     const auto& scenario = session.scenario;
+    auto source = source_model(scenario);
+    session.results.scene_load_ms = elapsed(begin);
     session.results.frames.resize(scenario.frames);
     session.results.events.reserve(scenario.events.size());
     session.results.memory.reserve(scenario.frames / scenario.memory_interval + 4);
@@ -110,7 +117,7 @@ void initialize(Session& session) {
                                  std::to_string(status.width) + "x" +
                                  std::to_string(status.height));
     }
-    load_world(session);
+    generate_world(session, std::move(source));
     load_models(session);
     prepare_entities(session);
     validate_materials(session);

@@ -121,6 +121,29 @@ void test_materials(World& world) {
             "Material property edit revision is incorrect");
 }
 
+void test_material_rename() {
+    using engine::world::model::Material;
+    World world;
+    const auto first = world.add_material(Material{.name = "red", .color_base = {1, 0, 0}});
+    const auto second = world.add_material(Material{.name = "green", .color_base = {0, 1, 0}});
+    const auto revision = world.view().material_revision;
+    auto renamed = world.materials()[second];
+    renamed.name = world.materials()[first].name;
+    bool rejected = false;
+    try {
+        world.set_material(second, renamed);
+    } catch (const std::invalid_argument&) {
+        rejected = true;
+    }
+    require(rejected && world.materials()[second].name == "green" &&
+                world.view().material_revision == revision,
+            "Duplicate material rename modified the registry");
+    renamed.name = "leaf";
+    world.set_material(second, renamed);
+    require(world.materials()[second].name == "leaf",
+            "Renaming a material to an available name failed");
+}
+
 void test_generation() {
     auto small = engine::world::model::build_model({2, 2, 2}, {{}, {}}, {{{1, 1, 1}, 1}});
     World world;
@@ -291,6 +314,7 @@ int main() {
         test_edits(world);
         test_entities(world);
         test_materials(world);
+        test_material_rename();
         test_generation();
         test_library_persistence();
         test_dynamic_bounds();

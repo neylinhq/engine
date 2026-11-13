@@ -1,61 +1,13 @@
 #include "binary.hpp"
 
 #include <algorithm>
-#include <atomic>
 #include <bit>
 #include <cctype>
-#include <chrono>
-#include <fstream>
-#include <limits>
+#include <engine/platform/filesystem/filesystem.hpp>
 #include <stdexcept>
 
 namespace engine::world::storage {
 namespace {
-
-std::filesystem::path sibling_temporary(const std::filesystem::path& path) {
-    static std::atomic<std::uint64_t> sequence = 0;
-    const auto clock = std::chrono::steady_clock::now().time_since_epoch().count();
-    for (unsigned attempt = 0; attempt < 100; ++attempt) {
-        auto candidate = path;
-        candidate += ".engine-" + std::to_string(clock) + "-" +
-                     std::to_string(sequence.fetch_add(1)) + ".tmp";
-        if (!std::filesystem::exists(candidate)) {
-            return candidate;
-        }
-    }
-    throw std::runtime_error("Cannot reserve temporary output path");
-}
-
-void replace_existing(const std::filesystem::path& temporary, const std::filesystem::path& path) {
-    if (!std::filesystem::is_regular_file(path)) {
-        throw std::runtime_error("Cannot replace output: " + path_text(path));
-    }
-    const auto backup = sibling_temporary(path);
-    std::filesystem::rename(path, backup);
-    std::error_code error;
-    std::filesystem::rename(temporary, path, error);
-    if (error) {
-        std::error_code restore_error;
-        std::filesystem::rename(backup, path, restore_error);
-        if (restore_error) {
-            throw std::runtime_error("Previous file preserved at: " + path_text(backup));
-        }
-        throw std::filesystem::filesystem_error("Cannot replace output", temporary, path, error);
-    }
-    std::filesystem::remove(backup, error);
-}
-
-void commit_file(const std::filesystem::path& temporary, const std::filesystem::path& path) {
-    std::error_code error;
-    std::filesystem::rename(temporary, path, error);
-    if (!error) {
-        return;
-    }
-    if (error != std::errc::file_exists && error != std::errc::permission_denied) {
-        throw std::filesystem::filesystem_error("Cannot commit output", temporary, path, error);
-    }
-    replace_existing(temporary, path);
-}
 
 std::size_t non_ascii_sequence(std::string_view value, std::size_t start) {
     const auto first = static_cast<unsigned char>(value[start]);
@@ -145,7 +97,7 @@ std::string Reader::terminated() {
         if (character == 0) {
             return result;
         }
-        if (result.size() > 1048576) {
+        if (result.size() > kMaxTerminatedStringBytes) {
             throw std::runtime_error("Unbounded binary string");
         }
         if (character >= 128) {
@@ -218,38 +170,8 @@ const std::vector<std::byte>& Writer::bytes() const {
 }
 
 std::vector<std::byte> read_file(const std::filesystem::path& path) {
-    std::ifstream stream(path, std::ios::binary | std::ios::ate);
-    if (!stream) {
-        throw std::runtime_error("Cannot open file: " + path_text(path));
-    }
-    const auto size = stream.tellg();
-    if (size < 0 || static_cast<std::uint64_t>(size) > 8ULL * 1024 * 1024 * 1024) {
-        throw std::runtime_error("File exceeds supported 8 GiB input bound");
-    }
-    std::vector<std::byte> result(static_cast<std::size_t>(size));
-    stream.seekg(0);
-    if (!stream.read(reinterpret_cast<char*>(result.data()), size)) {
-        throw std::runtime_error("Could not read file completely");
-    }
-    return result;
-}
-
-void write_file(const std::filesystem::path& path, std::span<const std::byte> bytes) {
-    const auto temporary = sibling_temporary(path);
-    try {
-        std::ofstream stream(temporary, std::ios::binary | std::ios::trunc);
-        stream.write(reinterpret_cast<const char*>(bytes.data()),
-                     static_cast<std::streamsize>(bytes.size()));
-        stream.close();
-        if (!stream) {
-            throw std::runtime_error("Could not write file: " + path_text(path));
-        }
-        commit_file(temporary, path);
-    } catch (...) {
-        std::error_code ignored;
-        std::filesystem::remove(temporary, ignored);
-        throw;
-    }
+    constexpr std::size_t kMaxAssetBytes = 8ULL * 1024 * 1024 * 1024;
+    return platform::filesystem::read(path, kMaxAssetBytes);
 }
 
 std::filesystem::path utf8_path(std::string_view text) {

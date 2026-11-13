@@ -1,8 +1,13 @@
 #include <engine/rendering/configuration/configuration.hpp>
 #include "settings.hpp"
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <stdexcept>
+#include <utility>
 namespace engine::rendering::configuration {
-void validate_settings(settings::Settings& settings) {
+namespace {
+void clamp_settings(settings::Settings& settings) {
     auto& general = settings.general;
     general.exposure = std::clamp(general.exposure, 0.1F, 10.0F);
     general.tone_mapping = std::clamp(general.tone_mapping, 0.1F, 10.0F);
@@ -24,7 +29,35 @@ void validate_settings(settings::Settings& settings) {
     path.max_samples = std::clamp(path.max_samples, 1, 8192);
 }
 
-namespace {
+void validate_settings(const settings::Settings& settings) {
+    const auto& base_settings = settings.render.base;
+    const std::array scalars{settings.general.exposure,
+                             settings.general.tone_mapping,
+                             settings.general.fov,
+                             base_settings.spatial_resample_size,
+                             base_settings.denoise_threshold,
+                             base_settings.radius_lit_factor,
+                             base_settings.noise_suppression_factor};
+    if (!std::ranges::all_of(scalars, [](float value) { return std::isfinite(value); })) {
+        throw std::runtime_error("Render settings must be finite");
+    }
+    using settings::RenderVersion;
+    const auto version = settings.render.version;
+    if (version != RenderVersion::albedo && version != RenderVersion::base &&
+        version != RenderVersion::path_tracer) {
+        throw std::runtime_error("Unknown render version");
+    }
+    validate_atmosphere(settings.atmosphere);
+}
+json::object encode_settings(const settings::Settings& settings) {
+    json::object general{{"exposure", settings.general.exposure},
+                         {"toneMappingFac", settings.general.tone_mapping},
+                         {"fov", settings.general.fov},
+                         {"lockTo60fps", settings.general.lock_to_60}};
+    return {{"general", std::move(general)},
+            {"render", write_render(settings.render)},
+            {"atmosphere", write_atmosphere(settings.atmosphere)}};
+}
 void known_keys(const json::object& input, const json::object& known) {
     for (const auto& member : input) {
         const auto* reference = known.if_contains(member.key());
@@ -37,12 +70,21 @@ void known_keys(const json::object& input, const json::object& known) {
     }
 }
 } // namespace
+settings::Settings checked_settings(const settings::Settings& settings, bool strict) {
+    validate_settings(settings);
+    auto clamped = settings;
+    clamp_settings(clamped);
+    if (strict && clamped != settings) {
+        throw std::runtime_error("Settings outside supported bounds");
+    }
+    return clamped;
+}
 settings::Settings parse(std::string_view text, bool strict) {
     const auto value = json::parse(text);
     const auto& root = value.as_object();
     settings::Settings result;
     if (strict) {
-        known_keys(root, json::parse(serialize(result)).as_object());
+        known_keys(root, encode_settings(result));
     }
     if (const auto* group = root.if_contains("general")) {
         const auto& general = group->as_object();
@@ -57,20 +99,9 @@ settings::Settings parse(std::string_view text, bool strict) {
     if (const auto* group = root.if_contains("atmosphere")) {
         read_atmosphere(group->as_object(), result.atmosphere);
     }
-    auto checked = result;
-    validate_settings(checked);
-    if (strict && checked != result) {
-        throw std::runtime_error("Settings outside supported bounds");
-    }
-    return checked;
+    return checked_settings(result, strict);
 }
 std::string serialize(const settings::Settings& settings) {
-    json::object general{{"exposure", settings.general.exposure},
-                         {"toneMappingFac", settings.general.tone_mapping},
-                         {"fov", settings.general.fov},
-                         {"lockTo60fps", settings.general.lock_to_60}};
-    return json::serialize(json::object{{"general", std::move(general)},
-                                        {"render", write_render(settings.render)},
-                                        {"atmosphere", write_atmosphere(settings.atmosphere)}});
+    return json::serialize(encode_settings(settings));
 }
 } // namespace engine::rendering::configuration
