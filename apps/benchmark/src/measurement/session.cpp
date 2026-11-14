@@ -3,24 +3,42 @@
 #include <algorithm>
 #include <engine/world/storage/storage.hpp>
 #include <iostream>
+#include <span>
+#include <string_view>
 namespace engine::app::benchmark {
 namespace {
-world::model::Model source_model(const Scenario& scenario) {
+world::storage::SceneSource source_model(const Scenario& scenario) {
     if (!scenario.scene.empty()) {
         return world::storage::load_scene(scenario.scene, scenario.materials);
     }
     std::vector<world::model::Material> materials{{},
                                                   {.name = "red", .color_base = {0.8, 0.2, 0.1}},
                                                   {.name = "green", .color_base = {0.1, 0.8, 0.2}}};
-    return world::model::build_model(scenario.empty_size, std::move(materials), {});
+    return {world::model::build_model(scenario.empty_size, std::move(materials), {}), {}};
 }
 json::object file_identity(const std::filesystem::path& path) {
     return {{"path", platform::process::path_text(path)},
             {"sha256", platform::process::file_sha256(path)},
             {"bytes", std::filesystem::file_size(path)}};
 }
-void generate_world(Session& session, world::model::Model source) {
-    auto identity = model_identity(source);
+// Scenario IDs follow first registration, with separate entries for anonymous materials.
+std::vector<std::string_view> material_keys(std::span<world::model::Material> materials,
+                                            std::size_t& anonymous_id) {
+    std::vector<std::string_view> keys;
+    keys.reserve(materials.size());
+    for (auto& material : materials) {
+        if (material.name.empty() || material.name.starts_with('_')) {
+            material.name = "_" + std::to_string(anonymous_id++);
+            keys.emplace_back();
+        } else {
+            keys.emplace_back(material.name);
+        }
+    }
+    return keys;
+}
+void generate_world(Session& session, world::storage::SceneSource source,
+                    std::size_t& anonymous_id) {
+    auto identity = model_identity(source.model, source.palette);
     if (!session.scenario.scene.empty()) {
         identity["file"] = file_identity(session.scenario.scene);
     }
@@ -34,11 +52,14 @@ void generate_world(Session& session, world::model::Model source) {
             {"path", platform::process::path_text(session.scenario.settings_file)}};
     }
     const auto generation = Clock::now();
-    auto mapped = session.world.prepare_generation(std::move(source));
+    auto materials =
+        source.palette.empty() ? std::span(source.model.materials) : std::span(source.palette);
+    const auto keys = material_keys(materials, anonymous_id);
+    auto mapped = session.world.prepare_generation(std::move(source.model), {source.palette, keys});
     take(session.renderer->generate_world(session.world, mapped, mapped.size, 4));
     session.results.generation_ms = elapsed(generation);
 }
-void load_models(Session& session) {
+void load_models(Session& session, std::size_t& anonymous_id) {
     json::array models;
     for (const auto& event : session.scenario.events) {
         if (event.model.empty() || session.models.contains(event.model)) {
@@ -47,7 +68,8 @@ void load_models(Session& session) {
         auto source = world::storage::load(event.model);
         auto identity = model_identity(source);
         identity["file"] = file_identity(event.model);
-        const auto index = session.world.add_model(std::move(source));
+        const auto keys = material_keys(source.materials, anonymous_id);
+        const auto index = session.world.add_model(std::move(source), {{}, keys});
         session.models.emplace(event.model, index);
         identity["index"] = index;
         models.push_back(std::move(identity));
@@ -76,7 +98,7 @@ void validate_materials(const Session& session) {
         const bool brush = event.operation == Operation::brush && !event.brush.erase;
         const bool fill = event.operation == Operation::fill;
         const auto material = brush ? event.brush.material : event.material;
-        if ((brush || fill) && material >= session.world.materials().size()) {
+        if ((brush || fill) && !session.world.has_material(material)) {
             throw std::invalid_argument("Event material is outside the loaded world palette");
         }
     }
@@ -84,7 +106,7 @@ void validate_materials(const Session& session) {
     for (const auto& probe : session.scenario.probes) {
         if (probe.voxel.x < 0 || probe.voxel.y < 0 || probe.voxel.z < 0 ||
             probe.voxel.x >= size.x || probe.voxel.y >= size.y || probe.voxel.z >= size.z ||
-            probe.material >= session.world.materials().size()) {
+            !session.world.has_material(probe.material)) {
             throw std::invalid_argument("Probe position or material is outside the loaded world");
         }
     }
@@ -117,8 +139,9 @@ void initialize(Session& session) {
                                  std::to_string(status.width) + "x" +
                                  std::to_string(status.height));
     }
-    generate_world(session, std::move(source));
-    load_models(session);
+    std::size_t anonymous_id = 0;
+    generate_world(session, std::move(source), anonymous_id);
+    load_models(session, anonymous_id);
     prepare_entities(session);
     validate_materials(session);
     camera(session);
@@ -138,7 +161,7 @@ void verify_probes(const Session& session) {
     }
 }
 int measure(const Options& options) {
-    const auto scenario = load_scenario(options);
+    auto scenario = load_scenario(options);
     if (!options.output.parent_path().empty()) {
         std::filesystem::create_directories(options.output.parent_path());
     }
@@ -148,7 +171,7 @@ int measure(const Options& options) {
     try {
         Session session;
         session.options = options;
-        session.scenario = scenario;
+        session.scenario = std::move(scenario);
         initialize(session);
         execute(session);
         verify_probes(session);

@@ -70,6 +70,9 @@ void bounds4(std::span<std::uint32_t, 64> cells, unsigned state_shift);
 void chunk_bounds(std::span<std::uint32_t> chunks, Vec3i size);
 void invalidate_bounds(ChunkBounds bounds, std::span<const std::size_t> changed, BoundWork& work);
 [[nodiscard]] bool advance_bounds(ChunkBounds bounds, BoundWork& work, std::size_t budget);
+void remap_materials(Model& model, std::span<const std::uint16_t> mapping);
+[[nodiscard]] Model snapshot_model(const Model& model, Vec3i size,
+                                   std::vector<std::uint16_t>* material_ids);
 void model_bounds(Model& model);
 [[nodiscard]] Model generate_model(Model source, Vec3i actual_size, Vec3i padded_size);
 [[nodiscard]] std::vector<std::uint32_t> entity_voxels(const Model& model);

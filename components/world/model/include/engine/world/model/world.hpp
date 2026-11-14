@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <span>
+#include <string_view>
 
 namespace engine::world::model {
 
@@ -40,6 +41,15 @@ struct PlacementGuard {
     const void* context = nullptr;
 };
 
+struct MaterialPalette {
+    // Optional properties in local ID order. Empty uses the model's properties.
+    std::span<const Material> values{};
+    // Explicit keys register every local entry, including zero. An empty key allocates its own ID.
+    // Repeated nonempty keys share the ID and properties of the first entry in the source.
+    // With no keys, unique embedded names are used and unused entry zero is skipped.
+    std::span<const std::string_view> keys{};
+};
+
 class World {
   public:
     explicit World(unsigned worker_count = 1);
@@ -49,11 +59,18 @@ class World {
     World(const World&) = delete;
     World& operator=(const World&) = delete;
 
+    // Replace the scene on the CPU using the same material layout as GPU generation.
     void replace(Model model, Vec3i requested_size = {}, int segment_groups = 4);
-    [[nodiscard]] Model prepare_generation(Model source);
+    // Prepare a scene without changing the active world. An override uses local palette order.
+    // For a local source, material_ids receives the runtime ID of each local entry.
+    // Adopt the result into this world before changing its materials.
+    [[nodiscard]] Model
+    prepare_generation(Model source, MaterialPalette palette = {},
+                       std::vector<std::uint16_t>* material_ids = nullptr) const;
     void adopt_generated(GeneratedWorld generated);
     void acknowledge_changes();
-    [[nodiscard]] Model snapshot() const;
+    // If requested, return the runtime ID for each compacted palette slot. Slot zero is reserved.
+    [[nodiscard]] Model snapshot(std::vector<std::uint16_t>* material_ids = nullptr) const;
     [[nodiscard]] WorldView view() const;
     [[nodiscard]] Vec3i size() const;
     [[nodiscard]] Vec3i actual_size() const;
@@ -76,10 +93,20 @@ class World {
     void rebuild_bounds();
     void update_bounds(std::size_t cell_budget = 32768);
     [[nodiscard]] std::span<const Material> materials() const;
+    [[nodiscard]] bool has_material(std::uint16_t id) const;
     [[nodiscard]] std::uint16_t add_material(Material material);
+    // Edit properties. Changing the name also changes the binding of this runtime ID.
     void set_material(std::uint16_t index, Material material);
+    // Apply updates to the listed material IDs in the active scene.
+    // IDs must be distinct and nonzero. Updates keep the source binding keys.
+    // Returns whether the effective palette changed. An invalid batch leaves the scene intact.
+    [[nodiscard]] bool set_scene_materials(std::span<const MaterialUpdate> updates);
+    // Read the active properties and display names in file ID order.
+    [[nodiscard]] std::vector<Material>
+    scene_palette(std::span<const std::uint16_t> material_ids) const;
     [[nodiscard]] std::span<const Model> models() const;
-    [[nodiscard]] std::size_t add_model(Model model);
+    // Register a model with its local materials and keep its assigned IDs across scene changes.
+    [[nodiscard]] std::size_t add_model(Model model, MaterialPalette palette = {});
     [[nodiscard]] std::span<const EntityType> entity_types() const;
     [[nodiscard]] std::span<const EntityInstance> entities() const;
     [[nodiscard]] std::size_t create_entity_type(std::size_t model_index);

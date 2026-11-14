@@ -22,6 +22,8 @@ enum class Operation {
     import_mesh,
     import_model,
     save_settings,
+    load_materials,
+    save_materials,
     restart_render,
     load_path,
     save_path,

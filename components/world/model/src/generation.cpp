@@ -59,6 +59,7 @@ Model generate_model(Model source, Vec3i actual_size, Vec3i padded_size) {
     Model result;
     result.name = source.name;
     result.material_context = source.material_context;
+    result.material_layout = std::move(source.material_layout);
     result.size = padded_size;
     result.materials = std::move(source.materials);
     result.voxels = std::move(source.voxels);

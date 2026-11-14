@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -29,6 +30,26 @@ struct Material {
     MaterialBase base = MaterialBase::diffuse;
     MaterialLayer layer = MaterialLayer::none;
     float roughness = 0;
+    bool operator==(const Material&) const = default;
+};
+
+struct MaterialUpdate {
+    std::uint16_t id = 0;
+    Material material;
+};
+
+enum class MaterialScope : std::uint8_t { vacant, persistent, scene, shared };
+
+struct MaterialSlot {
+    MaterialScope scope = MaterialScope::vacant;
+    // The source name used to bind imported assets. Palette edits only change the display name.
+    std::string key;
+    bool operator==(const MaterialSlot&) const = default;
+};
+
+struct MaterialLayout {
+    std::uint64_t base_revision = 0;
+    std::vector<MaterialSlot> slots;
 };
 
 struct Model {
@@ -40,6 +61,8 @@ struct Model {
     std::vector<std::uint32_t> voxels;
     // Zero means local file palette; nonzero identities are runtime-only.
     std::uint64_t material_context = 0;
+    // Present for prepared and active scenes, absent for files and registered library models.
+    std::optional<MaterialLayout> material_layout;
 };
 
 // The original generator reads this mirror before GPU AADF construction.

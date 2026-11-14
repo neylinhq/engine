@@ -31,12 +31,9 @@ void initialize_gpu_pool(const GeneratedWorld& generated, BlockPool& pool) {
     }
 }
 
-void validate_generated(const GeneratedWorld& generated, std::uint64_t context) {
+void validate_generated(const GeneratedWorld& generated) {
     validate(generated.model);
     static_cast<void>(chunk_size(generated.actual_size));
-    if (generated.model.material_context != context) {
-        throw std::runtime_error("Generated world belongs to another material registry");
-    }
     const auto size = generated.model.size;
     if (generated.actual_size.x > size.x || generated.actual_size.y > size.y ||
         generated.actual_size.z > size.z || generated.logical_voxels < 64 ||
@@ -57,25 +54,14 @@ void unique_indices(std::vector<std::uint32_t>& indices) {
 }
 
 void World::adopt_generated(GeneratedWorld generated) {
-    validate_generated(generated, state_->material_context);
+    validate_generated(generated);
+    state_->validate_prepared(generated.model);
     auto next = std::make_unique<State>();
-    next->material_context = state_->material_context;
-    next->next_anonymous_id = state_->next_anonymous_id;
     next->actual_size = generated.actual_size;
     next->compression_factor = generated.compression;
     next->gpu_authoritative = true;
     initialize_gpu_pool(generated, next->pool);
-    next->model = std::move(generated.model);
-    for (const auto& material : next->model.materials) {
-        next->packed_materials.push_back(pack_material(material));
-    }
-    next->entity_gpu.chunks.resize(next->model.chunks.size());
-    next->revision = state_->revision + 1;
-    next->chunk_revision = state_->chunk_revision + 1;
-    next->geometry_revision = state_->geometry_revision + 1;
-    next->material_revision = state_->material_revision + 1;
-    next->entity_gpu.revision = state_->entity_gpu.revision + 1;
-    next->entity_gpu.voxel_revision = state_->entity_gpu.voxel_revision + 1;
+    next->adopt_scene(std::move(generated.model), *state_);
     next->models = std::move(state_->models);
     state_ = std::move(next);
 }

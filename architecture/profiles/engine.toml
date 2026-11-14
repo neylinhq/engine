@@ -152,6 +152,14 @@ match = { path_pattern = 'apps/benchmark/(resources/scenarios|schemas)/.*' }
 handler_pattern = 'benchmark'
 
 [[registrations]]
+id = "sandbox_test_cvox"
+kind = "file_format"
+purpose = "CVox fixtures for Sandbox integration tests"
+extension = ".cvox"
+match = { path_pattern = 'apps/sandbox/tests/fixtures/.*' }
+handler_pattern = 'sandbox(_palette_reopen_test)?'
+
+[[registrations]]
 id = "import_bmp"
 kind = "file_format"
 purpose = "World import fixtures and reference image data"

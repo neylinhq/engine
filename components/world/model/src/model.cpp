@@ -75,11 +75,16 @@ std::uint16_t voxel_at(const Model& model, Vec3i position) {
 
 namespace {
 
-void validate_node(std::uint32_t word, std::size_t count, std::size_t width,
-                   std::size_t materials) {
+bool valid_material(const Model& model, std::uint32_t id) {
+    return id < model.materials.size() &&
+           (!model.material_layout ||
+            model.material_layout->slots[id].scope != MaterialScope::vacant);
+}
+
+void validate_node(std::uint32_t word, std::size_t count, std::size_t width, const Model& model) {
     const auto state = word >> 30;
     const auto payload = word & 0x3FFFFFFFU;
-    if (state == 3 || (state == 1 && payload >= materials)) {
+    if (state == 3 || (state == 1 && !valid_material(model, payload))) {
         throw std::runtime_error("Invalid NAADF node state or material");
     }
     if (state == 2 && (payload > count || width > count - payload)) {
@@ -106,16 +111,23 @@ void validate(const Model& model) {
     if (model.materials.empty() || model.materials.size() > 32768) {
         throw std::runtime_error("Material palette must contain 1..32768 entries");
     }
+    if (model.material_layout) {
+        const auto& slots = model.material_layout->slots;
+        if (model.material_context == 0 || slots.size() != model.materials.size() ||
+            slots[0].scope != MaterialScope::persistent) {
+            throw std::runtime_error("Invalid material slot table");
+        }
+    }
     for (auto word : model.chunks) {
-        validate_node(word, model.blocks.size(), 64, model.materials.size());
+        validate_node(word, model.blocks.size(), 64, model);
     }
     for (auto word : model.blocks) {
-        validate_node(word, model.voxels.size(), 32, model.materials.size());
+        validate_node(word, model.voxels.size(), 32, model);
     }
     for (auto word : model.voxels) {
         for (unsigned shift : {0U, 16U}) {
             const auto voxel = (word >> shift) & 0xFFFFU;
-            if ((voxel & 0x8000U) != 0 && (voxel & 0x7FFFU) >= model.materials.size()) {
+            if ((voxel & 0x8000U) != 0 && !valid_material(model, voxel & 0x7FFFU)) {
                 throw std::runtime_error("Voxel material is outside palette");
             }
         }

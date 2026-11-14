@@ -2,6 +2,7 @@
 #include "state.hpp"
 #include <algorithm>
 #include <cstdio>
+#include <string_view>
 #include <system_error>
 namespace engine::gui::frontend {
 namespace {
@@ -11,7 +12,29 @@ void set_path(FileDialog& dialog, const std::filesystem::path& path) {
 }
 bool writing(Operation operation) {
     return operation == Operation::save_world || operation == Operation::save_path ||
-           operation == Operation::save_settings;
+           operation == Operation::save_settings || operation == Operation::save_materials;
+}
+std::string_view default_suffix(Operation operation) {
+    switch (operation) {
+    case Operation::save_world:
+        return ".cvox";
+    case Operation::save_settings:
+        return ".settings.json";
+    case Operation::save_materials:
+        return ".materials.json";
+    default:
+        return {};
+    }
+}
+const char* default_name(Operation operation) {
+    switch (operation) {
+    case Operation::save_settings:
+        return "engine.settings.json";
+    case Operation::save_materials:
+        return "world.materials.json";
+    default:
+        return writing(operation) ? "world.cvox" : "";
+    }
 }
 const char* file_description(Operation operation) {
     switch (operation) {
@@ -23,6 +46,9 @@ const char* file_description(Operation operation) {
         return "Triangle mesh (*.obj, *.stl)";
     case Operation::save_settings:
         return "Engine settings (*.settings.json)";
+    case Operation::load_materials:
+    case Operation::save_materials:
+        return "Material palette (*.materials.json)";
     case Operation::load_path:
     case Operation::save_path:
         return "NAADF camera path (*.pnb)";
@@ -104,12 +130,9 @@ void submit(UiState& state) {
         dialog.directory = path;
         return;
     }
-    if (!path.empty() && path.extension().empty()) {
-        if (*dialog.operation == Operation::save_world) {
-            path += ".cvox";
-        } else if (*dialog.operation == Operation::save_settings) {
-            path += ".settings.json";
-        }
+    const auto suffix = default_suffix(*dialog.operation);
+    if (!suffix.empty() && !path.empty() && path.extension().empty()) {
+        path += suffix;
     }
     const auto readable = std::filesystem::is_regular_file(path, error);
     if (path.empty() || (!writing(*dialog.operation) && !readable)) {
@@ -192,11 +215,7 @@ void open_file(UiState& state, Operation operation) {
     if (dialog.directory.empty()) {
         dialog.directory = std::filesystem::current_path();
     }
-    if (operation == Operation::save_settings) {
-        set_path(dialog, dialog.directory / "engine.settings.json");
-    } else {
-        set_path(dialog, dialog.directory / (writing(operation) ? "world.cvox" : ""));
-    }
+    set_path(dialog, dialog.directory / default_name(operation));
 }
 void draw_files(UiState& state) {
     auto& dialog = state.file;

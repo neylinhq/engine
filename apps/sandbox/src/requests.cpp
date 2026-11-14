@@ -7,9 +7,9 @@ namespace {
 void replace_world(Application& app, const gui::frontend::Request& request,
                    world::model::Model model) {
     const auto fixed = request.operation == gui::frontend::Operation::open_fixed;
-    generate_world(app, std::move(model), fixed ? request.requested_size : world::model::Vec3i{},
+    const auto requested = fixed ? request.requested_size : world::model::Vec3i{};
+    generate_world(app, {.world = request.path}, std::move(model), requested,
                    request.segment_groups);
-    app.scene_source = {request.path, {}};
     app.ui->reset_world();
     reframe_camera(app);
     app.metrics.status = "Loaded " + path_to_utf8(request.path);
@@ -27,12 +27,22 @@ void begin_import(Application& app, const gui::frontend::Request& request) {
     app.importing = PendingImport{request, std::move(task)};
     app.metrics.status = "Loading " + path_to_utf8(request.path);
 }
+void save_world(Application& app, const std::filesystem::path& path) {
+    SceneSource saved{.world = path, .reserved_material = app.scene_source.reserved_material};
+    auto snapshot = app.world.snapshot(&saved.material_ids);
+    snapshot.materials[0] = saved.reserved_material;
+    // The file's zero entry cannot supply a name binding or a solid material.
+    snapshot.materials[0].name.clear();
+    world::storage::save_cvox(path, snapshot);
+    app.scene_source = std::move(saved);
+    app.metrics.status = "Saved " + path_to_utf8(path);
+}
+
 void handle_request(Application& app, const gui::frontend::Request& request) {
     using gui::frontend::Operation;
     switch (request.operation) {
     case Operation::save_world:
-        world::storage::save_cvox(request.path, app.world.snapshot());
-        app.metrics.status = "Saved " + path_to_utf8(request.path);
+        save_world(app, request.path);
         break;
     case Operation::import_model:
         begin_import(app, request);
@@ -40,6 +50,14 @@ void handle_request(Application& app, const gui::frontend::Request& request) {
     case Operation::save_settings:
         save_settings(app, request.path);
         app.metrics.status = "Saved settings " + path_to_utf8(request.path);
+        break;
+    case Operation::load_materials:
+        load_materials(app, request.path);
+        app.metrics.status = "Loaded materials " + path_to_utf8(request.path);
+        break;
+    case Operation::save_materials:
+        save_materials(app, request.path);
+        app.metrics.status = "Saved materials " + path_to_utf8(request.path);
         break;
     case Operation::restart_render:
         app.renderer->restart();
@@ -63,16 +81,24 @@ void handle_request(Application& app, const gui::frontend::Request& request) {
     }
 }
 } // namespace
-void generate_world(Application& app, world::model::Model source, world::model::Vec3i requested,
-                    int segment_groups) {
-    auto mapped = app.world.prepare_generation(std::move(source));
-    if (requested == world::model::Vec3i{}) {
-        requested = mapped.size;
+void generate_world(Application& app, SceneSource scene, world::model::Model source,
+                    world::model::Vec3i requested, int segment_groups,
+                    std::span<const world::model::Material> palette) {
+    auto first = palette.empty() ? source.materials.at(0) : palette.front();
+    auto prepared = app.world.prepare_generation(std::move(source), {palette}, &scene.material_ids);
+    if (scene.material_ids.front() == 0) {
+        scene.reserved_material = std::move(first);
     }
-    const auto result = app.renderer->generate_world(app.world, mapped, requested, segment_groups);
+    if (requested == world::model::Vec3i{}) {
+        requested = prepared.size;
+    }
+    const auto result =
+        app.renderer->generate_world(app.world, prepared, requested, segment_groups);
     if (!result) {
         throw std::runtime_error(result.error());
     }
+    app.renderer->reset_accumulation();
+    app.scene_source = std::move(scene);
 }
 void poll_import(Application& app) {
     if (!app.importing ||

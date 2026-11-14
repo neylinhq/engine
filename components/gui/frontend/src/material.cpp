@@ -1,6 +1,7 @@
 #include "state.hpp"
 #include <cstdio>
 #include <exception>
+#include <string>
 namespace engine::gui::frontend {
 namespace {
 void material_list(UiState& state, Context& context) {
@@ -9,8 +10,14 @@ void material_list(UiState& state, Context& context) {
     }
     const auto materials = context.world.materials();
     for (std::size_t index = 1; index < materials.size(); ++index) {
+        if (!context.world.has_material(static_cast<std::uint16_t>(index))) {
+            continue;
+        }
         ImGui::PushID(static_cast<int>(index));
-        if (ImGui::Selectable(materials[index].name.c_str(), state.editing.material == index)) {
+        const auto& name = materials[index].name;
+        const auto label =
+            name.empty() || name.starts_with('_') ? "Material " + std::to_string(index) : name;
+        if (ImGui::Selectable(label.c_str(), state.editing.material == index)) {
             state.editing.material = static_cast<std::uint16_t>(index);
         }
         if (state.editing.focus_material && state.editing.material == index) {
@@ -74,7 +81,7 @@ bool base_selector(world::model::Material& material) {
 }
 void material_fields(UiState& state, Context& context) {
     const auto index = state.editing.material;
-    if (index >= context.world.materials().size() || index == 0) {
+    if (index == 0 || !context.world.has_material(index)) {
         return;
     }
     auto material = context.world.materials()[index];
@@ -82,7 +89,9 @@ void material_fields(UiState& state, Context& context) {
     std::snprintf(name.data(), name.size(), "%s", material.name.c_str());
     auto changed =
         ImGui::InputText("name", name.data(), name.size(), ImGuiInputTextFlags_EnterReturnsTrue);
-    material.name = name.data();
+    if (changed) {
+        material.name = name.data();
+    }
     changed |= base_selector(material);
     changed |= optical_fields(material);
     if (changed) {
@@ -95,6 +104,13 @@ void material_fields(UiState& state, Context& context) {
 }
 } // namespace
 void draw_material(UiState& state, Context& context) {
+    if (ImGui::Button("Load Materials")) {
+        open_file(state, Operation::load_materials);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Save Materials As")) {
+        open_file(state, Operation::save_materials);
+    }
     if (ImGui::Button("Create new type")) {
         world::model::Material material;
         try {

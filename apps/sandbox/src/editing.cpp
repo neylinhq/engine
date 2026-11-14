@@ -91,7 +91,7 @@ void update_editing(Application& app, const interaction::input::Actions& actions
     if (editing.tool == world::editing::Tool::none || (!hit.hit && !editing.place_camera)) {
         return;
     }
-    if (editing.material >= app.world.materials().size() && !editing.erase &&
+    if (!app.world.has_material(editing.material) && !editing.erase &&
         editing.tool != world::editing::Tool::model) {
         app.metrics.status = "Select a material in World > Editing before applying this tool.";
         return;

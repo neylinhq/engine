@@ -5,6 +5,8 @@ add_library(world_model STATIC
     src/bounds.cpp
     src/bound_queue.cpp
     src/world.cpp
+    src/materials.cpp
+    src/snapshot.cpp
     src/editing/chunks.cpp
     src/editing/commit.cpp
     src/generation.cpp

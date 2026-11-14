@@ -119,16 +119,79 @@ void external_palette(const std::filesystem::path& directory) {
 
     write_palette("red", "green");
     model::World world;
-    world.replace(storage::load_scene(scene, path), {}, 1);
+    auto source = storage::load_scene(scene, path);
+    world.replace(world.prepare_generation(std::move(source.model), {source.palette}), {}, 1);
     const auto saved = directory / "palette.cvox";
-    storage::save_cvox(saved, world.snapshot());
+    const auto exported = directory / "palette.materials.json";
+    std::vector<std::uint16_t> ids;
+    storage::save_cvox(saved, world.snapshot(&ids));
+    storage::save_materials(exported, world.scene_palette(ids));
+    const model::Vec3i first{0, 0, 0};
+    const model::Vec3i second{18, 16, 3};
+    const auto stored = storage::load_cvox(saved);
+    const auto original = storage::load_cvox(scene);
+    const auto& first_saved = stored.materials[model::voxel_at(stored, first)];
+    const auto& second_saved = stored.materials[model::voxel_at(stored, second)];
+    require(first_saved.name == original.materials[model::voxel_at(original, first)].name &&
+                second_saved.name == original.materials[model::voxel_at(original, second)].name &&
+                first_saved.color_base == model::Vec3{1, 0, 0} &&
+                second_saved.color_base == model::Vec3{0, 1, 0},
+            "CVox did not retain the binding names and effective properties");
     model::World reopened;
-    reopened.replace(storage::load_cvox(saved), {}, 1);
-    const auto& red = reopened.materials()[reopened.at({0, 0, 0})];
-    const auto& green = reopened.materials()[reopened.at({18, 16, 3})];
-    require(red.name == "red" && red.color_base == model::Vec3{1, 0, 0} && green.name == "green" &&
-                green.color_base == model::Vec3{0, 1, 0},
-            "External palette changed on CVox round trip");
+    auto imported = storage::load_scene(saved, exported);
+    reopened.replace(reopened.prepare_generation(std::move(imported.model), {imported.palette}), {},
+                     1);
+    require(reopened.materials()[reopened.at(first)].name == "red" &&
+                reopened.materials()[reopened.at(second)].name == "green",
+            "Reopening the CVox with its external palette lost the display names");
+}
+
+void materials_round_trip(const std::filesystem::path& directory) {
+    using namespace engine::world;
+    const auto path =
+        directory /
+        std::filesystem::path{u8"\u043f\u0430\u043b\u0438\u0442\u0440\u0430.materials.json"};
+    const auto scene = directory / "small.cvox";
+    const std::vector<model::Material> palette{
+        {},
+        {"light", {0.116928, 0.31, 0.89}, {320, 0, 0}, model::MaterialBase::emissive},
+        {"mirror",
+         {1.8, 2.3, 2.9},
+         {0.25, 0.5, 0.75},
+         model::MaterialBase::metallic_rough,
+         model::MaterialLayer::metallic_mirror,
+         0.053F}};
+    storage::save_materials(path, palette);
+    require(storage::load_materials(path, palette.size()) == palette,
+            "Material palette did not round trip");
+    const auto loaded = storage::load_scene(scene, path);
+    require(loaded.palette == palette && model::voxel_at(loaded.model, {0, 0, 0}) == 1 &&
+                model::voxel_at(loaded.model, {18, 16, 3}) == 2,
+            "Exported palette could not be applied to its source scene");
+
+    auto homonyms = palette;
+    homonyms[2].name = homonyms[1].name;
+    storage::save_materials(path, homonyms);
+    require(storage::load_materials(path, homonyms.size()) == homonyms,
+            "Display names in a palette were treated as binding keys");
+
+    auto invalid = homonyms;
+    invalid[2].name = "invalid";
+    invalid[2].name.push_back('\0');
+    bool rejected = false;
+    try {
+        storage::save_materials(path, invalid);
+    } catch (const std::invalid_argument&) {
+        rejected = true;
+    }
+    require(rejected && storage::load_materials(path, homonyms.size()) == homonyms,
+            "Rejected export replaced the existing palette");
+
+    auto revised = palette;
+    revised[1].color_layer.x = 480;
+    storage::save_materials(path, revised);
+    require(storage::load_materials(path, revised.size()) == revised,
+            "Saving a new palette did not replace the existing file");
 }
 
 void reject_lossy_cvox_names(const std::filesystem::path& directory) {
@@ -179,6 +242,7 @@ int main(int argc, char** argv) {
         std::filesystem::create_directories(temporary);
         small_cvox(temporary);
         external_palette(temporary);
+        materials_round_trip(temporary);
         reject_lossy_cvox_names(temporary);
         path_fixture(temporary);
         ascii_path_names(temporary);

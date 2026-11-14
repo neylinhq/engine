@@ -48,7 +48,8 @@ json::object scenario() {
         {"frame":8,"type":"spawn","model":"model.cvox","entity":"two","position":[12,12,12]},
         {"frame":9,"type":"spawn","model":"model.cvox","entity":"three","position":[14,12,12]},
         {"frame":10,"type":"clear_entities"}],
-      "probes":[{"position":[16,16,16],"material":0},{"position":[4,4,4],"material":3}]
+      "probes":[{"position":[16,16,16],"material":0},{"position":[4,4,4],"material":5},
+                {"position":[18,16,16],"material":2}]
     })")
         .as_object();
 }
@@ -60,14 +61,14 @@ void assets(const std::filesystem::path& root) {
         root / "world.cvox",
         model::build_model({32, 32, 32}, palette, {{{1, 1, 1}, 1}, {{2, 1, 1}, 2}}));
     engine::world::storage::save_cvox(root / "model.cvox",
-                                      model::build_model({16, 16, 16}, palette, {{{0, 0, 0}, 2}}));
+                                      model::build_model({16, 16, 16}, palette, {{{0, 0, 0}, 1}}));
     write(root / "world.materials.json",
           R"({"schema":"engine.materials.v1","materials":[
             {"id":2,"name":"green","color_base":[0.1,0.8,0.2],"color_layer":[0,0,0],
              "base":"diffuse","layer":"none","roughness":0},
             {"id":0,"name":"","color_base":[0,0,0],"color_layer":[0,0,0],
              "base":"diffuse","layer":"none","roughness":0},
-            {"id":1,"name":"red","color_base":[0,0,1],"color_layer":[0,0,0],
+            {"id":1,"name":"blue","color_base":[0,0,1],"color_layer":[0,0,0],
              "base":"diffuse","layer":"none","roughness":0}
           ]})");
     write(root / "day.settings.json", R"({"general":{"fov":60,"exposure":2}})");
@@ -82,13 +83,18 @@ void check_result(const std::filesystem::path& directory, std::set<std::uint64_t
     require(coverage.at("recorded_events").to_number<unsigned>() == 11, "Event coverage mismatch");
     require(coverage.at("prepared_entity_types").to_number<unsigned>() == 1,
             "Repeated instances duplicated their entity type");
-    require(coverage.at("validated_probes").to_number<unsigned>() == 2, "Voxel probes not checked");
+    require(coverage.at("validated_probes").to_number<unsigned>() == 3, "Voxel probes not checked");
     require(report.at("validation_errors").to_number<unsigned>() == 0, "Vulkan validation errors");
     const auto& workload = report.at("workload").as_object();
-    const auto& red = workload.at("world_palette").as_array().at(2).as_object();
-    require(red.at("name") == "red" &&
-                red.at("color_base").as_array() == json::array{0.0, 0.0, 1.0},
-            "External palette did not replace the source material");
+    const auto& palette = workload.at("world_palette").as_array();
+    const auto& blue = palette.at(2).as_object();
+    require(blue.at("name") == "blue" &&
+                blue.at("color_base").as_array() == json::array{0.0, 0.0, 1.0},
+            "The external palette did not retain the v1 material ID and properties");
+    const auto& red = palette.at(5).as_object();
+    require(red.at("name") == "red" && red.at("color_base").as_array() ==
+                                           json::array{double{0.8F}, double{0.2F}, double{0.1F}},
+            "The stamped model did not retain its own material under v1 binding");
     const auto& settings = workload.at("settings").as_object().at("general").as_object();
     require(settings.at("exposure").to_number<double>() == 2 &&
                 settings.at("fov").to_number<double>() == 70,
@@ -185,6 +191,42 @@ void path_accumulation(const std::filesystem::path& executable, const std::files
     }
     require(images.front() != images.back(), "Static PathTracer ignored the accumulation limit");
 }
+void same_named_materials(const std::filesystem::path& executable,
+                          const std::filesystem::path& root, std::string_view shaders) {
+    constexpr double kStoneRed = 0.116928;
+    const std::vector<model::Material> input_palette{
+        {}, {"stone", {kStoneRed, 0, 0}}, {"stone", {0, 0, 1}}};
+    engine::world::storage::save_materials(root / "same-name.materials.json", input_palette);
+    auto value = scenario();
+    value["scene"].as_object()["materials"] = "same-name.materials.json";
+    value.erase("events");
+    value["probes"] = json::parse(R"([
+      {"position":[1,1,1],"material":2},
+      {"position":[2,1,1],"material":2}
+    ])");
+    const auto input = root / "same-name.json";
+    const auto output = root / "same-name";
+    write(input, json::serialize(value));
+    require(process::run({executable,
+                          {"measure", "--scenario", process::path_text(input), "--shaders",
+                           std::string(shaders), "--output", process::path_text(output), "--hidden",
+                           "--validation"}}) == 0,
+            "Benchmark changed the ID for a same-named material");
+    const auto report =
+        json::parse(read(output / "summary.json"), {}, {.numbers = json::number_precision::precise})
+            .as_object();
+    require(report.at("coverage").as_object().at("validated_probes").to_number<unsigned>() == 2 &&
+                report.at("validation_errors").to_number<unsigned>() == 0,
+            "Benchmark material probes were not verified");
+    const auto& palette = report.at("workload").as_object().at("world_palette").as_array();
+    require(palette.size() == 3 &&
+                palette.at(2).as_object().at("color_base") == json::array{kStoneRed, 0.0, 0.0},
+            "V1 did not use the first same-named material");
+    const auto result = process::path_text(output);
+    require(process::run({executable, {"compare", "--baseline", result, "--candidate", result}}) ==
+                0,
+            "Benchmark could not verify a round-tripped palette in its own report");
+}
 void run(const std::vector<std::string>& arguments) {
     require(arguments.size() == 4, "Expected executable, shaders and scratch directory");
     const auto executable = process::text_path(arguments[1]);
@@ -224,6 +266,7 @@ void run(const std::vector<std::string>& arguments) {
     comparison_checks(executable, output);
     changed_workload(executable, root);
     path_accumulation(executable, root);
+    same_named_materials(executable, root, arguments[2]);
 }
 int checked(const std::vector<std::string>& arguments) {
     try {

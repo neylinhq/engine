@@ -13,8 +13,11 @@ struct PendingImport {
     std::future<world::model::Model> task;
 };
 struct SceneSource {
-    std::filesystem::path world;
-    std::filesystem::path materials;
+    std::filesystem::path world{};
+    std::filesystem::path materials{};
+    std::vector<std::uint16_t> material_ids{};
+    // Local entry zero has no runtime material when it is reserved for empty space.
+    world::model::Material reserved_material{};
 };
 struct Application {
     Options options;
@@ -50,8 +53,9 @@ struct Application {
 };
 [[nodiscard]] int run(Options options);
 void initialize(Application& app);
-void generate_world(Application& app, world::model::Model source, world::model::Vec3i requested,
-                    int segment_groups);
+void generate_world(Application& app, SceneSource scene, world::model::Model source,
+                    world::model::Vec3i requested, int segment_groups,
+                    std::span<const world::model::Material> palette = {});
 void frame(Application& app, double seconds);
 void copy_frame_context(Application& app, const rendering::vulkan::FrameInput& input,
                         const rendering::vulkan::FrameSampling& sampling);
@@ -66,6 +70,8 @@ void reset_camera(Application& app);
 void reframe_camera(Application& app);
 void load_settings(Application& app);
 void save_settings(const Application& app, const std::filesystem::path& path);
+void load_materials(Application& app, const std::filesystem::path& path);
+void save_materials(const Application& app, const std::filesystem::path& path);
 void load_path(Application& app, const std::filesystem::path& path);
 void save_path(const Application& app, const std::filesystem::path& path);
 } // namespace engine::app::sandbox

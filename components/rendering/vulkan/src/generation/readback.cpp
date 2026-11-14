@@ -159,6 +159,7 @@ GenerationResult generation_readback(GenerationState& state) {
     result.model.size = state.dimensions;
     result.model.materials = state.source.materials;
     result.model.material_context = state.source.material_context;
+    result.model.material_layout = state.source.material_layout;
     result.actual_size = state.requested;
     result.logical_voxels = state.counts[0];
     result.block_words = state.counts[1];

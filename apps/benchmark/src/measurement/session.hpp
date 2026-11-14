@@ -87,7 +87,9 @@ void apply_events(Session& session, FrameSample& sample);
 void collect_gpu(Measurements& result, const rendering::vulkan::Statistics& statistics);
 void observe_memory(Session& session, std::string_view phase, std::optional<unsigned> frame = {});
 void identify(Session& session);
-[[nodiscard]] json::object model_identity(const world::model::Model& model);
+[[nodiscard]] json::object
+model_identity(const world::model::Model& model,
+               std::span<const world::model::Material> override_palette = {});
 void finish_report(Session& session);
 void verify_probes(const Session& session);
 } // namespace engine::app::benchmark

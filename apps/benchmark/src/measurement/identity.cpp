@@ -123,10 +123,13 @@ json::object contract(const Session& session) {
             {"events", event_contract(session)}};
 }
 } // namespace
-json::object model_identity(const world::model::Model& model) {
+json::object model_identity(const world::model::Model& model,
+                            std::span<const world::model::Material> override_palette) {
     json::object result{
         {"size", json::array{model.size.x, model.size.y, model.size.z}},
-        {"palette", palette(model.materials)},
+        {"palette",
+         palette(override_palette.empty() ? std::span<const world::model::Material>(model.materials)
+                                          : override_palette)},
         {"word_endian", std::endian::native == std::endian::little ? "little" : "big"},
         {"chunks_sha256", platform::process::sha256(std::as_bytes(std::span(model.chunks)))},
         {"blocks_sha256", platform::process::sha256(std::as_bytes(std::span(model.blocks)))},

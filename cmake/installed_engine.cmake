@@ -10,6 +10,11 @@ foreach(notice IN ITEMS LICENSE box3d.txt qsort.txt)
     endif()
 endforeach()
 
+file(READ "${prefix}/README.md" readme)
+if(NOT readme MATCHES "docs/world_storage\\.md" OR NOT EXISTS "${prefix}/docs/world_storage.md")
+    message(FATAL_ERROR "Missing installed material palette documentation")
+endif()
+
 file(READ "${prefix}/bin/shaders/programs.json" manifest)
 string(JSON program_count LENGTH "${manifest}" programs)
 if(program_count EQUAL 0)

@@ -73,21 +73,20 @@ void filling() {
 
 void stamping() {
     auto world = empty_world();
-    model::Material existing;
-    existing.name = "red";
-    existing.color_base = {1, 0, 0};
-    world.set_material(1, existing);
+    const model::Material existing{"red", {1, 0, 0}};
+    const auto red = world.add_material(existing);
     auto source = model::build_model({3, 2, 1}, {{}, existing}, {{{0, 0, 0}, 1}, {{2, 1, 0}, 1}});
     const auto index = world.add_model(std::move(source));
-    require(world.materials().size() == 5, "Named material not shared or original dummy omitted");
+    require(model::voxel_at(world.models()[index], {}) == red && world.materials()[red] == existing,
+            "Named material did not reuse the registered ID");
     world.set({16, 16, 16}, 2);
     world.commit_edits();
     editing::stamp_model(world, world.models()[index], {15, 16, 16});
-    require(world.at({15, 16, 16}) == 1 && world.at({17, 17, 16}) == 1 &&
+    require(world.at({15, 16, 16}) == red && world.at({17, 17, 16}) == red &&
                 world.at({16, 16, 16}) == 2,
             "Stamp origin, palette remapping or empty-voxel preservation incorrect");
     editing::stamp_model(world, world.models()[index], {-2, 4, 4});
-    require(world.at({0, 5, 4}) == 1, "Stamp clipping at world edge is incorrect");
+    require(world.at({0, 5, 4}) == red, "Stamp clipping at world edge is incorrect");
     const auto revision = world.view().revision;
     editing::stamp_model(world, world.models()[index], {std::numeric_limits<int>::max(), 0, 0});
     editing::stamp_model(world, world.models()[index], {std::numeric_limits<int>::min(), 0, 0});

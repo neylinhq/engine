@@ -28,7 +28,7 @@ Material stone() {
 GeneratedWorld generated(World& world) {
     Model model;
     model.size = {64, 64, 64};
-    model.materials = {{}, stone()};
+    model.materials = {{}, {}, stone()};
     model.chunks.resize(64);
     model.blocks.resize(192);
     model.voxels.resize(64);
@@ -36,7 +36,7 @@ GeneratedWorld generated(World& world) {
     model.chunks[1] = 0x80000080U;
     model.blocks[64] = 0x80000020U;
     model.blocks[128] = 0x80000020U;
-    model.voxels[42] = 0x80010000U;
+    model.voxels[42] = 0x80020000U;
     return {world.prepare_generation(std::move(model)),
             {32, 16, 16},
             {{32, 2, 407000451U}},
@@ -206,11 +206,12 @@ void test_entities() {
 void test_add_before_release() {
     World world;
     auto data = generated(world);
+    const auto stone = voxel_at(data.model, {1, 1, 1});
     data.model.chunks[1] = 0;
     data.hash.front()[1] = 1;
     data.model.blocks[65] = 0x80000040U;
     data.model.voxels.resize(96);
-    data.model.voxels[64] = 0x8002U;
+    data.model.voxels[64] = 0x8000U | stone;
     data.hash.push_back({64, 1, 1250000831U});
     data.logical_voxels = 192;
     data.compression = 1;

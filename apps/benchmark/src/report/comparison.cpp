@@ -6,7 +6,10 @@
 namespace engine::app::benchmark {
 namespace {
 json::object checked_report(const std::filesystem::path& directory) {
-    auto report = json::parse(read_text(directory / "summary.json")).as_object();
+    // Workload numbers must round-trip before the fingerprint is verified.
+    auto report = json::parse(read_text(directory / "summary.json"), {},
+                              {.numbers = json::number_precision::precise})
+                      .as_object();
     if (report.at("schema") != "engine.benchmark.run.v1" || report.at("status") != "complete" ||
         report.at("validation_errors").to_number<unsigned>() != 0) {
         throw std::invalid_argument("Only complete, error-free benchmark reports can be compared");

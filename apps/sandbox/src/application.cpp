@@ -269,9 +269,10 @@ void reframe_camera(Application& app) {
 }
 void initialize(Application& app) {
     load_settings(app);
-    auto source = app.options.scene.empty()
-                      ? world::model::build_model({256, 256, 256}, {world::model::Material{}}, {})
-                      : world::storage::load_scene(app.options.scene, app.options.materials);
+    auto source =
+        app.options.scene.empty()
+            ? world::storage::SceneSource{world::model::build_model({256, 256, 256}, {{}}, {}), {}}
+            : world::storage::load_scene(app.options.scene, app.options.materials);
     auto window = platform::window::Window::create(
         {app.options.width, app.options.height, "Sandbox", !app.options.hidden});
     if (!window) {
@@ -289,8 +290,8 @@ void initialize(Application& app) {
         throw std::runtime_error(renderer.error());
     }
     app.renderer = std::make_unique<rendering::vulkan::Renderer>(std::move(*renderer));
-    generate_world(app, std::move(source), {}, 4);
-    app.scene_source = {app.options.scene, app.options.materials};
+    generate_world(app, {.world = app.options.scene, .materials = app.options.materials},
+                   std::move(source.model), {}, 4, source.palette);
     reset_camera(app);
     app.ui = std::make_unique<gui::frontend::Frontend>(*app.window);
     update_metrics(app);

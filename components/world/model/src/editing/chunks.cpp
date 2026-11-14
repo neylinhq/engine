@@ -34,7 +34,9 @@ void World::adopt_chunk_voxels(Vec3i chunk, std::unique_ptr<DenseChunk> voxels) 
     if (!inside(chunk, dimensions)) {
         throw std::out_of_range("Chunk is outside the world");
     }
-    if (!voxels || std::ranges::max(*voxels) >= state_->model.materials.size()) {
+    const auto invalid = [this](std::uint16_t id) { return !state_->has_material(id); };
+    if (!voxels || (std::ranges::max(*voxels) >= state_->first_vacant_material &&
+                    std::ranges::any_of(*voxels, invalid))) {
         throw std::runtime_error("Selected material is outside palette");
     }
     auto& destination = state_->edits[flatten(chunk, dimensions)];
@@ -46,7 +48,7 @@ void World::fill_chunk(Vec3i chunk, std::uint16_t material) {
     if (!inside(chunk, dimensions)) {
         throw std::out_of_range("Chunk is outside the world");
     }
-    if (material >= state_->model.materials.size()) {
+    if (!has_material(material)) {
         throw std::runtime_error("Selected material is outside palette");
     }
     const auto index = flatten(chunk, dimensions);

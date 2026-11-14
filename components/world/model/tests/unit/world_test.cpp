@@ -1,8 +1,10 @@
 #include <engine/world/model/world.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <random>
 #include <stdexcept>
 
@@ -148,13 +150,13 @@ void test_generation() {
     auto small = engine::world::model::build_model({2, 2, 2}, {{}, {}}, {{{1, 1, 1}, 1}});
     World world;
     world.replace(std::move(small), {35, 35, 35}, 1);
-    require(world.at({1, 1, 1}) == 2 && world.at({17, 1, 17}) == 2 && world.at({33, 1, 33}) == 2,
+    require(world.at({1, 1, 1}) == 1 && world.at({17, 1, 17}) == 1 && world.at({33, 1, 33}) == 1,
             "Model does not tile horizontally with chunk-aligned period");
     require(world.at({1, 17, 1}) == 0 && world.at({49, 1, 1}) == 0,
             "Model repeats vertically or extends beyond actual world dimensions");
     world.set({1, 1, 1}, 0);
     world.commit_edits();
-    require(world.at({17, 1, 17}) == 2, "Tiled chunks share mutable block slots");
+    require(world.at({17, 1, 17}) == 1, "Tiled chunks share mutable block slots");
     auto full = engine::world::model::build_model({2, 2, 2}, {{}, {}}, {{{1, 1, 1}, 1}});
     world.replace(std::move(full), {17, 35, 35}, 1);
     require(world.at({17, 1, 1}) == 0, "Partial final world chunk was not clipped");
@@ -175,22 +177,190 @@ void test_library_persistence() {
     static_cast<void>(world.spawn_entity(type, {10, 10, 10}));
     red.color_base = {0, 1, 0};
     world.replace(engine::world::model::build_model({4, 4, 4}, {{}, red}, {{{2, 2, 2}, 1}}), {}, 1);
-    require(world.models().size() == 1 && world.materials().size() == 6,
-            "World replacement discarded imported library or global materials");
-    require(world.at({2, 2, 2}) == 2 && world.materials()[2].color_base == Vec3{1, 0, 0},
-            "Named material was not reused with original global properties");
-    require(world.materials()[1].name == "_0" && world.materials()[3].name == "_1" &&
-                world.materials()[5].name == "_2",
-            "Original anonymous material counter differs");
+    const auto blue_id = engine::world::model::voxel_at(world.models()[imported], {});
+    const auto red_id = world.at({2, 2, 2});
+    require(world.models().size() == 1 && world.materials()[blue_id] == blue,
+            "World replacement discarded the model library or its material");
+    require(red_id != blue_id && world.materials()[red_id] == red,
+            "World replacement did not use the new scene material");
     require(world.entity_types().empty() && world.entities().empty(),
             "World replacement preserved entities that belong to previous world");
     world.replace(world.models()[imported], {}, 1);
-    require(world.materials().size() == 6 && world.at({0, 0, 0}) == 4,
-            "Already registered model was registered a second time");
+    require(world.at({0, 0, 0}) == blue_id && world.materials()[blue_id] == blue,
+            "Replacing the scene with a registered model changed its material ID");
     const auto snapshot = world.snapshot();
     require(snapshot.materials.size() == 2 && snapshot.material_context == 0 &&
                 engine::world::model::voxel_at(snapshot, {0, 0, 0}) == 1,
             "Saved world did not compact original used palette to local indices");
+}
+
+void test_scene_material_ids() {
+    using namespace engine::world::model;
+    World world;
+    const auto green = world.add_material({"green", {0, 1, 0}});
+    const std::vector<Sample> samples{{{0, 0, 0}, 1}, {{1, 1, 1}, 2}};
+    auto source = build_model({2, 2, 2}, {{}, {"red", {1, 0, 0}}, {"green"}}, samples);
+    std::vector<std::uint16_t> ids;
+    const auto before = world.view().material_revision;
+    auto mapped = world.prepare_generation(std::move(source), {}, &ids);
+    require(ids.size() == 3 && ids[1] != green && ids[2] == green &&
+                world.view().material_revision == before && !world.has_material(ids[1]),
+            "Scene preparation did not retain library IDs or changed the active palette");
+    const auto red = ids[1];
+    world.replace(std::move(mapped), {}, 1);
+    require(world.at(samples[0].position) == red && world.at(samples[1].position) == green &&
+                world.has_material(red) && world.has_material(green) &&
+                world.materials()[red].name == "red" && world.materials()[green].name == "green",
+            "CPU replacement lost the prepared palette");
+
+    const auto snapshot = world.snapshot(&ids);
+    validate(snapshot);
+    require(ids == std::vector<std::uint16_t>{0, green, red} &&
+                ids[voxel_at(snapshot, samples[0].position)] == red &&
+                ids[voxel_at(snapshot, samples[1].position)] == green,
+            "Saved palette IDs did not match the compacted voxel indices");
+}
+
+void test_snapshot_shared_blocks() {
+    using namespace engine::world::model;
+    constexpr Vec3i first{1, 1, 1};
+    constexpr Vec3i second{17, 1, 1};
+    World world;
+    world.replace(build_model({32, 16, 16}, {{}, {"stone"}, {"removed"}},
+                              {{first, 1}, {second, 1}, {{24, 2, 2}, 2}}),
+                  {}, 1);
+    world.set({24, 2, 2}, 0);
+    world.commit_edits();
+    const auto snapshot = world.snapshot();
+    validate(snapshot);
+    require(snapshot.materials.size() == 2 && voxel_at(snapshot, first) == 1 &&
+                voxel_at(snapshot, second) == 1,
+            "Snapshot dropped a reachable voxel or retained an erased material");
+    World reopened;
+    reopened.replace(snapshot, {}, 1);
+    reopened.set(first, 0);
+    reopened.commit_edits();
+    require(reopened.at(first) == 0 && reopened.at(second) == 1,
+            "Editing a reopened chunk changed another chunk");
+}
+
+void test_palette_capacity() {
+    using namespace engine::world::model;
+    constexpr std::uint16_t last = 32767;
+    std::vector<Material> palette(last + 1, {"stone", {1, 0, 0}});
+    palette.front() = {};
+    palette.back().color_base = {0, 0, 1};
+    const auto source =
+        build_model({16, 16, 16}, std::move(palette), {{{1, 1, 1}, 1}, {{2, 1, 1}, last}});
+    World world;
+    world.replace(source, {}, 1);
+    require(world.materials().size() == last + 1 && world.at({1, 1, 1}) == 1 &&
+                world.at({2, 1, 1}) == last && world.materials()[last].color_base == Vec3{0, 0, 1},
+            "A full scene palette lost a material or consumed an extra ID");
+
+    World library;
+    const auto imported = library.add_model(source);
+    const auto& model = library.models()[imported];
+    require(voxel_at(model, {1, 1, 1}) == 1 && voxel_at(model, {2, 1, 1}) == last &&
+                library.materials()[last].color_base == Vec3{0, 0, 1},
+            "A full model palette merged entries or consumed an extra ID");
+}
+
+void test_legacy_zero() {
+    using namespace engine::world::model;
+    Model legacy;
+    legacy.size = {16, 16, 16};
+    legacy.materials = {{"stone", {1, 0, 0}}};
+    legacy.chunks = {0x40000000U};
+    World world;
+    world.replace(legacy, {}, 1);
+    const auto stone = world.at({1, 1, 1});
+    require(stone != 0 && world.materials()[stone] == legacy.materials[0],
+            "An occupied legacy local ID zero was mapped to empty space");
+}
+
+void test_edit_with_vacant_material_ids() {
+    using namespace engine::world::model;
+    World world;
+    world.replace(build_model({16, 16, 16}, {{}, {"stone"}, {"grass"}}, {}), {}, 1);
+    const auto retained = world.add_material({"library"});
+    world.replace(build_model({16, 16, 16}, {{}, {"water"}}, {}), {}, 1);
+
+    std::array<std::uint16_t, 4096> voxels{};
+    voxels[0] = retained;
+    voxels[1] = 2;
+    require(!world.has_material(2) && world.has_material(retained),
+            "Fixture requires a vacant ID below a retained one");
+    bool rejected = false;
+    try {
+        world.set_chunk_voxels({}, voxels);
+    } catch (const std::runtime_error&) {
+        rejected = true;
+    }
+    require(rejected && world.at({}) == 0, "Bulk edit accepted a vacant material ID");
+
+    voxels[1] = 0;
+    world.set_chunk_voxels({}, voxels);
+    world.commit_edits();
+    require(world.at({}) == retained, "Bulk edit rejected a registered ID above a vacant one");
+    const auto reused = world.add_material({"paint"});
+    require(reused == 2, "New material did not reuse the vacant ID");
+    voxels[1] = reused;
+    world.set_chunk_voxels({}, voxels);
+    world.commit_edits();
+    require(world.at({1, 0, 0}) == reused, "Bulk edit did not accept the reused material ID");
+}
+
+void test_stale_material_layout() {
+    using namespace engine::world::model;
+    World world;
+    world.replace(build_model({16, 16, 16}, {{}, {"stone"}}, {{{1, 1, 1}, 1}}), {}, 1);
+    const auto prepared =
+        world.prepare_generation(build_model({16, 16, 16}, {{}, {"grass"}}, {{{2, 2, 2}, 1}}));
+    const auto stone = world.at({1, 1, 1});
+    const auto library = world.add_material({"library"});
+    bool rejected = false;
+    try {
+        world.replace(prepared, {}, 1);
+    } catch (const std::invalid_argument&) {
+        rejected = true;
+    }
+    require(rejected && world.at({1, 1, 1}) == stone && world.at({2, 2, 2}) == 0 &&
+                world.materials()[library].name == "library",
+            "Stale preparation replaced the scene after a registry change");
+}
+
+void test_material_updates() {
+    using namespace engine::world::model;
+    World world;
+    const auto first = world.add_material({"red", {1, 0, 0}});
+    const auto second = world.add_material({"green", {0, 1, 0}});
+    std::array<MaterialUpdate, 2> updates{
+        {{first, {"green", {0, 0, 1}}}, {second, {"red", {1, 1, 0}}}}};
+    const auto before = world.view();
+    require(world.set_scene_materials(updates), "Valid palette did not update the registry");
+    const auto after = world.view();
+    require(after.material_revision == before.material_revision + 1 &&
+                after.geometry_revision == before.geometry_revision &&
+                after.chunk_revision == before.chunk_revision &&
+                world.materials()[first] == updates[0].material &&
+                world.materials()[second] == updates[1].material,
+            "Palette update did not commit both entries without touching geometry");
+    require(!world.set_scene_materials(updates), "Reapplying a palette changed the registry");
+
+    const auto packed = after.materials[first];
+    updates[0].material.color_base = {0, 1, 1};
+    updates[1].material.roughness = std::numeric_limits<float>::infinity();
+    bool rejected = false;
+    try {
+        static_cast<void>(world.set_scene_materials(updates));
+    } catch (const std::runtime_error&) {
+        rejected = true;
+    }
+    require(rejected && world.materials()[first].color_base == Vec3{0, 0, 1} &&
+                world.view().materials[first] == packed &&
+                world.view().material_revision == after.material_revision,
+            "Invalid palette left a partial update");
 }
 
 std::vector<unsigned> occupancy_prefix(const World& world, Vec3i dimensions) {
@@ -307,7 +477,7 @@ int main() {
         World world;
         world.replace(std::move(model), {}, 1);
         for (const auto& point : points) {
-            require(world.at(point.position) == 2,
+            require(world.at(point.position) == 1,
                     "Packed model lost voxel during global registration");
         }
         test_trace(world, points);
@@ -317,6 +487,13 @@ int main() {
         test_material_rename();
         test_generation();
         test_library_persistence();
+        test_scene_material_ids();
+        test_snapshot_shared_blocks();
+        test_palette_capacity();
+        test_legacy_zero();
+        test_edit_with_vacant_material_ids();
+        test_stale_material_layout();
+        test_material_updates();
         test_dynamic_bounds();
         std::cout << "World: 1000 independent nearest-hit comparisons; edits and entities passed\n";
     } catch (const std::exception& error) {
